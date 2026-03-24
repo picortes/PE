@@ -1,0 +1,512 @@
+/* loginModal.css - Estilos para el Modal de Login Universal */
+/* ================================================================ */
+
+/* --- OVERLAY PRINCIPAL --- */
+.login-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(3px);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.login-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* --- CONTENEDOR DEL MODAL --- */
+.login-modal-container {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 440px;
+  max-height: 90vh;
+  overflow-y: auto;
+  transform: scale(0.9) translateY(20px);
+  transition: transform 0.3s ease;
+  position: relative;
+}
+
+.login-modal-overlay.active .login-modal-container {
+  transform: scale(1) translateY(0);
+}
+
+/* --- HEADER DEL MODAL --- */
+.login-modal-header {
+  background: linear-gradient(135deg, #005baa 0%, #0066cc 100%);
+  color: white;
+  padding: 24px;
+  border-radius: 16px 16px 0 0;
+  text-align: center;
+  position: relative;
+}
+
+.login-modal-header h2 {
+  margin: 0 0 8px 0;
+  font-size: 1.4em;
+  font-weight: 600;
+}
+
+.login-modal-header p {
+  margin: 0;
+  opacity: 0.9;
+  font-size: 0.95em;
+}
+
+/* --- FORMULARIO --- */
+.login-modal-form {
+  padding: 32px 24px 24px 24px;
+}
+
+.login-modal-field {
+  margin-bottom: 20px;
+}
+
+.login-modal-label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+  color: #333;
+  font-size: 0.95em;
+}
+
+.login-modal-input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e1e5e9;
+  border-radius: 8px;
+  font-size: 1em;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  box-sizing: border-box;
+}
+
+.login-modal-input:focus {
+  outline: none;
+  border-color: #005baa;
+  box-shadow: 0 0 0 3px rgba(0, 91, 170, 0.1);
+}
+
+.login-modal-input.error {
+  border-color: #dc3545;
+  background-color: #fff5f5;
+}
+
+.login-modal-input.error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+/* --- MENSAJES --- */
+.login-modal-message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  font-size: 0.9em;
+  font-weight: 500;
+  display: none;
+  text-align: center;
+}
+
+.login-modal-message.error {
+  background-color: #fff5f5;
+  color: #dc3545;
+  border: 1px solid #f5c6cb;
+}
+
+.login-modal-message.success {
+  background-color: #f8fff8;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.login-modal-message.warning {
+  background-color: #fffbf0;
+  color: #856404;
+  border: 1px solid #ffeaa7;
+}
+
+.login-modal-message.info {
+  background-color: #f0f8ff;
+  color: #004085;
+  border: 1px solid #b3d7ff;
+}
+
+/* --- BOTONES --- */
+.login-modal-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-modal-btn-primary,
+.login-modal-btn-secondary {
+  padding: 14px 24px;
+  border-radius: 8px;
+  border: none;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.login-modal-btn-primary {
+  background: linear-gradient(135deg, #005baa 0%, #0066cc 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 91, 170, 0.3);
+}
+
+.login-modal-btn-primary:hover:not(:disabled) {
+  background: linear-gradient(135deg, #004488 0%, #0055aa 100%);
+  box-shadow: 0 4px 12px rgba(0, 91, 170, 0.4);
+  transform: translateY(-1px);
+}
+
+.login-modal-btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.login-modal-btn-secondary {
+  background: #f8f9fa;
+  color: #6c757d;
+  border: 2px solid #e9ecef;
+}
+
+.login-modal-btn-secondary:hover {
+  background: #e9ecef;
+  color: #495057;
+  border-color: #dee2e6;
+}
+
+/* --- SPINNER DE CARGA --- */
+.login-modal-spinner {
+  display: inline-block;
+  animation: spin 1s linear infinite;
+  font-size: 1.2em;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* --- FOOTER --- */
+.login-modal-footer {
+  padding: 16px 24px 24px 24px;
+  text-align: center;
+  border-top: 1px solid #f1f3f4;
+  background-color: #fafbfc;
+  border-radius: 0 0 16px 16px;
+}
+
+.login-modal-footer small {
+  color: #6c757d;
+  font-size: 0.85em;
+  line-height: 1.4;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 480px) {
+  .login-modal-container {
+    width: 95%;
+    margin: 20px;
+  }
+  
+  .login-modal-form {
+    padding: 24px 20px 20px 20px;
+  }
+  
+  .login-modal-header {
+    padding: 20px;
+  }
+  
+  .login-modal-buttons {
+    gap: 10px;
+  }
+  
+  .login-modal-btn-primary,
+  .login-modal-btn-secondary {
+    padding: 12px 20px;
+    font-size: 0.95em;
+  }
+}
+
+/* --- ANIMACIONES ADICIONALES --- */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+.login-modal-input.error {
+  animation: shake 0.4s ease-in-out;
+}
+
+/* --- ACCESIBILIDAD --- */
+.login-modal-overlay:focus-within .login-modal-container {
+  outline: 2px solid #005baa;
+  outline-offset: 2px;
+}
+
+/* --- TEMA OSCURO (OPCIONAL) --- */
+@media (prefers-color-scheme: dark) {
+  .login-modal-container {
+    background: #2d3748;
+    color: #e2e8f0;
+  }
+  
+  .login-modal-input {
+    background: #4a5568;
+    border-color: #4a5568;
+    color: #e2e8f0;
+  }
+  
+  .login-modal-input:focus {
+    border-color: #63b3ed;
+  }
+  
+  .login-modal-label {
+    color: #e2e8f0;
+  }
+  
+  .login-modal-btn-secondary {
+    background: #4a5568;
+    color: #e2e8f0;
+    border-color: #4a5568;
+  }
+  
+  .login-modal-btn-secondary:hover {
+    background: #2d3748;
+    border-color: #2d3748;
+  }
+  
+  .login-modal-footer {
+    background-color: #1a202c;
+    border-color: #4a5568;
+  }
+}
+
+/* ================================================================ */
+/* --- WIDGET DE USUARIO (POSICIÓN ESTÁNDAR INFERIOR DERECHA) --- */
+/* ================================================================ */
+
+/* Widget de usuario - posicionado por defecto en esquina inferior derecha */
+.user-session-widget,
+#userSessionWidget {
+  position: fixed !important;
+  top: auto !important;
+  bottom: 15px !important;
+  right: 15px !important;
+  left: auto !important;
+  z-index: 10001 !important;
+  max-width: 280px !important;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.25) !important;
+  width: auto !important;
+  transform: none !important;
+  background: linear-gradient(135deg, #0d40afff 0%, #063c68ff 100%) !important;
+  border-radius: 25px !important;
+  padding: 10px 16px !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  animation: slideInFromRight 0.3s ease-out !important;
+  display: none;
+  align-items: center !important;
+  gap: 8px !important;
+  min-height: 40px !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+/* Variante integrada en cabecera (skill emesa-web-header) */
+.user-session-widget.hosted,
+#userSessionWidget.hosted {
+  position: static !important;
+  top: auto !important;
+  bottom: auto !important;
+  right: auto !important;
+  left: auto !important;
+  z-index: auto !important;
+  display: none;
+  padding: 6px 6px 6px 12px !important;
+  border-radius: 18px !important;
+  box-shadow: none !important;
+  animation: none !important;
+  background: rgba(255,255,255,0.18) !important;
+  backdrop-filter: blur(6px) !important;
+  max-width: 320px !important;
+  min-height: auto !important;
+}
+
+/* Estilo adicional para la clase interna */
+.user-session-widget .user-info,
+#userSessionWidget .user-info {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  color: white !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.user-session-widget .user-icon,
+#userSessionWidget .user-icon {
+  font-size: 18px !important;
+  min-width: 18px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.user-session-widget .user-name,
+#userSessionWidget .user-name {
+  max-width: 120px !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-weight: 600 !important;
+}
+
+.user-session-widget .logout-btn,
+#userSessionWidget .logout-btn {
+  background: rgba(255, 255, 255, 0.25) !important;
+  border: none !important;
+  border-radius: 12px !important;
+  color: white !important;
+  cursor: pointer !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 5px 10px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  transition: all 0.2s ease !important;
+  white-space: nowrap !important;
+  margin-left: auto !important;
+}
+
+.user-session-widget .logout-btn:hover,
+#userSessionWidget .logout-btn:hover {
+  background: rgba(255, 255, 255, 0.35) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2) !important;
+}
+
+.user-session-widget .logout-btn:active,
+#userSessionWidget .logout-btn:active {
+  transform: translateY(0) !important;
+}
+
+.user-session-widget .logout-icon,
+#userSessionWidget .logout-icon {
+  font-size: 14px !important;
+}
+
+/* Animación de entrada desde la derecha */
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* --- RESPONSIVE PARA EL WIDGET DE USUARIO --- */
+@media (max-width: 768px) {
+  .user-session-widget,
+  #userSessionWidget {
+    bottom: 10px !important;
+    right: 10px !important;
+    padding: 8px 12px !important;
+    min-height: 36px !important;
+    max-width: 90vw !important;
+  }
+
+  .user-session-widget.hosted,
+  #userSessionWidget.hosted {
+    bottom: auto !important;
+    right: auto !important;
+    max-width: min(70vw, 280px) !important;
+  }
+  
+  .user-session-widget .user-info,
+  #userSessionWidget .user-info {
+    font-size: 12px !important;
+    gap: 6px !important;
+  }
+  
+  .user-session-widget .user-icon,
+  #userSessionWidget .user-icon {
+    font-size: 16px !important;
+  }
+  
+  .user-session-widget .user-name,
+  #userSessionWidget .user-name {
+    max-width: 80px !important;
+  }
+  
+  .user-session-widget .logout-btn,
+  #userSessionWidget .logout-btn {
+    padding: 4px 8px !important;
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-session-widget,
+  #userSessionWidget {
+    bottom: 8px !important;
+    right: 8px !important;
+    padding: 6px 10px !important;
+    min-height: 32px !important;
+    max-width: calc(100vw - 20px) !important;
+  }
+
+  .user-session-widget.hosted,
+  #userSessionWidget.hosted {
+    bottom: auto !important;
+    right: auto !important;
+    max-width: min(64vw, 240px) !important;
+    padding: 4px 6px 4px 10px !important;
+  }
+  
+  .user-session-widget .user-info,
+  #userSessionWidget .user-info {
+    font-size: 11px !important;
+    gap: 4px !important;
+  }
+  
+  .user-session-widget .user-icon,
+  #userSessionWidget .user-icon {
+    font-size: 14px !important;
+    min-width: 14px !important;
+  }
+  
+  .user-session-widget .user-name,
+  #userSessionWidget .user-name {
+    max-width: 60px !important;
+  }
+  
+  .user-session-widget .logout-btn,
+  #userSessionWidget .logout-btn {
+    padding: 3px 6px !important;
+    font-size: 10px !important;
+  }
+}

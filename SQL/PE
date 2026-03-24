@@ -1,0 +1,122 @@
+Tipo	Tabla/Vista	Columna	Tipo de Dato	Longitud	Nulos
+BASE TABLE	Cargas	ID_Carga	int		NO
+BASE TABLE	Cargas	ID_Proveedor_Destino	int		NO
+BASE TABLE	Cargas	ID_Proveedor_Transportista	int		NO
+BASE TABLE	Cargas	ID_Envío	int		NO
+BASE TABLE	Cargas	Fecha	datetime		YES
+BASE TABLE	Cargas	Origen	nvarchar	300	NO
+BASE TABLE	Cargas	ID_Mercancia	int		NO
+BASE TABLE	Cargas	Código_Mercancia	nvarchar	50	NO
+BASE TABLE	Cargas	Descripción_Mercancia	nvarchar	500	YES
+BASE TABLE	Cargas	Peso_KG	decimal		YES
+BASE TABLE	Cargas	Matrícula_Vehículo	nvarchar	20	NO
+BASE TABLE	Cargas	Matrícula_Remolque	nvarchar	20	YES
+BASE TABLE	Cargas	Fecha_Creacion	datetime		YES
+BASE TABLE	Cargas	Fecha_Actualización	datetime		YES
+BASE TABLE	Cargas	Activo	bit		YES
+BASE TABLE	Columnas_Puesto	ID_ColumnaPuesto	int		NO
+BASE TABLE	Columnas_Puesto	ID_Puesto	int		NO
+BASE TABLE	Columnas_Puesto	Columna	nvarchar	100	NO
+BASE TABLE	Columnas_Puesto	Nombre_Columna	nvarchar	150	YES
+BASE TABLE	Columnas_Puesto	Orden_Columna	int		YES
+BASE TABLE	Controles	Id_Control	int		NO
+BASE TABLE	Controles	ID_Puesto	int		YES
+BASE TABLE	Controles	PuntoInspección	nvarchar	150	NO
+BASE TABLE	Controles	Proceso	nvarchar	100	NO
+BASE TABLE	Controles	CaracInspeccion	nvarchar	150	YES
+BASE TABLE	Controles	TipoReg	nvarchar	50	YES
+BASE TABLE	Controles	DescripcionControl	nvarchar	255	YES
+BASE TABLE	Controles	Metodo	nvarchar	100	YES
+BASE TABLE	Controles	Ruta_foto_mostrar	nvarchar	255	YES
+BASE TABLE	Controles	VisiblePDF	bit		NO
+BASE TABLE	Controles_OLD	Id_Control	int		NO
+BASE TABLE	Controles_OLD	Puesto	nvarchar	100	NO
+BASE TABLE	Controles_OLD	PuntoInspección	nvarchar	150	NO
+BASE TABLE	Controles_OLD	Proceso	nvarchar	100	NO
+BASE TABLE	Controles_OLD	CaracInspeccion	nvarchar	150	YES
+BASE TABLE	Controles_OLD	TipoReg	nvarchar	50	YES
+BASE TABLE	Controles_OLD	DescripcionControl	nvarchar	255	YES
+BASE TABLE	Controles_OLD	Metodo	nvarchar	100	YES
+BASE TABLE	Controles_OLD	Ruta_foto_mostrar	nvarchar	255	YES
+BASE TABLE	Controles_OLD	VisiblePDF	bit		NO
+BASE TABLE	Controles_OLD	ID_Puesto	int		YES
+BASE TABLE	DatosUser	ID_Pedido	int		NO
+BASE TABLE	DatosUser	ID_Control	int		NO
+BASE TABLE	DatosUser	Resultado	varchar	100	YES
+BASE TABLE	DatosUser	Comentario	nvarchar	500	YES
+BASE TABLE	DatosUser	Resultado_txt	nvarchar	255	YES
+BASE TABLE	DatosUser	User	varchar	100	YES
+BASE TABLE	DatosUser	FechaRegistro	datetime		NO
+BASE TABLE	Envíos	ID_Envío	int		NO
+BASE TABLE	Envíos	Matrícula_Vehículo	nvarchar	20	NO
+BASE TABLE	Envíos	Matrícula_Remolque	nvarchar	20	YES
+BASE TABLE	Envíos	Fecha_Creacion	datetime		YES
+BASE TABLE	Envíos	Activo	bit		YES
+BASE TABLE	Pauta_Referencias	ID_Referencia	int		NO
+BASE TABLE	Pauta_Referencias	ID_Pauta	int		NO
+BASE TABLE	Pauta_Referencias	Referencia	nvarchar	255	NO
+BASE TABLE	Pauta_Referencias	Fecha_creacion	datetime2		YES
+BASE TABLE	Pauta_Referencias	Fecha_modificacion	datetime2		YES
+BASE TABLE	Pautas	ID_Pauta	int		NO
+BASE TABLE	Pautas	Nombre_Pauta	nvarchar	200	NO
+BASE TABLE	Pautas	ID_Control	int		NO
+BASE TABLE	Pautas	Fecha_creacion	datetime		NO
+BASE TABLE	Pautas	Fecha_modificacion	datetime		YES
+BASE TABLE	Pautas	Orden_Pauta	int		YES
+BASE TABLE	Pautas	Activo	bit		NO
+BASE TABLE	pedido	ID_Pedido	int		NO
+BASE TABLE	pedido	Armario	nvarchar	50	NO
+BASE TABLE	pedido	Fecha	datetime		NO
+BASE TABLE	pedido	Referencia	nvarchar	100	YES
+BASE TABLE	pedido	Comentarios	nvarchar	-1	YES
+BASE TABLE	pedido	Cerrado	int		YES
+BASE TABLE	pedido	Nombre_Pauta	nvarchar	255	YES
+BASE TABLE	pedido	NumPedido	int		YES
+BASE TABLE	Proveedores	ID_Proveedor	int		NO
+BASE TABLE	Proveedores	Nombre_Proveedor	varchar	200	NO
+BASE TABLE	Proveedores	Direccion	varchar	300	YES
+BASE TABLE	Proveedores	CP	varchar	10	YES
+BASE TABLE	Proveedores	Ciudad	varchar	100	YES
+BASE TABLE	Proveedores	CIF	varchar	20	YES
+BASE TABLE	Proveedores	Tipo	varchar	50	YES
+BASE TABLE	Proveedores_Pautas	ID_Prov_Pauta	int		NO
+BASE TABLE	Proveedores_Pautas	ID_Proveedor	int		NO
+BASE TABLE	Proveedores_Pautas	ID_Pauta	int		NO
+BASE TABLE	Proveedores_Pautas	ID_Puesto	int		NO
+BASE TABLE	Proveedores_Pautas	Precio	decimal		NO
+BASE TABLE	Proveedores_Pautas	Peso	decimal		NO
+BASE TABLE	Proveedores_Pautas	Codigo	varchar	50	YES
+BASE TABLE	Proveedores_Pautas	pdf	bit		YES
+BASE TABLE	Puesto	ID_Puesto	int		NO
+BASE TABLE	Puesto	Nombre_Puesto	nvarchar	100	NO
+BASE TABLE	Puesto	puesto_compartido	bit		NO
+BASE TABLE	Puestos_OLD	ID_Puesto	int		NO
+BASE TABLE	Puestos_OLD	Nombre_Puesto	nvarchar	100	NO
+BASE TABLE	Puestos_OLD	Columna	nvarchar	100	NO
+BASE TABLE	Puestos_OLD	Nombre_Columna	nvarchar	150	YES
+BASE TABLE	Puestos_OLD	Orden_Columna	int		YES
+BASE TABLE	Puestos_OLD	puesto_compartido	bit		NO
+VIEW	Checklist	Id_Control	int		NO
+VIEW	Checklist	Puesto	nvarchar	100	NO
+VIEW	Checklist	PuntoInspección	nvarchar	150	NO
+VIEW	Checklist	Proceso	nvarchar	100	NO
+VIEW	Checklist	CaracInspeccion	nvarchar	150	YES
+VIEW	Checklist	TipoReg	nvarchar	50	YES
+VIEW	Checklist	DescripcionControl	nvarchar	255	YES
+VIEW	Checklist	Metodo	nvarchar	100	YES
+VIEW	Checklist	Ruta_foto_mostrar	nvarchar	255	YES
+VIEW	Checklist	ID_Pauta	int		NO
+VIEW	Checklist	Nombre_Pauta	nvarchar	200	NO
+VIEW	Checklist	Fecha_creacion	datetime		NO
+VIEW	Checklist	Fecha_modificacion	datetime		YES
+VIEW	Checklist	Orden_Pauta	int		YES
+VIEW	Columnas_Controles	Columnas_Controles	nvarchar	128	YES
+VIEW	Puesto_Pauta	Puesto	nvarchar	100	NO
+VIEW	Puesto_Pauta	Nombre_Pauta	nvarchar	200	NO
+VIEW	Puesto_Pauta	Num_Pautas	int		YES
+VIEW	Puestos	ID_Puesto	int		NO
+VIEW	Puestos	Nombre_Puesto	nvarchar	100	NO
+VIEW	Puestos	Columna	nvarchar	100	NO
+VIEW	Puestos	Nombre_Columna	nvarchar	150	YES
+VIEW	Puestos	Orden_Columna	int		YES
+VIEW	Puestos	puesto_compartido	bit		NO

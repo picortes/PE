@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario - Checklist Power</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .manual-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .manual-header {
+            background: linear-gradient(135deg, #2980c7 0%, #1e5a8e 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .manual-header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .manual-header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .manual-nav {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            overflow-x: auto;
+            background: #f8f9fa;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            color: #666;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            white-space: nowrap;
+            min-width: 150px;
+        }
+
+        .nav-btn:hover {
+            background: #f0f0f0;
+            color: #2980c7;
+        }
+
+        .nav-btn.active {
+            color: #2980c7;
+            border-bottom-color: #2980c7;
+            background: white;
+        }
+
+        .manual-content {
+            padding: 40px;
+            max-height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .section h2 {
+            color: #2980c7;
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 10px;
+        }
+
+        .subsection {
+            margin-bottom: 30px;
+        }
+
+        .subsection h3 {
+            color: #1e5a8e;
+            font-size: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .subsection p {
+            color: #555;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .subsection ul, .subsection ol {
+            margin-left: 25px;
+            color: #555;
+            line-height: 1.8;
+        }
+
+        .subsection li {
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .info-box {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .warning-box {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+        }
+
+        .manual-footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            padding: 12px 24px;
+            background: #2980c7;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #1e5a8e;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(41, 128, 199, 0.3);
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #2980c7;
+        }
+
+        .feature-card h4 {
+            color: #2980c7;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .feature-card p {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .restricted-section {
+            background: #fff3cd;
+            border: 2px dashed #ffc107;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+            color: #856404;
+        }
+
+        .restricted-section p {
+            margin: 0;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background: #2980c7;
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .access-level {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .access-all {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .access-limited {
+            background: #fff3cd;
+            color: #856404;
+        }
+    </style>
+</head>
+<body>
+    <div class="manual-container">
+        <!-- Header -->
+        <div class="manual-header">
+            <h1>📘 Manual de Usuario</h1>
+            <p>Guía completa para usar Checklist Calidad</p>
+        </div>
+
+        <!-- Navigation -->
+        <div class="manual-nav">
+            <button class="nav-btn active" onclick="cambiarSeccion('inicio')">🏠 Inicio</button>
+            <button class="nav-btn" onclick="cambiarSeccion('puestos')">🏭 Puestos</button>
+            <button class="nav-btn" onclick="cambiarSeccion('pautas')">📋 Pautas</button>
+            <button class="nav-btn" onclick="cambiarSeccion('checklist')">✓ Checklist</button>
+            <button class="nav-btn" onclick="cambiarSeccion('monitoreo')">📊 Monitorización</button>
+            <button class="nav-btn" onclick="cambiarSeccion('configuracion')">⚙️ Configuración</button>
+        </div>
+
+        <!-- Content -->
+        <div class="manual-content">
+
+            <!-- SECCIÓN: INICIO -->
+            <div id="inicio" class="section active">
+                <h2>🏠 Bienvenido a Checklist Calidad</h2>
+                
+                <div class="subsection">
+                    <h3>¿Qué es Checklist Calidad?</h3>
+                    <p>Checklist Calidad es una aplicación web diseñada para gestionar y completar checklists de control de calidad en nuestros procesos de fabricación. Te permite:</p>
+                    <ul>
+                        <li>Visualizar puestos de trabajo y sus pautas asociadas</li>
+                        <li>Completar checklists de forma digital</li>
+                        <li>Generar reportes en PDF</li>
+                        <li>Gestionar configuraciones (solo para administradores)</li>
+                    </ul>
+                </div>
+
+                <div class="subsection">
+                    <h3>🔐 Niveles de Acceso</h3>
+                    <p>El sistema tiene dos niveles de acceso según tu rol:</p>
+                    <div class="feature-list">
+                        <div class="feature-card">
+                            <h4>👤 Operario (Nivel ≤ 2)</h4>
+                            <p>Acceso limitado a visualización de puestos y completar pautas de checklist.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>👨‍💼 Administrador (Nivel > 2)</h4>
+                            <p>Acceso completo incluyendo configuración de puestos, controles y pautas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>💡 Tip:</strong> Tu nivel de acceso se determina automáticamente al iniciar sesión. Si necesitas más permisos, contacta a tu administrador.
+                </div>
+            </div>
+
+            <!-- SECCIÓN: PUESTOS -->
+            <div id="puestos" class="section">
+                <h2>🏭 Gestión de Puestos</h2>
+                
+                <div class="subsection">
+                    <h3>¿Qué son los Puestos?</h3>
+                    <p>Los puestos representan las diferentes etapas del proceso de manufactura (ej: Soldadura, Subcontratación, Montaje, Inspección). Cada puesto puede tener múltiples pautas asignadas.</p>
+                </div>
+
+                <div class="subsection">
+                    <h3>Visualizar Puestos <span class="access-level access-all">Todo usuario</span></h3>
+                    <ol>
+                        <li><span class="step-number">1</span>Inicia sesión en Checklist Power</li>
+                        <li><span class="step-number">2</span>Desde el menú principal, selecciona <strong>Puestos 📊</strong></li>
+                        <li><span class="step-number">3</span>Verás una lista de puestos disponibles con sus pautas asociadas</li>
+                        <li><span class="step-number">4</span>Haz clic en una pauta para iniciar el checklist</li>
+                    </ol>
+                </div>
+
+                <div class="subsection">
+                    <h3>Gestionar Puestos <span class="access-level access-all">Solo Administrador</span></h3>
+                    <div class="restricted-section" id="puestos-admin" style="display: none;">
+                        <ol>
+                            <li><span class="step-number">1</span>Accede a <strong>Configuración ⚙️</strong></li>
+                            <li><span class="step-number">2</span>Selecciona <strong>Configuración de Puestos 🏭</strong></li>
+                            <li><span class="step-number">3</span>Puedes crear, editar o eliminar puestos</li>
+                            <li><span class="step-number">4</span>Selecciona las columnas que deseas mostrar en el checklist</li>
+                        </ol>
+                        <div class="warning-box">
+                            <strong>⚠️ Importante - Nomenclatura de Puestos:</strong><br>
+                            Los nombres de los puestos <strong>DEBEN</strong> seguir el formato:<br>
+                            <code>{Número de 2 dígitos}_{Nombre Descriptivo}</code><br><br>
+                            <strong>Ejemplos correctos:</strong><br>
+                            • <code>10_Soldadura</code><br>
+                            • <code>15_Expedición</code><br>
+                            • <code>20_Subcontratación</code><br>
+                            • <code>40_Inspección</code><br><br>
+                            <strong>¿Por qué es importante?</strong><br>
+                            El número de 2 dígitos define el <strong>orden de ejecución</strong> de los puestos en el checklist. Los números menores se ejecutan primero, permitiendo un flujo lógico de trabajo.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: PAUTAS -->
+            <div id="pautas" class="section">
+                <h2>📋 Gestión de Pautas</h2>
+                
+                <div class="subsection">
+                    <h3>¿Qué son las Pautas?</h3>
+                    <p>Las pautas son conjuntos de controles agrupados que define qué debe verificarse en cada puesto. Cada pauta contiene múltiples items de control.</p>
+                </div>
+
+                <div class="subsection">
+                    <h3>Completar una Pauta <span class="access-level access-limited">Operario</span></h3>
+                    <ol>
+                        <li><span class="step-number">1</span>Ve a <strong>Puestos 📊</strong></li>
+                        <li><span class="step-number">2</span>Haz clic en una pauta para iniciar el checklist</li>
+                        <li><span class="step-number">3</span>Completa todos los campos requeridos</li>
+                        <li><span class="step-number">4</span>Haz clic en <strong>Guardar checklist</strong> para registrar los datos</li>
+                    </ol>
+                </div>
+
+                <div class="subsection">
+                    <h3>Crear Pautas <span class="access-level access-all">Solo Administrador</span></h3>
+                    <div id="pautas-admin" style="display: none;">
+                        <ol>
+                            <li><span class="step-number">1</span>Ve a <strong>Configuración ⚙️</strong></li>
+                            <li><span class="step-number">2</span>Selecciona <strong>Configuración de Pautas 📋</strong></li>
+                            <li><span class="step-number">3</span>Haz clic en <strong>Crear Pauta ➕</strong></li>
+                            <li><span class="step-number">4</span>Ingresa el nombre de la pauta</li>
+                            <li><span class="step-number">5</span>Selecciona los controles que formarán parte de la pauta</li>
+                            <li><span class="step-number">6</span>Guarda los cambios</li>
+                        </ol>
+                    </div>
+                    <div class="info-box">
+                        <strong>🔗 Configuración de Referencias por Pauta (NUEVO):</strong><br>
+                        Ahora puedes asignar <strong>referencias específicas</strong> (archivos PDF, imágenes, documentos) a cada pauta para que los operarios tengan acceso a la información necesaria mientras completan el checklist.<br><br>
+                        <strong>Cómo hacerlo:</strong><br>
+                        1. En <strong>Configuración de Pautas 📋</strong>, selecciona una pauta<br>
+                        2. Busca la sección <strong>Referencias 📎</strong><br>
+                        3. Haz clic en <strong>Agregar Referencia ➕</strong><br>
+                        4. Sube el archivo (PDF, imagen, etc.)<br>
+                        5. Los operarios podrán ver el icono 📎 al completar la pauta y acceder a los documentos
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: CHECKLIST -->
+            <div id="checklist" class="section">
+                <h2>✓ Completar Checklist</h2>
+                
+                <div class="subsection">
+                    <h3>Pasos para Completar un Checklist <span class="access-level access-limited">Operario</span></h3>
+                    <ol>
+                        <li><span class="step-number">1</span>Selecciona un puesto y pauta desde el menú principal</li>
+                        <li><span class="step-number">2</span>Se abrirá una modal para seleccionar el armario</li>
+                        <li><span class="step-number">3</span>Completa los campos de cada control:
+                            <ul style="margin-top: 10px;">
+                                <li><strong>Resultado:</strong> OK, NOK, Dimensión, texto libre, etc.</li>
+                                <li><strong>Comentario:</strong> Notas opcionales</li>
+                            </ul>
+                        </li>
+                        <li><span class="step-number">4</span>Haz clic en <strong>Guardar checklist</strong> para guardar</li>
+                    </ol>
+                </div>
+
+
+                <div class="subsection">
+                    <h3>Generar PDF</h3>
+                    <ol>
+                        <li><span class="step-number">1</span>Completa el checklist</li>
+                        <li><span class="step-number">2</span>Al final, haz clic en <strong>Guardar checklist</strong></li>
+                        <li><span class="step-number">3</span>Se abrirá una modal pidiendo el <strong>Número de Pedido</strong></li>
+                        <li><span class="step-number">4</span>Introduce el número y confirma</li>
+                        <li><span class="step-number">5</span>El PDF se generará automáticamente y se guardará en la carpeta compartida</li>
+                        <li><span class="step-number">6</span>Se abrirá una previsualización del PDF que puedes descargar</li>
+                    </ol>
+                </div>
+
+                <div class="info-box">
+                    <strong>📄 Generación Automática de PDF (ACTUALIZADO):</strong><br>
+                    El sistema ahora genera automáticamente un PDF cuando guardas el checklist. <strong>Ya no necesitas hacer clic adicional</strong> para generarlo.<br><br>
+                    El archivo se genera con la siguiente estructura:<br>
+                    • Una página por puesto visitado<br>
+                    • Encabezado con información del pedido y fecha<br>
+                    • Todos los controles de cada pauta completada<br>
+                    • Resultados y comentarios
+                </div>
+
+                <div class="info-box">
+                    <strong>📁 Ubicación de PDFs Guardados:</strong><br>
+                    Los PDFs se guardan automáticamente en: <code>\\servidor\unidad compartida\PDFs_Generados\</code><br><br>
+                    <strong>📝 Nomenclatura de Archivos:</strong><br>
+                    El nombre del archivo incluye tanto el <strong>número de pedido</strong> como el <strong>número de armario</strong>:<br><br>
+                    <code>Pedido {NumPedido}_ Armario {NumArmario}.pdf</code><br><br>
+                    <strong>Ejemplos:</strong><br>
+                    • <code>Pedido PED001_ Armario 1212.pdf</code><br>
+                    • <code>Pedido PED001_ Armario 1313.pdf</code><br><br>
+                    <strong>💡 Nota importante:</strong><br>
+                    El botón <strong>Guardar checklist</strong> solo aparece cuando <strong>TODOS los controles están OK</strong>. Por lo tanto, los PDFs generados siempre contienen checklist 100% completados y aprobados.
+                </div>
+
+            
+            </div>
+
+            <!-- SECCIÓN: MONITORIZACIÓN -->
+            <div id="monitoreo" class="section">
+                <h2>📊 Monitorización de Checklists</h2>
+                
+                <div class="subsection">
+                    <h3>¿Qué es la Monitorización?</h3>
+                    <p>La monitorización es una herramienta que permite visualizar el estado de todos los checklists completados en tiempo real. Te ofrece una visión general del progreso y la calidad de los procesos.</p>
+                </div>
+
+                <div class="subsection">
+                    <h3>Acceder a Monitorización <span class="access-level access-limited">Operario</span></h3>
+                    <ol>
+                        <li><span class="step-number">1</span>Desde el menú principal, selecciona <strong>Monitorización 📊</strong></li>
+                        <li><span class="step-number">2</span>Selecciona una <strong>pauta</strong> del desplegable para ver sus datos</li>
+                        <li><span class="step-number">3</span>Verás una tabla con todos los armarios y sus estados en cada puesto</li>
+                    </ol>
+                </div>
+
+                <div class="subsection">
+                    <h3>Entender los Estados</h3>
+                    <p>Cada celda en la monitorización muestra el estado del checklist con un color indicativo:</p>
+                    <div class="feature-list">
+                        <div class="feature-card">
+                            <h4>🟢 Verde (OK)</h4>
+                            <p>Todos los controles en ese puesto han sido completados y aprobados.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>🔴 Rojo (NOK)</h4>
+                            <p>Hay algún control con resultado NOK (no conforme) en ese puesto. El operario intentó completar el checklist pero hubo problemas que requirieron corrección.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>⚪ Gris (Sin completar)</h4>
+                            <p>El checklist para ese puesto aún no ha sido completado o iniciado.</p>
+                        </div>
+                        <div class="feature-card">
+                            <h4>⏳ En Proceso</h4>
+                            <p>El checklist está en progreso (solo Gris o Blanco, sin Verde ni Rojo). El operario aún está completando los controles.</p>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="subsection">
+                    <h3>Filtrado y Búsqueda</h3>
+                    <ol>
+                        <li><span class="step-number">1</span>Usa los botones de <strong>filtro por color</strong> (Todas, En Proceso, Verde, Gris, Rojo, Limpiar) para mostrar solo lo que te interesa</li>
+                        <li><span class="step-number">2</span>Usa la <strong>búsqueda global</strong> para encontrar un armario específico por número o fecha</li>
+                        <li><span class="step-number">3</span>Cada columna tiene un <strong>filtro independiente</strong> para buscar en ese puesto</li>
+                        <li><span class="step-number">4</span>Haz clic en <strong>Limpiar 🔄</strong> para resetear todos los filtros</li>
+                    </ol>
+                </div>
+
+                <div class="info-box">
+                    <strong>💡 Uso de Monitorización:</strong><br>
+                    • Verifica el progreso de tus checklists en tiempo real<br>
+                    • Identifica rápidamente qué puestos tienen problemas (rojo)<br>
+                    • Busca un armario específico por número<br>
+                    • Filtra por estado para enfocarte en lo que necesitas<br>
+                    • La información se actualiza automáticamente cuando se guardan nuevos checklists
+                </div>
+
+                <div class="subsection">
+                    <h3>Paginación por Pauta <span class="access-level access-limited">Operario</span></h3>
+                    <p>Cuando hay muchos armarios en una pauta, se muestran <strong>máximo 20 armarios por página</strong>. Usa los botones <strong>Anterior</strong> y <strong>Siguiente</strong> para navegar entre páginas.</p>
+                </div>
+            </div>
+
+            <!-- SECCIÓN: CONFIGURACIÓN -->
+            <div id="configuracion" class="section">
+                <h2>⚙️ Configuración del Sistema</h2>
+                
+                <div class="restricted-section">
+                    <p><strong>🔐 Esta sección es solo para Administradores (Nivel > 2)</strong></p>
+                </div>
+
+                <div id="config-admin" style="display: none;">
+                    <div class="subsection">
+                        <h3>Configuración de Controles</h3>
+                        <p>Gestiona los items de control que se utilizarán en las pautas:</p>
+                        <ol>
+                            <li>Ve a <strong>Configuración ⚙️ → Configuración de Controles 🔧</strong></li>
+                            <li>Haz clic en <strong>Crear Control ➕</strong></li>
+                            <li>Completa los datos del control:
+                                <ul style="margin-top: 10px;">
+                                    <li><strong>Puesto:</strong> Asigna a qué puesto pertenece</li>
+                                    <li><strong>Descripción:</strong> Qué se debe verificar</li>
+                                    <li><strong>Tipo de Registro:</strong> Selecciona el formato de respuesta</li>
+                                </ul>
+                            </li>
+                            <li>Marca <strong>Visible en PDF</strong> si debe aparecer en los reportes</li>
+                            <li>Guarda los cambios</li>
+                        </ol>
+
+                     
+                    </div>
+
+                    <div class="subsection">
+                        <h3>Configuración de Pautas</h3>
+                        <p>Define qué controles forman parte de cada pauta:</p>
+                        <ol>
+                            <li>Ve a <strong>Configuración ⚙️ → Configuración de Pautas 📋</strong></li>
+                            <li>Haz clic en <strong>Crear Pauta ➕</strong></li>
+                            <li>Ingresa el nombre descriptivo</li>
+                            <li>Selecciona los controles disponibles</li>
+                            <li>Organiza el orden usando las flechas</li>
+                            <li>Guarda la pauta</li>
+                        </ol>
+
+                        <div class="info-box">
+                            <strong>🔄 Comportamiento de Pautas con "Listado Armarios" (NUEVO):</strong><br>
+                            Si una pauta contiene <strong>SOLO</strong> un control de tipo "Listado Armarios":<br><br>
+                            1. El operario verá una <strong>pantalla especial</strong> en lugar del formulario tradicional<br>
+                            2. Se mostrará un <strong>selector visual con todos los armarios disponibles</strong><br>
+                            3. El operario selecciona múltiples armarios usando <strong>pills clickeables</strong><br>
+                            4. Puede ver un <strong>preview de los seleccionados</strong><br>
+                            5. Al guardar, se registran todos automáticamente con estado "OK"<br>
+                        
+                        </div>
+
+                        <div class="warning-box">
+                            <strong>⚠️ Advertencia:</strong> Cambios en la configuración afectarán todos los nuevos checklists. Ten cuidado al modificar pautas existentes.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="manual-footer">
+            <div>
+                <p>Checklist Power © 2025 | EMESA</p>
+            </div>
+            <button class="back-btn" onclick="volverAtras()">← Volver</button>
+        </div>
+    </div>
+
+    <script src="/assets/css/loginModal.js"></script>
+    <script>
+        // Detectar nivel de usuario y mostrar/ocultar secciones
+        function actualizarAccesoAdmin() {
+            const user = LoginModal.getCurrentUser();
+            const nivelAdmin = user && user.nivel && user.nivel > 2;
+
+            // Mostrar/ocultar secciones de administrador
+            document.getElementById('puestos-admin').style.display = nivelAdmin ? 'block' : 'none';
+            document.getElementById('pautas-admin').style.display = nivelAdmin ? 'block' : 'none';
+            document.getElementById('config-admin').style.display = nivelAdmin ? 'block' : 'none';
+
+            // Si no tiene acceso de admin, cambiar el aviso de configuración
+            if (!nivelAdmin) {
+                const configBtn = document.querySelector('[onclick="cambiarSeccion(\'configuracion\')"]');
+                if (configBtn) {
+                    configBtn.style.opacity = '0.5';
+                    configBtn.style.cursor = 'not-allowed';
+                }
+            }
+        }
+
+        function cambiarSeccion(seccionId) {
+            // Verificar acceso a sección de configuración
+            if (seccionId === 'configuracion') {
+                const user = LoginModal.getCurrentUser();
+                const nivelAdmin = user && user.nivel && user.nivel > 2;
+                
+                if (!nivelAdmin) {
+                    alert('❌ No tienes permisos para acceder a esta sección.\nSe requiere nivel de administrador (> 2)');
+                    return;
+                }
+            }
+
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+
+            // Ocultar todos los botones de nav
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar sección seleccionada
+            const seccion = document.getElementById(seccionId);
+            if (seccion) {
+                seccion.classList.add('active');
+            }
+
+            // Marcar botón como activo
+            event.target.classList.add('active');
+
+            // Scroll al inicio
+            document.querySelector('.manual-content').scrollTop = 0;
+        }
+
+        function volverAtras() {
+            window.history.back();
+        }
+
+        // Inicializar al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            actualizarAccesoAdmin();
+        });
+    </script>
+</body>
+</html>
