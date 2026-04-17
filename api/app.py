@@ -3,7 +3,9 @@
 # IMPORTACIONES Y CONFIGURACIÓN
 # ====================================================================================
 import os
+import re
 import sys
+import time
 
 # 🆕 Configurar stdout para UTF-8 (soportar emojis en terminal)
 if sys.stdout.encoding != 'utf-8':
@@ -354,6 +356,31 @@ def obtener_usuario_sesion():
         print(f"Error obteniendo usuario de sesión: {e}")
         return 'Sistema'
 
+def obtener_id_usuario_sesion():
+    """Obtiene el ID interno del usuario autenticado desde la sesión actual"""
+    try:
+        if 'user_data' in session and session['user_data']:
+            return session['user_data'].get('id')
+        return None
+    except Exception as e:
+        print(f"Error obteniendo ID de usuario de sesión: {e}")
+        return None
+
+def obtener_id_usuario_request():
+    """Obtiene el ID de usuario desde sesión o, como fallback, desde cabecera enviada por el frontend."""
+    usuario_id = obtener_id_usuario_sesion()
+    if usuario_id:
+        return usuario_id
+
+    try:
+        header_user_id = request.headers.get('X-User-Id')
+        if header_user_id:
+            return int(header_user_id)
+    except Exception as e:
+        print(f"Error obteniendo ID de usuario desde headers: {e}")
+
+    return None
+
 # ====================================================================================
 # RUTAS PARA SERVIR ARCHIVOS ESTÁTICOS
 # ====================================================================================
@@ -522,6 +549,149 @@ def obtener_permisos_usuario():
     except Exception as e:
         print(f"Error obteniendo permisos de usuario: {e}")
         return jsonify({'success': False, 'message': 'Error del servidor'}), 500
+
+# ====================================================================================
+# ENDPOINTS PARA PREFERENCIAS DE VISTA POR USUARIO
+# ====================================================================================
+@app.route('/api/preferencias-vista/puestos', methods=['GET'])
+def get_preferencias_vista_puestos():
+    """Obtiene el layout guardado de la vista Puestos para el usuario autenticado"""
+    try:
+        usuario_id = obtener_id_usuario_request()
+        if not usuario_id:
+            return jsonify({'success': False, 'message': 'Usuario no autenticado'}), 401
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión a base de datos'}), 500
+
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT TOP 1 ConfiguracionJson, AutoAplicar, Fecha_Modificacion
+                FROM [Digitalizacion].[PE].[PreferenciasVista]
+                WHERE Id_Usuario = ? AND Vista = ?
+            """, (usuario_id, 'puestos-layout'))
+
+            row = cursor.fetchone()
+            if not row:
+                return jsonify({
+                    'success': True,
+                    'has_preferences': False,
+                    'preferences': None
+                })
+
+            configuracion = json.loads(row[0]) if row[0] else {}
+
+            return jsonify({
+                'success': True,
+                'has_preferences': True,
+                'preferences': {
+                    'puestos': configuracion.get('puestos', []),
+                    'pautas': configuracion.get('pautas', []),
+                    'auto_aplicar': bool(row[1]),
+                    'fecha_modificacion': row[2].isoformat() if row[2] else None
+                }
+            })
+
+    except Exception as e:
+        print(f"💥 Error obteniendo preferencias de vista Puestos: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
+
+@app.route('/api/preferencias-vista/puestos', methods=['POST'])
+def save_preferencias_vista_puestos():
+    """Guarda o actualiza el layout preferido de la vista Puestos para el usuario autenticado"""
+    try:
+        usuario_id = obtener_id_usuario_request()
+        if not usuario_id:
+            return jsonify({'success': False, 'message': 'Usuario no autenticado'}), 401
+
+        data = request.get_json() or {}
+        puestos = data.get('puestos', [])
+        pautas = data.get('pautas', [])
+        auto_aplicar = bool(data.get('auto_aplicar', True))
+
+        if not isinstance(puestos, list) or not isinstance(pautas, list):
+            return jsonify({'success': False, 'message': 'Formato inválido para puestos o pautas'}), 400
+
+        configuracion_json = json.dumps({
+            'puestos': puestos,
+            'pautas': pautas
+        }, ensure_ascii=False)
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión a base de datos'}), 500
+
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM [Digitalizacion].[PE].[PreferenciasVista]
+                WHERE Id_Usuario = ? AND Vista = ?
+            """, (usuario_id, 'puestos-layout'))
+
+            existe = cursor.fetchone()[0] > 0
+
+            if existe:
+                cursor.execute("""
+                    UPDATE [Digitalizacion].[PE].[PreferenciasVista]
+                    SET ConfiguracionJson = ?,
+                        AutoAplicar = ?,
+                        Fecha_Modificacion = SYSDATETIME()
+                    WHERE Id_Usuario = ? AND Vista = ?
+                """, (configuracion_json, 1 if auto_aplicar else 0, usuario_id, 'puestos-layout'))
+            else:
+                cursor.execute("""
+                    INSERT INTO [Digitalizacion].[PE].[PreferenciasVista]
+                    (Id_Usuario, Vista, ConfiguracionJson, AutoAplicar)
+                    VALUES (?, ?, ?, ?)
+                """, (usuario_id, 'puestos-layout', configuracion_json, 1 if auto_aplicar else 0))
+
+            return jsonify({
+                'success': True,
+                'message': 'Layout de Puestos guardado correctamente',
+                'preferences': {
+                    'puestos': puestos,
+                    'pautas': pautas,
+                    'auto_aplicar': auto_aplicar
+                }
+            })
+
+    except Exception as e:
+        print(f"💥 Error guardando preferencias de vista Puestos: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
+
+@app.route('/api/preferencias-vista/puestos', methods=['DELETE'])
+def delete_preferencias_vista_puestos():
+    """Elimina el layout guardado de la vista Puestos para el usuario autenticado"""
+    try:
+        usuario_id = obtener_id_usuario_request()
+        if not usuario_id:
+            return jsonify({'success': False, 'message': 'Usuario no autenticado'}), 401
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión a base de datos'}), 500
+
+            cursor = conn.cursor()
+            cursor.execute("""
+                DELETE FROM [Digitalizacion].[PE].[PreferenciasVista]
+                WHERE Id_Usuario = ? AND Vista = ?
+            """, (usuario_id, 'puestos-layout'))
+
+            return jsonify({
+                'success': True,
+                'message': 'Layout de Puestos eliminado correctamente'
+            })
+
+    except Exception as e:
+        print(f"💥 Error eliminando preferencias de vista Puestos: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
 
 # ====================================================================================
 # ENDPOINT PARA MOSTRAR PUESTOSCAB.HTML (PARA VISUALIZACIÓN)
@@ -1347,14 +1517,38 @@ def upload_photo():
         
         file = request.files['photo']
         control_id = request.form.get('controlId', 'unknown')
+        id_pedido = (request.form.get('idPedido') or '').strip()
+        armario = (request.form.get('armario') or '').strip()
         
         if file.filename == '':
             return jsonify({'success': False, 'message': 'Nombre de archivo vacío'}), 400
 
         if file:
-            # Generar nombre único: Fecha_Hora_ControlID.jpg
+            def limpiar_segmento_nombre(valor, fallback):
+                valor_limpio = re.sub(r'[^A-Za-z0-9_-]+', '-', str(valor or '').strip())
+                valor_limpio = re.sub(r'-{2,}', '-', valor_limpio).strip('-_')
+                return valor_limpio or fallback
+
+            if id_pedido and not armario:
+                try:
+                    with ConexionODBC('Digitalizacion') as conn:
+                        if conn:
+                            cursor = conn.cursor()
+                            cursor.execute("""
+                                SELECT TOP 1 [Armario]
+                                FROM [Digitalizacion].[PE].[Pedido]
+                                WHERE [ID_Pedido] = ?
+                            """, (id_pedido,))
+                            pedido_row = cursor.fetchone()
+                            if pedido_row:
+                                if not armario:
+                                    armario = (pedido_row[0] or '').strip()
+                except Exception as lookup_error:
+                    print(f"⚠️ No se pudo completar Armario para foto del pedido {id_pedido}: {lookup_error}")
+
+            # Generar nombre único: Fecha_Hora_ControlID_Armario.jpg
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            filename = f"{timestamp}_Control_{control_id}.jpg"
+            filename = f"{timestamp}_Control_{control_id}_{limpiar_segmento_nombre(armario, 'SIN_ARMARIO')}.jpg"
             
             # Asegurar que el directorio existe
             if not os.path.exists(RUTA_FOTOS_COMPARTIDA):
@@ -2411,12 +2605,17 @@ def get_puesto_pauta():
     Si puesto_compartido = 0 (default):
     - Mostrar una tarjeta por cada pauta (comportamiento actual)
     """
+    request_started_at = time.perf_counter()
     try:
         with ConexionODBC('Digitalizacion') as conn:
             if not conn:
                 return jsonify({'success': False, 'message': 'Error de conexión a base de datos'}), 500
             
             cursor = conn.cursor()
+            try:
+                cursor.timeout = 10
+            except Exception:
+                pass
             
             # Obtener datos de puestos y pautas SOLO donde Activo = 1
             cursor.execute("""
@@ -2428,7 +2627,7 @@ def get_puesto_pauta():
             """)
             
             resultados = cursor.fetchall()
-            print(f"\n🔍 Resultados obtenidos de PE.Puesto_Pauta (solo Activo=1): {len(resultados)} registros")
+            print(f"\n🔍 Resultados obtenidos de PE.Puesto_Pauta (solo Activo=1): {len(resultados)} registros en {time.perf_counter() - request_started_at:.2f}s")
             
             # Organizar datos por puesto
             puestos = {}
@@ -2552,7 +2751,7 @@ def get_puesto_pauta():
             })
             
     except Exception as e:
-        print(f"💥 Error obteniendo puesto-pauta: {e}")
+        print(f"💥 Error obteniendo puesto-pauta tras {time.perf_counter() - request_started_at:.2f}s: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({
@@ -3588,276 +3787,292 @@ def obtener_puestos_pauta(pauta):
         return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
 
 # ====================================================================================
-# ENDPOINT PARA MONITORIZACIÓN - ESTADO DE ARMARIOS POR PAUTA Y PUESTO
+# ENDPOINTS PARA MONITORIZACIÓN - ESTADO DE ARMARIOS POR PAUTA Y PUESTO
 # ====================================================================================
-@app.route('/api/monitoreo/estado-armarios', methods=['GET'])
-def monitoreo_estado_armarios():
-    """
-    Obtiene el estado de todos los armarios organizados por pauta y puesto.
-    Devuelve una estructura que permite visualizar en pildoras:
-    - Columnas: Pautas + Puestos dinámicos
-    - Filas: Armarios (Nº armario + referencia)
-    - Color de pildora según estado: ROJO (NOK), GRIS (incompleto), VERDE (completado en último puesto)
-    """
+def _extraer_valor_puesto(nombre_puesto):
     try:
-        print(f"🔍 INICIO: monitoreo_estado_armarios")
-        
+        return int(''.join(filter(str.isdigit, nombre_puesto)))
+    except Exception:
+        return 999
+
+
+def _obtener_resumen_monitoreo(cursor):
+    print("📋 PASO 1: Obteniendo pautas...")
+    cursor.execute("""
+        SELECT DISTINCT [Nombre_Pauta]
+        FROM [Digitalizacion].[PE].[Checklist]
+        WHERE [Nombre_Pauta] IS NOT NULL AND [Nombre_Pauta] != ''
+        ORDER BY [Nombre_Pauta]
+    """)
+
+    pautas = [row[0] for row in cursor.fetchall()]
+    print(f"✅ PASO 1 COMPLETADO: Pautas encontradas: {pautas}")
+
+    print("📍 PASO 2: Obteniendo puestos por pauta...")
+    cursor.execute("""
+        SELECT DISTINCT [Nombre_Pauta], [Puesto]
+        FROM [Digitalizacion].[PE].[Checklist]
+        WHERE [Nombre_Pauta] IS NOT NULL AND [Nombre_Pauta] != ''
+          AND [Puesto] IS NOT NULL AND [Puesto] != ''
+        ORDER BY [Nombre_Pauta], [Puesto]
+    """)
+
+    pauta_puestos_raw = {}
+    for row in cursor.fetchall():
+        pauta_puestos_raw.setdefault(row[0], []).append(row[1])
+
+    pauta_puestos = {}
+    pauta_primer_ultimo = {}
+    for pauta in pautas:
+        puestos_ordenados = sorted(pauta_puestos_raw.get(pauta, []), key=_extraer_valor_puesto)
+        pauta_puestos[pauta] = puestos_ordenados
+        pauta_primer_ultimo[pauta] = {
+            'primer': puestos_ordenados[0] if puestos_ordenados else None,
+            'ultimo': puestos_ordenados[-1] if puestos_ordenados else None,
+            'todos': puestos_ordenados
+        }
+
+    cursor.execute("""
+        SELECT [Nombre_Pauta], COUNT(DISTINCT [ID_Pedido]) AS total_armarios
+        FROM [Digitalizacion].[PE].[Pedido]
+        WHERE [Nombre_Pauta] IS NOT NULL AND [Nombre_Pauta] != ''
+        GROUP BY [Nombre_Pauta]
+    """)
+
+    armarios_por_pauta = {row[0]: row[1] for row in cursor.fetchall()}
+
+    print(f"✅ PASO 2 COMPLETADO: {len(pauta_puestos)} pautas con puestos")
+    return pautas, pauta_puestos, pauta_primer_ultimo, armarios_por_pauta
+
+
+def _obtener_estado_armarios_por_pauta(cursor, pauta, puestos_pauta, primer_ultimo_pauta):
+    print(f"🛒 PASO 3: Obteniendo armarios/pedidos para pauta '{pauta}'...")
+    cursor.execute("""
+        SELECT DISTINCT
+            [ID_Pedido],
+            [Armario],
+            [Referencia],
+            [Nombre_Pauta],
+            [Cerrado],
+            [Fecha]
+        FROM [Digitalizacion].[PE].[Pedido]
+        WHERE [Nombre_Pauta] = ?
+        ORDER BY [Armario]
+    """, (pauta,))
+
+    pedidos_rows = cursor.fetchall()
+    print(f"✅ PASO 3 COMPLETADO: {len(pedidos_rows)} armarios encontrados para pauta '{pauta}'")
+
+    print(f"⚡ PASO 3B: Precargando datos de controles y estados para pauta '{pauta}'...")
+    cursor.execute("""
+        WITH datos_agregados AS (
+            SELECT
+                du.[ID_Pedido],
+                c.[Puesto],
+                c.[Nombre_Pauta],
+                COUNT(DISTINCT du.[ID_Control]) as total_controles,
+                SUM(CASE WHEN du.[Resultado] = 'NOK' THEN 1 ELSE 0 END) as noks_count,
+                MAX(CASE WHEN c.[TipoReg] = 'Listado Armarios' AND du.[Resultado] = 'OK' THEN du.[FechaRegistro] ELSE NULL END) as fecha_listado
+            FROM [Digitalizacion].[PE].[DatosUser] du
+            INNER JOIN [Digitalizacion].[PE].[Checklist] c ON du.[ID_Control] = c.[Id_Control]
+            WHERE c.[Nombre_Pauta] = ?
+            GROUP BY du.[ID_Pedido], c.[Puesto], c.[Nombre_Pauta]
+        )
+        SELECT [ID_Pedido], [Puesto], [Nombre_Pauta], [total_controles], [noks_count], [fecha_listado]
+        FROM datos_agregados
+    """, (pauta,))
+
+    datos_pedido_puesto = {}
+    for row in cursor.fetchall():
+        fecha_str = row[5].strftime('%d/%m/%Y %H:%M') if row[5] else None
+        datos_pedido_puesto[(row[0], row[1], row[2])] = {
+            'completados': row[3],
+            'noks': row[4] or 0,
+            'fecha': fecha_str
+        }
+    print(f"✅ PASO 3B COMPLETADO: {len(datos_pedido_puesto)} registros precargados")
+
+    cursor.execute("""
+        SELECT [Puesto], COUNT(*) AS total_controles, MAX([TipoReg]) AS tipo_reg
+        FROM [Digitalizacion].[PE].[Checklist]
+        WHERE [Nombre_Pauta] = ?
+        GROUP BY [Puesto]
+    """, (pauta,))
+    controles_por_puesto = {
+        row[0]: {'total': row[1], 'tipo': row[2]}
+        for row in cursor.fetchall()
+    }
+
+    print(f"📦 PASO 4: Procesando {len(pedidos_rows)} armarios para pauta '{pauta}'...")
+    estado_armarios_pauta = {}
+    contador = 0
+    primer_puesto = primer_ultimo_pauta.get('primer')
+    ultimo_puesto = primer_ultimo_pauta.get('ultimo')
+
+    for pedido_row in pedidos_rows:
+        contador += 1
+        if contador % 50 == 0:
+            print(f"   ⏳ Procesados {contador}/{len(pedidos_rows)} armarios de '{pauta}'...")
+
+        id_pedido = pedido_row[0]
+        armario = pedido_row[1]
+        referencia = pedido_row[2] or ''
+        cerrado_valor = pedido_row[4]
+        armario_ref = f"{armario} - {referencia}" if referencia else armario
+
+        if armario_ref not in estado_armarios_pauta:
+            estado_armarios_pauta[armario_ref] = {
+                'id_pedido': id_pedido,
+                'armario': armario,
+                'referencia': referencia,
+                'puestos_estado': {}
+            }
+
+        for indice_puesto, puesto in enumerate(puestos_pauta):
+            datos = datos_pedido_puesto.get((id_pedido, puesto, pauta), {'completados': 0, 'noks': 0, 'fecha': None})
+            controles_config = controles_por_puesto.get(puesto, {'total': 0, 'tipo': None})
+            total_controles = controles_config['total']
+            tipo_reg = controles_config['tipo']
+            tiene_listado = tipo_reg == 'Listado Armarios'
+            puesto_numero = _extraer_valor_puesto(puesto)
+
+            checklist_cerrado_ok = (
+                bool(cerrado_valor)
+                and cerrado_valor >= puesto_numero
+                and (datos['noks'] or 0) == 0
+                and (datos['completados'] or 0) > 0
+            )
+
+            if checklist_cerrado_ok and total_controles > datos['completados']:
+                total_controles = datos['completados']
+
+            es_visible = puesto == primer_puesto
+            if not es_visible and indice_puesto > 0:
+                puesto_anterior = puestos_pauta[indice_puesto - 1]
+                valor_anterior = _extraer_valor_puesto(puesto_anterior)
+                if cerrado_valor and cerrado_valor >= valor_anterior:
+                    datos_anterior = datos_pedido_puesto.get((id_pedido, puesto_anterior, pauta), {'noks': 0})
+                    es_visible = (datos_anterior.get('noks') or 0) == 0
+
+            if es_visible:
+                if datos['noks'] > 0:
+                    color = 'ROJO'
+                elif datos['completados'] < total_controles:
+                    color = 'GRIS'
+                elif puesto == ultimo_puesto:
+                    color = 'VERDE'
+                else:
+                    color = 'GRIS'
+
+                estado = {
+                    'color': color,
+                    'controles_completados': datos['completados'],
+                    'total_controles': total_controles,
+                    'noks': datos['noks'],
+                    'es_listado_armarios': tiene_listado,
+                    'fecha_registro': datos['fecha']
+                }
+            else:
+                estado = 'NO_VISIBLE'
+
+            estado_armarios_pauta[armario_ref]['puestos_estado'][puesto] = estado
+
+    print(f"✅ PASO 4 COMPLETADO: {contador} armarios procesados para pauta '{pauta}'")
+    return estado_armarios_pauta
+
+
+@app.route('/api/monitoreo/pautas', methods=['GET'])
+def monitoreo_resumen_pautas():
+    try:
+        print("🔍 INICIO: monitoreo_resumen_pautas")
         with ConexionODBC('Digitalizacion') as conn:
             if not conn:
-                print(f"❌ No se pudo conectar a BD")
+                print("❌ No se pudo conectar a BD")
                 return jsonify({'success': False, 'message': 'Error de conexión a base de datos'}), 500
-            
+
             cursor = conn.cursor()
-            
-            # PASO 1: Obtener todas las pautas activas
-            print(f"📋 PASO 1: Obteniendo pautas...")
-            cursor.execute("""
-                SELECT DISTINCT [Nombre_Pauta]
-                FROM [Digitalizacion].[PE].[Checklist]
-                WHERE [Nombre_Pauta] IS NOT NULL AND [Nombre_Pauta] != ''
-                ORDER BY [Nombre_Pauta]
-            """)
-            
-            pautas_rows = cursor.fetchall()
-            pautas = [row[0] for row in pautas_rows]
-            
-            print(f"✅ PASO 1 COMPLETADO: Pautas encontradas: {pautas}")
-            
-            # PASO 2: Para cada pauta, obtener sus puestos ordenados
-            print(f"📍 PASO 2: Obteniendo puestos por pauta...")
-            pauta_puestos = {}
-            pauta_primer_ultimo = {}
-            
-            for pauta in pautas:
-                cursor.execute("""
-                    SELECT DISTINCT [Puesto]
-                    FROM [Digitalizacion].[PE].[Checklist]
-                    WHERE [Nombre_Pauta] = ?
-                    ORDER BY [Puesto]
-                """, (pauta,))
-                
-                puestos_rows = cursor.fetchall()
-                puestos_nombres = [row[0] for row in puestos_rows]
-                
-                # Ordenar por valor numérico
-                def extraer_valor(p):
-                    try:
-                        return int(''.join(filter(str.isdigit, p)))
-                    except:
-                        return 999
-                
-                puestos_ordenados = sorted(puestos_nombres, key=extraer_valor)
-                pauta_puestos[pauta] = puestos_ordenados
-                pauta_primer_ultimo[pauta] = {
-                    'primer': puestos_ordenados[0] if puestos_ordenados else None,
-                    'ultimo': puestos_ordenados[-1] if puestos_ordenados else None,
-                    'todos': puestos_ordenados
-                }
-            
-            print(f"✅ PASO 2 COMPLETADO: {len(pauta_puestos)} pautas con puestos")
-            
-            # PASO 3: Obtener todos los armarios/pedidos con su estado
-            print(f"🛒 PASO 3: Obteniendo armarios/pedidos...")
-            cursor.execute("""
-                SELECT DISTINCT 
-                    [ID_Pedido], 
-                    [Armario], 
-                    [Referencia],
-                    [Nombre_Pauta],
-                    [Cerrado],
-                    [Fecha]
-                FROM [Digitalizacion].[PE].[Pedido]
-                WHERE [Nombre_Pauta] IN ({})
-                ORDER BY [Nombre_Pauta], [Armario]
-            """.format(','.join(['?' for _ in pautas])), pautas)
-            
-            pedidos_rows = cursor.fetchall()
-            print(f"✅ PASO 3 COMPLETADO: {len(pedidos_rows)} armarios encontrados")
-            
-            # Función auxiliar para extraer valor numérico del puesto
-            def extraer_valor(p):
-                try:
-                    return int(''.join(filter(str.isdigit, p)))
-                except:
-                    return 999
-            
-            # Procesador simplificado para evitar N+1 queries
-            print(f"📦 PASO 4: Procesando {len(pedidos_rows)} armarios...")
-            
-            # Estructura: {pauta: {armario_ref: {puesto: estado}}}
-            estado_armarios = {}
-            
-            # 🆕 OPTIMIZACIÓN: Precarga masiva en UNA SOLA QUERY (mucho más rápido)
-            print(f"⚡ PASO 3B: Precargando datos de controles y estados...")
-            
-            # Cache de información: {(id_pedido, puesto, pauta): {completados, noks, fecha}}
-            datos_pedido_puesto = {}
-            
-            # Una sola query con CTE que calcula todo de una vez
-            cursor.execute("""
-                WITH datos_agregados AS (
-                    SELECT 
-                        du.[ID_Pedido], 
-                        c.[Puesto], 
-                        c.[Nombre_Pauta],
-                        COUNT(DISTINCT du.[ID_Control]) as total_controles,
-                        SUM(CASE WHEN du.[Resultado] = 'NOK' THEN 1 ELSE 0 END) as noks_count,
-                        MAX(CASE WHEN c.[TipoReg] = 'Listado Armarios' AND du.[Resultado] = 'OK' THEN du.[FechaRegistro] ELSE NULL END) as fecha_listado
-                    FROM [Digitalizacion].[PE].[DatosUser] du
-                    INNER JOIN [Digitalizacion].[PE].[Checklist] c ON du.[ID_Control] = c.[Id_Control]
-                    WHERE c.[Nombre_Pauta] IN ({})
-                    GROUP BY du.[ID_Pedido], c.[Puesto], c.[Nombre_Pauta]
-                )
-                SELECT [ID_Pedido], [Puesto], [Nombre_Pauta], [total_controles], [noks_count], [fecha_listado]
-                FROM datos_agregados
-            """.format(','.join(['?' for _ in pautas])), pautas)
-            
-            for row in cursor.fetchall():
-                clave = (row[0], row[1], row[2])
-                fecha_str = None
-                if row[5]:  # fecha_listado
-                    fecha_str = row[5].strftime('%d/%m/%Y %H:%M')
-                
-                datos_pedido_puesto[clave] = {
-                    'completados': row[3],
-                    'noks': row[4] or 0,
-                    'fecha': fecha_str
-                }
-            
-            
-            print(f"✅ PASO 3B COMPLETADO: {len(datos_pedido_puesto)} registros precargados")
-            
-            contador = 0
-            for pedido_row in pedidos_rows:
-                contador += 1
-                if contador % 50 == 0:
-                    print(f"   ⏳ Procesados {contador}/{len(pedidos_rows)} armarios...")
-                
-                id_pedido = pedido_row[0]
-                armario = pedido_row[1]
-                referencia = pedido_row[2] or ''
-                pauta = pedido_row[3]
-                cerrado_valor = pedido_row[4]
-                
-                # Clave única del armario
-                armario_ref = f"{armario} - {referencia}" if referencia else armario
-                
-                if pauta not in estado_armarios:
-                    estado_armarios[pauta] = {}
-                
-                if armario_ref not in estado_armarios[pauta]:
-                    estado_armarios[pauta][armario_ref] = {
-                        'id_pedido': id_pedido,
-                        'armario': armario,
-                        'referencia': referencia,
-                        'puestos_estado': {}
-                    }
-                
-                # Para cada puesto de la pauta, determinar el estado
-                puestos_pauta = pauta_puestos.get(pauta, [])
-                
-                for puesto in puestos_pauta:
-                    # Obtener datos precargados o usar valores por defecto
-                    clave = (id_pedido, puesto, pauta)
-                    datos = datos_pedido_puesto.get(clave, {'completados': 0, 'noks': 0, 'fecha': None})
-                    
-                    controles_completados = datos['completados']
-                    noks = datos['noks']
-                    fecha_registro = datos['fecha']
-                    
-                    # Total de controles en este puesto (necesitamos saberlo para el color)
-                    # Usamos un cache simple
-                    if not hasattr(monitoreo_estado_armarios, '_total_controles_cache'):
-                        monitoreo_estado_armarios._total_controles_cache = {}
-                    
-                    cache_key = (puesto, pauta)
-                    if cache_key not in monitoreo_estado_armarios._total_controles_cache:
-                        cursor.execute("""
-                            SELECT COUNT(*), MAX([TipoReg])
-                            FROM [Digitalizacion].[PE].[Checklist]
-                            WHERE [Puesto] = ? AND [Nombre_Pauta] = ?
-                        """, (puesto, pauta))
-                        
-                        check_row = cursor.fetchone()
-                        total_controles = check_row[0] if check_row else 0
-                        tipo_reg = check_row[1] if check_row else None
-                        monitoreo_estado_armarios._total_controles_cache[cache_key] = {
-                            'total': total_controles,
-                            'tipo': tipo_reg
-                        }
-                    
-                    cache_data = monitoreo_estado_armarios._total_controles_cache[cache_key]
-                    total_controles = cache_data['total']
-                    tipo_reg = cache_data['tipo']
-                    tiene_listado = tipo_reg == 'Listado Armarios'
-                    
-                    # Determinar visibilidad
-                    primer_puesto = pauta_primer_ultimo[pauta]['primer']
-                    ultimo_puesto = pauta_primer_ultimo[pauta]['ultimo']
-                    es_primer_puesto = puesto == primer_puesto
-                    
-                    es_visible = es_primer_puesto
-                    
-                    if not es_primer_puesto and pauta_puestos.get(pauta):
-                        indice_puesto = pauta_puestos[pauta].index(puesto)
-                        if indice_puesto > 0:
-                            puesto_anterior = pauta_puestos[pauta][indice_puesto - 1]
-                            valor_anterior = extraer_valor(puesto_anterior)
-                            
-                            if cerrado_valor and cerrado_valor >= valor_anterior:
-                                cursor.execute("""
-                                    SELECT COUNT(*)
-                                    FROM [Digitalizacion].[PE].[DatosUser] du
-                                    INNER JOIN [Digitalizacion].[PE].[Checklist] c ON du.[ID_Control] = c.[Id_Control]
-                                    WHERE du.[ID_Pedido] = ? AND c.[Puesto] = ? AND du.[Resultado] = 'NOK'
-                                """, (id_pedido, puesto_anterior))
-                                
-                                noks_anterior = cursor.fetchone()[0] or 0
-                                es_visible = noks_anterior == 0
-                    
-                    if es_visible:
-                        # Determinar color
-                        if noks > 0:
-                            color = 'ROJO'
-                        elif controles_completados < total_controles:
-                            color = 'GRIS'
-                        elif puesto == ultimo_puesto:
-                            color = 'VERDE'
-                        else:
-                            color = 'GRIS'
-                        
-                        estado = {
-                            'color': color,
-                            'controles_completados': controles_completados,
-                            'total_controles': total_controles,
-                            'noks': noks,
-                            'es_listado_armarios': tiene_listado,
-                            'fecha_registro': fecha_registro
-                        }
-                    else:
-                        estado = 'NO_VISIBLE'
-                    
-                    estado_armarios[pauta][armario_ref]['puestos_estado'][puesto] = estado
-            
-            print(f"✅ PASO 4 COMPLETADO: {contador} armarios procesados")
-            
-            # PASO 5: Retornar resultado
-            print(f"📋 PASO 5: Preparando respuesta JSON...")
-            resultado = {
+            try:
+                cursor.timeout = 15
+            except Exception:
+                pass
+
+            pautas, pauta_puestos, pauta_primer_ultimo, armarios_por_pauta = _obtener_resumen_monitoreo(cursor)
+
+            return jsonify({
                 'success': True,
                 'pautas': pautas,
                 'pauta_puestos': pauta_puestos,
                 'pauta_primer_ultimo': pauta_primer_ultimo,
-                'estado_armarios': estado_armarios
-            }
-            
-            total_armarios = sum(len(armarios) for armarios in estado_armarios.values())
-            print(f"✅ MONITOREO COMPLETADO. Pautas: {len(pautas)}, Armarios totales: {total_armarios}")
-            
-            return jsonify(resultado)
-            
+                'armarios_por_pauta': armarios_por_pauta
+            })
     except Exception as e:
-        print(f"💥 Error en monitoreo_estado_armarios: {e}")
+        print(f"💥 Error en monitoreo_resumen_pautas: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
+
+
+@app.route('/api/monitoreo/estado-armarios', methods=['GET'])
+def monitoreo_estado_armarios():
+    """
+    Obtiene el estado de armarios para una pauta concreta.
+    Si no se informa pauta, devuelve un resumen ligero con pautas y puestos.
+    """
+    request_started_at = time.perf_counter()
+    pauta_seleccionada = (request.args.get('pauta') or '').strip()
+
+    try:
+        print(f"🔍 INICIO: monitoreo_estado_armarios pauta='{pauta_seleccionada or 'TODAS'}'")
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                print("❌ No se pudo conectar a BD")
+                return jsonify({'success': False, 'message': 'Error de conexión a base de datos'}), 500
+
+            cursor = conn.cursor()
+            try:
+                cursor.timeout = 30
+            except Exception:
+                pass
+
+            pautas, pauta_puestos, pauta_primer_ultimo, armarios_por_pauta = _obtener_resumen_monitoreo(cursor)
+
+            if not pauta_seleccionada:
+                print(f"✅ MONITOREO RESUMEN COMPLETADO en {time.perf_counter() - request_started_at:.2f}s")
+                return jsonify({
+                    'success': True,
+                    'pautas': pautas,
+                    'pauta_puestos': pauta_puestos,
+                    'pauta_primer_ultimo': pauta_primer_ultimo,
+                    'armarios_por_pauta': armarios_por_pauta,
+                    'estado_armarios': {}
+                })
+
+            if pauta_seleccionada not in pauta_puestos:
+                return jsonify({'success': False, 'message': f'La pauta {pauta_seleccionada} no existe'}), 404
+
+            estado_armarios_pauta = _obtener_estado_armarios_por_pauta(
+                cursor,
+                pauta_seleccionada,
+                pauta_puestos.get(pauta_seleccionada, []),
+                pauta_primer_ultimo.get(pauta_seleccionada, {})
+            )
+
+            total_armarios = len(estado_armarios_pauta)
+            print(f"📋 PASO 5: Preparando respuesta JSON para pauta '{pauta_seleccionada}'...")
+            print(f"✅ MONITOREO COMPLETADO en {time.perf_counter() - request_started_at:.2f}s. Pauta: {pauta_seleccionada}, Armarios: {total_armarios}")
+
+            return jsonify({
+                'success': True,
+                'pautas': [pauta_seleccionada],
+                'pauta_puestos': {pauta_seleccionada: pauta_puestos.get(pauta_seleccionada, [])},
+                'pauta_primer_ultimo': {pauta_seleccionada: pauta_primer_ultimo.get(pauta_seleccionada, {})},
+                'armarios_por_pauta': {pauta_seleccionada: total_armarios},
+                'estado_armarios': {pauta_seleccionada: estado_armarios_pauta}
+            })
+
+    except Exception as e:
+        print(f"💥 Error en monitoreo_estado_armarios tras {time.perf_counter() - request_started_at:.2f}s: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
@@ -6491,6 +6706,7 @@ def eliminar_proveedor(proveedor_id):
 @app.route('/api/get-puestos-dropdown', methods=['GET'])
 def get_puestos_dropdown():
     """Obtener puestos únicos con ID y nombre para dropdown"""
+    request_started_at = time.perf_counter()
     try:
         print("🔍 Obteniendo puestos para dropdown...")
         
@@ -6499,11 +6715,16 @@ def get_puestos_dropdown():
                 return jsonify({'success': False, 'message': 'Error de conexión a base de datos'}), 500
             
             cursor = conn.cursor()
+            try:
+                cursor.timeout = 8
+            except Exception:
+                pass
             
-            # Obtener puestos únicos por nombre
+            # Obtener puestos con nombre válido para dropdown
             cursor.execute("""
                 SELECT DISTINCT ID_Puesto, Nombre_Puesto
                 FROM [Digitalizacion].[PE].[Puestos]
+                WHERE Nombre_Puesto IS NOT NULL AND LTRIM(RTRIM(Nombre_Puesto)) <> ''
                 ORDER BY Nombre_Puesto
             """)
             
@@ -6516,7 +6737,7 @@ def get_puestos_dropdown():
                     'nombre_puesto': row[1]
                 })
             
-            print(f"📊 Puestos únicos obtenidos: {len(puestos)}")
+            print(f"📊 Puestos obtenidos para dropdown: {len(puestos)} en {time.perf_counter() - request_started_at:.2f}s")
             
             return jsonify({
                 'success': True,
@@ -6524,8 +6745,16 @@ def get_puestos_dropdown():
                 'message': f'Se obtuvieron {len(puestos)} puestos exitosamente'
             })
     
+    except pyodbc.Error as e:
+        print(f"❌ Error SQL obteniendo puestos dropdown tras {time.perf_counter() - request_started_at:.2f}s: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'message': 'Error consultando puestos en base de datos'
+        }), 500
     except Exception as e:
-        print(f"❌ Error obteniendo puestos dropdown: {e}")
+        print(f"❌ Error obteniendo puestos dropdown tras {time.perf_counter() - request_started_at:.2f}s: {e}")
         import traceback
         traceback.print_exc()
         return jsonify({
@@ -7494,12 +7723,34 @@ def get_pedido_correcciones(id_pedido):
             if not row:
                 return jsonify({'success': False, 'message': 'Pedido no encontrado'}), 404
 
+            nombre_pauta = row[4] or ''
+            referencias_validas = []
+
+            if nombre_pauta:
+                cursor.execute("""
+                    SELECT TOP 1 ID_Pauta
+                    FROM [Digitalizacion].[PE].[Pautas]
+                    WHERE Nombre_Pauta = ?
+                    ORDER BY ID_Pauta DESC
+                """, (nombre_pauta,))
+
+                pauta_row = cursor.fetchone()
+                if pauta_row:
+                    cursor.execute("""
+                        SELECT Referencia
+                        FROM [Digitalizacion].[PE].[Pauta_Referencias]
+                        WHERE ID_Pauta = ?
+                        ORDER BY Referencia ASC
+                    """, (pauta_row[0],))
+                    referencias_validas = [ref_row[0] for ref_row in cursor.fetchall() if ref_row[0]]
+
             pedido = {
                 'id_pedido': row[0],
                 'armario': row[1] or '',
                 'num_pedido': row[2] or '',
                 'referencia': row[3] or '',
-                'nombre_pauta': row[4] or ''
+                'nombre_pauta': nombre_pauta,
+                'referencias_validas': referencias_validas
             }
 
             return jsonify({'success': True, 'pedido': pedido})
@@ -7513,16 +7764,20 @@ def get_pedido_correcciones(id_pedido):
 
 @app.route('/api/correcciones/pedido/<int:id_pedido>', methods=['PUT'])
 def actualizar_pedido_correcciones(id_pedido):
-    """Actualiza Armario y NumPedido para Correcciones"""
+    """Actualiza Armario, NumPedido y Referencia para Correcciones"""
     try:
         data = request.get_json() or {}
         armario = (data.get('armario') or '').strip()
         num_pedido = (data.get('num_pedido') or '').strip()
+        referencia = (data.get('referencia') or '').strip()
 
         if not armario:
             return jsonify({'success': False, 'message': 'El campo Armario es obligatorio'}), 400
 
-        print(f"📝 [Correcciones] Actualizar pedido {id_pedido}: Armario='{armario}', NumPedido='{num_pedido}'")
+        if not referencia:
+            return jsonify({'success': False, 'message': 'La referencia es obligatoria'}), 400
+
+        print(f"📝 [Correcciones] Actualizar pedido {id_pedido}: Armario='{armario}', NumPedido='{num_pedido}', Referencia='{referencia}'")
 
         with ConexionODBC('Digitalizacion') as conn:
             if not conn:
@@ -7532,13 +7787,17 @@ def actualizar_pedido_correcciones(id_pedido):
 
             # Validar existencia
             cursor.execute("""
-                SELECT COUNT(*)
+                SELECT Nombre_Pauta, Referencia
                 FROM [Digitalizacion].[PE].[Pedido]
                 WHERE ID_Pedido = ?
             """, (id_pedido,))
 
-            if cursor.fetchone()[0] == 0:
+            pedido_row = cursor.fetchone()
+            if not pedido_row:
                 return jsonify({'success': False, 'message': 'Pedido no encontrado'}), 404
+
+            nombre_pauta = pedido_row[0] or ''
+            referencia_actual = pedido_row[1] or ''
 
             # Validar unicidad de Armario (NumPedido sí puede repetirse)
             cursor.execute("""
@@ -7554,11 +7813,34 @@ def actualizar_pedido_correcciones(id_pedido):
                     'message': f'El armario "{armario}" ya existe en otro pedido (ID: {duplicado[0]}).'
                 }), 409
 
+            if nombre_pauta:
+                cursor.execute("""
+                    SELECT TOP 1 ID_Pauta
+                    FROM [Digitalizacion].[PE].[Pautas]
+                    WHERE Nombre_Pauta = ?
+                    ORDER BY ID_Pauta DESC
+                """, (nombre_pauta,))
+                pauta_row = cursor.fetchone()
+
+                if pauta_row:
+                    cursor.execute("""
+                        SELECT COUNT(*)
+                        FROM [Digitalizacion].[PE].[Pauta_Referencias]
+                        WHERE ID_Pauta = ? AND Referencia = ?
+                    """, (pauta_row[0], referencia))
+                    referencia_valida = cursor.fetchone()[0] > 0
+
+                    if not referencia_valida and referencia != referencia_actual:
+                        return jsonify({
+                            'success': False,
+                            'message': f'La referencia "{referencia}" no está configurada para la pauta "{nombre_pauta}".'
+                        }), 400
+
             cursor.execute("""
                 UPDATE [Digitalizacion].[PE].[Pedido]
-                SET Armario = ?, NumPedido = ?
+                SET Armario = ?, NumPedido = ?, Referencia = ?
                 WHERE ID_Pedido = ?
-            """, (armario, num_pedido, id_pedido))
+            """, (armario, num_pedido, referencia, id_pedido))
 
             conn.commit()
 
@@ -7568,7 +7850,8 @@ def actualizar_pedido_correcciones(id_pedido):
                 'pedido': {
                     'id_pedido': id_pedido,
                     'armario': armario,
-                    'num_pedido': num_pedido
+                    'num_pedido': num_pedido,
+                    'referencia': referencia
                 }
             })
 
@@ -7750,7 +8033,7 @@ if __name__ == '__main__':
     
     if cert_file and key_file:
         # Ejecutar con HTTPS usando ssl_context
-        print(f"\n🔒 Iniciando servidor HTTPS en https://192.168.253.9:3550")
+        print(f"\n🔒 Iniciando servidor HTTPS en https://192.168.253.9:3007")
         print(f"⚠️  Nota: El navegador mostrará advertencia de seguridad (certificado auto-firmado)")
         print(f"⚠️  Esto es NORMAL. Continúa de todas formas para usar el lector de QR.\n")
         try:
@@ -7758,13 +8041,13 @@ if __name__ == '__main__':
             import ssl
             context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
             context.load_cert_chain(cert_file, key_file)
-            app.run(host='0.0.0.0', port=3550, ssl_context=context, debug=False, use_reloader=False, threaded=True)
+            app.run(host='0.0.0.0', port=3007, ssl_context=context, debug=False, use_reloader=False, threaded=True)
         except Exception as e:
             print(f"⚠️ Error con SSL context: {e}")
             print(f"⚠️ Intentando con ssl_context simple...\n")
-            app.run(host='0.0.0.0', port=3550, ssl_context=(cert_file, key_file), debug=False, use_reloader=False, threaded=True)
+            app.run(host='0.0.0.0', port=3007, ssl_context=(cert_file, key_file), debug=False, use_reloader=False, threaded=True)
     else:
         # Fallback a HTTP si hay problema con certificado
-        print(f"\n⚠️  Iniciando servidor HTTP en http://192.168.253.9:3550")
+        print(f"\n⚠️  Iniciando servidor HTTP en http://192.168.253.9:3007")
         print(f"⚠️  El lector de QR NO funcionará desde direcciones IP sin HTTPS\n")
-        app.run(host='0.0.0.0', port=3550, debug=False, use_reloader=False, threaded=True)
+        app.run(host='0.0.0.0', port=3007, debug=False, use_reloader=False, threaded=True)

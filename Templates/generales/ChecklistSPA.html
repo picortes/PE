@@ -1867,9 +1867,234 @@
       padding: 0 20px;
     }
 
+    .puestos-toolbar {
+      max-width: 1200px;
+      margin: 0 auto 20px auto;
+      padding: 0 20px;
+      z-index: 30;
+    }
+
+    .puestos-toolbar[data-compact="true"] .puestos-filter-bar {
+      gap: 10px;
+    }
+
+    .puestos-toolbar[data-saved-layout-active="true"] .puestos-filter-bar {
+      gap: 8px;
+    }
+
+    .puestos-toolbar[data-compact="true"] .puestos-filter-group {
+      padding: 10px 14px;
+      border-radius: 12px;
+    }
+
+    .puestos-toolbar[data-saved-layout-active="true"] .puestos-filter-group {
+      padding: 9px 13px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    }
+
+    .puestos-toolbar[data-compact="true"] .puestos-filter-group-header {
+      margin-bottom: 8px;
+    }
+
+    .puestos-toolbar[data-saved-layout-active="true"] .puestos-filter-group-header {
+      margin-bottom: 6px;
+    }
+
+    .puestos-toolbar[data-compact="true"] .puestos-filter-toggle {
+      padding: 7px 12px;
+      font-size: 0.84rem;
+    }
+
+    .puestos-toolbar[data-saved-layout-active="true"] .puestos-filter-toggle {
+      padding: 6px 11px;
+      font-size: 0.82rem;
+    }
+
+    .puestos-toolbar[data-saved-layout-active="true"] .puestos-filter-group-title {
+      font-size: 0.9rem;
+    }
+
+    .puestos-toolbar[data-saved-layout-active="true"] .puestos-filter-hint {
+      font-size: 0.82rem;
+      opacity: 0.88;
+    }
+
+    .puestos-toolbar[data-saved-layout-active="true"] .puestos-filter-reset,
+    .puestos-toolbar[data-saved-layout-active="true"] .puestos-pin-button {
+      padding: 7px 12px;
+      font-size: 0.8rem;
+    }
+
+    .puestos-filter-bar {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 18px;
+    }
+
+    .puestos-filter-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .puestos-filter-group {
+      background: #ffffff;
+      border: 1px solid #e3e8ee;
+      border-radius: 14px;
+      padding: 16px 18px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.05);
+    }
+
+    .puestos-filter-group--primary {
+      border-color: #cfe2f8;
+      box-shadow: 0 8px 20px rgba(56, 128, 199, 0.08);
+    }
+
+    .puestos-filter-group--secondary {
+      border-color: #e2e8f0;
+    }
+
+    .puestos-filter-group-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .puestos-filter-group-title {
+      color: #2c3e50;
+      font-weight: 600;
+      font-size: 0.98rem;
+    }
+
+    .puestos-filter-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .puestos-pin-button {
+      border: 1px solid #d4deea;
+      background: white;
+      color: #47607a;
+      border-radius: 999px;
+      padding: 9px 14px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .puestos-pin-button:hover:not(:disabled) {
+      border-color: #3880c7;
+      color: #2c6bb3;
+      background: #f4f9ff;
+    }
+
+    .puestos-pin-button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .puestos-pin-button.is-saved {
+      background: linear-gradient(135deg, #3880c7 0%, #2c6bb3 100%);
+      color: white;
+      border-color: #2c6bb3;
+      box-shadow: 0 8px 16px rgba(56, 128, 199, 0.18);
+    }
+
+    .puestos-pin-button.is-dirty {
+      border-color: #f0b429;
+      background: #fff9e8;
+      color: #8a5a00;
+    }
+
+    .puestos-pin-status {
+      color: #64748b;
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+
+    .puestos-filter-reset {
+      border: none;
+      background: #edf2f7;
+      color: #4a5568;
+      border-radius: 999px;
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .puestos-filter-reset:hover {
+      background: #dbe7f3;
+      color: #2c5282;
+    }
+
+    .puestos-filter-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .puestos-filter-toggle {
+      border: 2px solid #dfe6e9;
+      background: #f8fafc;
+      color: #2c3e50;
+      border-radius: 999px;
+      padding: 10px 16px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .puestos-filter-toggle:hover {
+      border-color: #3880c7;
+      background: #eef6fd;
+      transform: translateY(-1px);
+    }
+
+    .puestos-filter-toggle.active {
+      background: linear-gradient(135deg, #3880c7 0%, #2c6bb3 100%);
+      border-color: #2c6bb3;
+      color: white;
+      box-shadow: 0 6px 16px rgba(56, 128, 199, 0.25);
+    }
+
+    .puestos-filter-empty {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+      font-style: italic;
+    }
+
+    .puestos-filter-hint {
+      color: #7f8c8d;
+      font-size: 0.9rem;
+    }
+
     .puestos-tree-content {
       display: grid;
-      gap: 30px;
+      gap: 20px;
+    }
+
+    .puestos-tree-content[data-interface-mode="comparison"] {
+      gap: 16px;
+    }
+
+    .puestos-tree-content[data-interface-mode="work"] {
+      gap: 0;
     }
 
     /* Estilo para cada puesto (categoría principal) */
@@ -1886,6 +2111,56 @@
     .puesto-section:hover {
       transform: translateY(-2px);
       box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+    }
+
+    .puesto-section[data-interface-mode="work"] {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    .puesto-section[data-interface-mode="work"]:hover {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .puesto-section[data-interface-mode="comparison"] {
+      overflow: visible;
+    }
+
+    .puesto-section__toggle {
+      width: 100%;
+      border: none;
+      background: none;
+      padding: 0;
+      text-align: left;
+      cursor: pointer;
+      display: block;
+    }
+
+    .puesto-section__toggle-icon {
+      position: relative;
+      z-index: 1;
+      margin-left: auto;
+      font-size: 1rem;
+      opacity: 0.95;
+      transition: transform 0.22s ease;
+    }
+
+    .puesto-section[data-expanded="true"] .puesto-section__toggle-icon {
+      transform: rotate(180deg);
+    }
+
+    .puesto-section[data-interface-mode="work"] .puesto-header {
+      border-radius: 18px 18px 0 0;
+      padding: 18px 22px;
+    }
+
+    .puesto-section[data-interface-mode="comparison"] .puesto-header {
+      padding: 12px 16px;
+      min-height: auto;
     }
 
     /* Header del puesto */
@@ -1911,7 +2186,7 @@
     }
 
     .puesto-title {
-      font-size: 1.4rem;
+      font-size: 1.22rem;
       font-weight: 600;
       margin: 0;
       position: relative;
@@ -1919,6 +2194,41 @@
       display: flex;
       align-items: center;
       gap: 12px;
+    }
+
+    .puesto-header__meta {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .puesto-header__meta-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,0.18);
+      color: white;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .puesto-section[data-interface-mode="comparison"] .puesto-header__meta-badge {
+      padding: 4px 9px;
+      font-size: 0.74rem;
+    }
+
+    .puesto-section__content {
+      display: block;
+    }
+
+    .puesto-section[data-interface-mode="comparison"][data-expanded="false"] .puesto-section__content {
+      display: none;
     }
 
     .puesto-icon {
@@ -1930,21 +2240,56 @@
     .pautas-grid {
       padding: 25px;
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      align-items: stretch;
+      grid-auto-flow: row dense;
+      justify-items: stretch;
+    }
+
+    .pautas-grid[data-layout="focus"] {
+      grid-template-columns: minmax(320px, 800px);
+      justify-content: center;
+      justify-items: center;
+    }
+
+    .pautas-grid[data-layout="compact"] {
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      padding: 16px 18px 18px 18px;
+    }
+
+    .puesto-section[data-layout="focus"] {
+      max-width: 980px;
+      margin: 0 auto;
     }
 
     /* Tarjetas de pautas */
     .pauta-card {
       background: white;
-      border-radius: 12px;
-      padding: 20px;
+      border-radius: 16px;
+      padding: 20px 20px 18px 20px;
       box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-      border: 2px solid transparent;
-      transition: all 0.3s ease;
+      border: 1px solid #e2e8f0;
+      transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease, background 0.25s ease;
       cursor: pointer;
       position: relative;
       overflow: hidden;
+      width: 100%;
+      min-height: 170px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: left;
+      appearance: none;
+      -webkit-appearance: none;
+      font-family: inherit;
+    }
+
+    .pauta-card[data-layout="compact"] {
+      min-height: 108px;
+      padding: 12px 13px;
+      border-radius: 14px;
     }
 
     .pauta-card::before {
@@ -1954,44 +2299,228 @@
       left: 0;
       right: 0;
       height: 4px;
-      background: linear-gradient(90deg, #4CAF50, #45a049);
+      background: linear-gradient(90deg, #3880c7, #2c6bb3);
       transform: scaleX(0);
       transition: transform 0.3s ease;
     }
 
     .pauta-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 28px rgba(0,0,0,0.15);
-      border-color: #4CAF50;
+      transform: translateY(-4px);
+      box-shadow: 0 14px 30px rgba(15, 23, 42, 0.14);
+      border-color: #3880c7;
     }
 
     .pauta-card:hover::before {
       transform: scaleX(1);
     }
 
+    .pauta-card:focus-visible {
+      outline: none;
+      border-color: #3880c7;
+      box-shadow: 0 0 0 4px rgba(56, 128, 199, 0.18), 0 14px 30px rgba(15, 23, 42, 0.14);
+    }
+
+    .pauta-card--selected {
+      border-color: #2c6bb3;
+      background: linear-gradient(180deg, #f4f9ff 0%, #ffffff 100%);
+      box-shadow: 0 12px 26px rgba(56, 128, 199, 0.16);
+    }
+
+    .pauta-card--selected::before {
+      transform: scaleX(1);
+    }
+
+    .pauta-card[data-layout="focus"] {
+      min-height: 220px;
+      padding: 28px;
+      border-radius: 20px;
+    }
+
+    .pauta-card__action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      pointer-events: none;
+    }
+
+    .pauta-card[data-layout="focus"] .pauta-card__action {
+      margin-top: 12px;
+      width: 100%;
+      border-radius: 12px;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, #3880c7 0%, #2c6bb3 100%);
+      color: white;
+      font-size: 0.96rem;
+      box-shadow: 0 8px 18px rgba(56, 128, 199, 0.22);
+    }
+
+    .pauta-card__header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .pauta-card[data-layout="compact"] .pauta-card__header {
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .pauta-card__title-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+    }
+
     .pauta-name {
-      font-size: 1.1rem;
-      font-weight: 600;
+      font-size: 1.08rem;
+      font-weight: 700;
       color: #2c3e50;
-      margin: 0 0 10px 0;
+      margin: 0;
       line-height: 1.3;
+      flex: 1;
+    }
+
+    .pauta-card[data-layout="focus"] .pauta-name {
+      font-size: 1.35rem;
+      line-height: 1.35;
+    }
+
+    .pauta-card[data-layout="compact"] .pauta-name {
+      font-size: 1.12rem;
+      line-height: 1.2;
+    }
+
+    .pauta-card__subtitle {
+      color: #64748b;
+      font-size: 0.92rem;
+      line-height: 1.45;
+      margin: 0;
+    }
+
+    .pauta-card[data-layout="compact"] .pauta-card__subtitle {
+      font-size: 0.78rem;
+      line-height: 1.25;
+      display: -webkit-box;
+      line-clamp: 2;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      opacity: 0.82;
+    }
+
+    .pauta-card__footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: auto;
+    }
+
+    .pauta-card[data-layout="compact"] .pauta-card__footer {
+      gap: 8px;
     }
 
     .pauta-badge {
-      background: linear-gradient(135deg, #e8f5e8 0%, #d4edda 100%);
-      color: #155724;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 500;
+      background: #eef6fd;
+      color: #2c6bb3;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 0.76rem;
+      font-weight: 600;
       display: inline-flex;
       align-items: center;
-      gap: 6px;
-      border: 1px solid #c3e6cb;
+      gap: 5px;
+      border: 1px solid #cfe2f8;
+      white-space: nowrap;
+    }
+
+    .pauta-card[data-layout="compact"] .pauta-badge {
+      padding: 3px 8px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #5b7ea7;
+      background: #f4f8fc;
+      border-color: #d9e7f5;
     }
 
     .pauta-badge .badge-icon {
-      font-size: 0.9rem;
+      font-size: 0.8rem;
+    }
+
+    .pauta-card[data-layout="compact"] .pauta-badge .badge-icon {
+      font-size: 0.72rem;
+    }
+
+    .pauta-card[data-layout="compact"] .pauta-card__action {
+      color: #2c6bb3;
+      font-size: 0.8rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .pauta-card[data-layout="compact"] .pauta-card__action::after {
+      content: '→';
+      font-size: 0.92rem;
+      line-height: 1;
+    }
+
+    @media (min-width: 768px) and (max-width: 1180px) {
+      .puestos-toolbar {
+        position: sticky;
+        top: 74px;
+      }
+
+      .puestos-filter-bar {
+        gap: 12px;
+      }
+
+      .puestos-filter-topbar {
+        align-items: flex-start;
+      }
+
+      .puestos-filter-group {
+        padding: 14px 16px;
+      }
+
+      .puestos-filter-list {
+        gap: 8px;
+      }
+
+      .puestos-filter-toggle {
+        min-height: 42px;
+        padding: 10px 14px;
+      }
+
+      .puestos-tree-container {
+        padding-top: 8px;
+      }
+
+      .puestos-tree-content[data-interface-mode="comparison"] {
+        gap: 12px;
+      }
+
+      .puesto-header {
+        padding: 16px 18px;
+      }
+
+      .puesto-section[data-interface-mode="comparison"] .puesto-header {
+        padding: 10px 14px;
+      }
+
+      .pautas-grid[data-layout="compact"] {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 12px;
+        padding: 14px 14px 16px 14px;
+      }
+
+      .pauta-card[data-layout="compact"] {
+        min-height: 104px;
+      }
     }
 
     /* Estados de carga y vacío */
@@ -2057,9 +2586,13 @@
       .pautas-grid {
         grid-template-columns: 1fr;
         padding: 20px;
-        gap: 15px;
+        gap: 18px;
       }
-      
+
+      .puestos-toolbar {
+        padding: 0 20px;
+      }
+
       .puesto-header {
         padding: 15px 20px;
       }
@@ -2069,9 +2602,25 @@
       .puestos-tree-container {
         padding: 0 15px;
       }
+
+      .puestos-filter-bar {
+        padding: 0 15px;
+      }
+
+      .puestos-toolbar {
+        padding: 0 15px;
+      }
+
+      .puestos-filter-group {
+        padding: 14px;
+      }
       
       .pauta-card {
         padding: 15px;
+      }
+
+      .pauta-card[data-layout="focus"] {
+        padding: 20px;
       }
     }
 
@@ -4901,6 +5450,39 @@
         <p class="subtitle">Vista de puestos y pautas configuradas</p>
         <button onclick="toggleFullScreen()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer; padding: 5px; border-radius: 5px; transition: background 0.3s;" title="Pantalla completa" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='none'">⛶</button>
       </div>
+
+      <div class="puestos-toolbar" id="puestos-toolbar">
+        <div class="puestos-filter-bar">
+          <div class="puestos-filter-topbar">
+            <span class="puestos-filter-hint">Selecciona un puesto y/o una pauta para acotar la vista.</span>
+            <div class="puestos-filter-actions">
+              <button type="button" id="puestos-pin-button" class="puestos-pin-button" onclick="togglePuestosPinnedLayout()" disabled>
+                <span id="puestos-pin-icon">📌</span>
+                <span id="puestos-pin-label">Guardar layout</span>
+              </button>
+              <span id="puestos-pin-status" class="puestos-pin-status"></span>
+            </div>
+          </div>
+          <div class="puestos-filter-group puestos-filter-group--primary">
+            <div class="puestos-filter-group-header">
+              <span class="puestos-filter-group-title">Puesto activo</span>
+              <div class="puestos-filter-actions">
+                <button type="button" class="puestos-filter-reset" onclick="clearPuestoFilters()">Limpiar puestos</button>
+              </div>
+            </div>
+            <div id="puestos-puesto-filter-list" class="puestos-filter-list"></div>
+          </div>
+          <div class="puestos-filter-group puestos-filter-group--secondary">
+            <div class="puestos-filter-group-header">
+              <span class="puestos-filter-group-title">Pauta activa</span>
+              <div class="puestos-filter-actions">
+                <button type="button" class="puestos-filter-reset" onclick="clearPautaFilters()">Limpiar pautas</button>
+              </div>
+            </div>
+            <div id="puestos-pauta-filter-list" class="puestos-filter-list"></div>
+          </div>
+        </div>
+      </div>
       
       <div id="puestos-tree-container" class="puestos-tree-container">
         <div id="loading-puestos" class="loading-message">
@@ -5175,7 +5757,9 @@
 
           <div>
             <label for="editarReferencia" style="display:block; font-weight: 600; margin-bottom: 6px; color: #333;">Referencia</label>
-            <input id="editarReferencia" type="text" readonly style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; background: #f6f8fb; color: #666;" />
+            <select id="editarReferencia" style="width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; background: white; color: #333;">
+              <option value="">Selecciona una referencia...</option>
+            </select>
           </div>
 
           <div>
@@ -6054,6 +6638,12 @@
     let controlesDisponibles = [];
     let controlesSeleccionados = [];
     let referenciasSeleccionadas = [];  // 🆕 Variable para referencias
+    let puestosTreeData = [];
+    let selectedPuestoFilters = [];
+    let selectedPautaFilters = [];
+    let expandedPuestoSection = null;
+    let savedPuestosLayout = null;
+    let applyingSavedPuestosLayout = false;
     let navigationHistory = ['screen-main']; // Historial de navegación interna
     let currentScreenIndex = 0; // Índice actual en el historial
 
@@ -7053,6 +7643,7 @@
       // Variables para controlar el comportamiento del dropdown
       let userInteracting = false;
       let dropdownOpen = false;
+      let destroyed = false;
       
       try {
         let opciones = [];
@@ -7141,13 +7732,20 @@
         select.appendChild(option);
       }
       
+      function cleanupDropdown() {
+        if (destroyed) return;
+        destroyed = true;
+        document.removeEventListener('click', handleClickOutside);
+      }
+
       // Función para finalizar la edición
       function finalizarEdicion() {
+        cleanupDropdown();
         const nuevoValor = select.value;
         if (tipo === 'puesto') {
           // Para puesto, buscar el nombre correspondiente al ID
           const selectedOption = select.options[select.selectedIndex];
-          const nombreMostrado = selectedOption.textContent;
+          const nombreMostrado = selectedOption ? selectedOption.textContent : valorActual;
           celda.textContent = nombreMostrado || valorActual;
           celda.dataset.value = nuevoValor || valorActual;  // Guardar el ID
           celda.dataset.idPuesto = nuevoValor || valorActual;  // 🆕 Guardar ID en dataset
@@ -7179,7 +7777,7 @@
         dropdownOpen = false;
         const nuevoValor = select.value;
         const selectedOption = select.options[select.selectedIndex];
-        const nombreMostrado = selectedOption.textContent;
+        const nombreMostrado = selectedOption ? selectedOption.textContent : valorActual;
         
         if (tipo === 'puesto') {
           celda.textContent = nombreMostrado;  // Mostrar nombre
@@ -7202,7 +7800,7 @@
           dropdownOpen = false;
           const nuevoValor = select.value;
           const selectedOption = select.options[select.selectedIndex];
-          const nombreMostrado = selectedOption.textContent;
+          const nombreMostrado = selectedOption ? selectedOption.textContent : valorActual;
           
           if (tipo === 'puesto') {
             celda.textContent = nombreMostrado;
@@ -7240,11 +7838,11 @@
       
       // Manejar clics fuera del dropdown
       function handleClickOutside(e) {
+        if (destroyed) return;
         if (!select.contains(e.target)) {
           userInteracting = false;
           dropdownOpen = false;
           finalizarEdicion();
-          document.removeEventListener('click', handleClickOutside);
         }
       }
       
@@ -7257,7 +7855,9 @@
         select.focus();
         // Agregar listener para clics externos después de un delay
         setTimeout(() => {
-          document.addEventListener('click', handleClickOutside);
+          if (!destroyed) {
+            document.addEventListener('click', handleClickOutside);
+          }
         }, 100);
       }, 10);
     }
@@ -7536,12 +8136,21 @@
         const data = await response.json();
         
         if (data.success && data.puestos && data.puestos.length > 0) {
-          renderPuestosTree(data.puestos);
-          document.getElementById('loading-puestos').style.display = 'none';
-          document.getElementById('puestos-tree-content').style.display = 'block';
+          puestosTreeData = data.puestos;
+          await loadSavedPuestosLayout();
+          applySavedPuestosLayoutIfAvailable();
+          renderPuestoFilterToggles(data.puestos);
+          renderPautaFilterToggles(data.puestos);
+          updatePuestosPinButtonState();
+          renderFilteredPuestosTree();
           console.log(`✅ ${data.puestos.length} puestos cargados exitosamente`);
         } else {
           // No hay puestos para mostrar
+          puestosTreeData = [];
+          savedPuestosLayout = null;
+          renderPuestoFilterToggles([]);
+          renderPautaFilterToggles([]);
+          updatePuestosPinButtonState();
           document.getElementById('loading-puestos').style.display = 'none';
           document.getElementById('no-puestos-message').style.display = 'block';
           console.log('ℹ️ No se encontraron puestos configurados');
@@ -7549,38 +8158,528 @@
         
       } catch (error) {
         console.error('💥 Error cargando puestos:', error);
+        puestosTreeData = [];
+        savedPuestosLayout = null;
+        renderPuestoFilterToggles([]);
+        renderPautaFilterToggles([]);
+        updatePuestosPinButtonState();
         document.getElementById('loading-puestos').style.display = 'none';
         document.getElementById('no-puestos-message').style.display = 'block';
       }
     }
 
+    function normalizeLayoutFilters(filters) {
+      return [...new Set((Array.isArray(filters) ? filters : []).filter(Boolean))].sort((a, b) => a.localeCompare(b, 'es'));
+    }
+
+    function getCurrentPuestosLayoutSelection() {
+      return {
+        puestos: normalizeLayoutFilters(selectedPuestoFilters),
+        pautas: normalizeLayoutFilters(selectedPautaFilters)
+      };
+    }
+
+    function arePuestosLayoutsEqual(firstLayout, secondLayout) {
+      if (!firstLayout || !secondLayout) return false;
+
+      const firstPuestos = normalizeLayoutFilters(firstLayout.puestos);
+      const secondPuestos = normalizeLayoutFilters(secondLayout.puestos);
+      const firstPautas = normalizeLayoutFilters(firstLayout.pautas);
+      const secondPautas = normalizeLayoutFilters(secondLayout.pautas);
+
+      return JSON.stringify(firstPuestos) === JSON.stringify(secondPuestos) &&
+             JSON.stringify(firstPautas) === JSON.stringify(secondPautas);
+    }
+
+    function applySavedPuestosLayoutIfAvailable() {
+      if (!savedPuestosLayout || applyingSavedPuestosLayout) return;
+
+      applyingSavedPuestosLayout = true;
+      selectedPuestoFilters = [...savedPuestosLayout.puestos];
+      selectedPautaFilters = [...savedPuestosLayout.pautas];
+      applyingSavedPuestosLayout = false;
+    }
+
+    async function fetchJsonWithTimeout(url, options = {}, timeoutMs = 8000) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status} - ${response.statusText}`);
+        }
+
+        const contentType = response.headers.get('content-type') || '';
+        if (!contentType.includes('application/json')) {
+          throw new Error(`Respuesta no JSON recibida desde ${url}`);
+        }
+
+        return await response.json();
+      } finally {
+        clearTimeout(timeoutId);
+      }
+    }
+
+    function setSelectLoadingState(selectId, loadingText) {
+      const select = document.getElementById(selectId);
+      if (!select) return null;
+
+      select.innerHTML = `<option value="">${loadingText}</option>`;
+      return select;
+    }
+
+    function setSelectErrorState(selectId, errorText) {
+      const select = document.getElementById(selectId);
+      if (!select) return;
+
+      select.innerHTML = `<option value="">${errorText}</option>`;
+    }
+
+    function getPuestosPreferencesRequestOptions(method = 'GET', body = null) {
+      const user = LoginModal.getCurrentUser();
+      const headers = {};
+
+      if (user?.id) {
+        headers['X-User-Id'] = String(user.id);
+      }
+
+      if (body !== null) {
+        headers['Content-Type'] = 'application/json';
+      }
+
+      return {
+        method,
+        headers,
+        credentials: 'include',
+        ...(body !== null ? { body: JSON.stringify(body) } : {})
+      };
+    }
+
+    async function loadSavedPuestosLayout() {
+      const user = LoginModal.getCurrentUser();
+      if (!user) {
+        savedPuestosLayout = null;
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/preferencias-vista/puestos', getPuestosPreferencesRequestOptions('GET'));
+        const data = await response.json();
+
+        if (response.ok && data.success && data.has_preferences && data.preferences?.auto_aplicar) {
+          savedPuestosLayout = {
+            puestos: normalizeLayoutFilters(data.preferences.puestos),
+            pautas: normalizeLayoutFilters(data.preferences.pautas)
+          };
+        } else {
+          savedPuestosLayout = null;
+        }
+      } catch (error) {
+        console.error('💥 Error cargando layout guardado de Puestos:', error);
+        savedPuestosLayout = null;
+      }
+    }
+
+    function updatePuestosPinButtonState() {
+      const pinButton = document.getElementById('puestos-pin-button');
+      const pinLabel = document.getElementById('puestos-pin-label');
+      const pinStatus = document.getElementById('puestos-pin-status');
+      const toolbar = document.getElementById('puestos-toolbar');
+
+      if (!pinButton || !pinLabel || !pinStatus || !toolbar) return;
+
+      const user = LoginModal.getCurrentUser();
+      const currentLayout = getCurrentPuestosLayoutSelection();
+      const hasActiveSelection = currentLayout.puestos.length > 0 || currentLayout.pautas.length > 0;
+      const hasSavedLayout = !!savedPuestosLayout;
+      const matchesSavedLayout = hasSavedLayout && arePuestosLayoutsEqual(savedPuestosLayout, currentLayout);
+
+      pinButton.disabled = !user || (!hasActiveSelection && !hasSavedLayout);
+      pinButton.classList.toggle('is-saved', matchesSavedLayout);
+      pinButton.classList.toggle('is-dirty', hasSavedLayout && hasActiveSelection && !matchesSavedLayout);
+
+      if (!user) {
+        pinLabel.textContent = 'Guardar layout';
+        pinStatus.textContent = 'Inicia sesión para guardar tu vista preferida';
+      } else if (!hasSavedLayout) {
+        pinLabel.textContent = 'Guardar layout';
+        pinStatus.textContent = hasActiveSelection ? 'Guarda esta selección como vista inicial' : 'Selecciona filtros para poder guardarlos';
+      } else if (matchesSavedLayout) {
+        pinLabel.textContent = 'Quitar layout';
+        pinStatus.textContent = 'Este layout se aplica automáticamente al entrar';
+      } else {
+        pinLabel.textContent = 'Actualizar layout';
+        pinStatus.textContent = 'Tus cambios actuales son temporales hasta que pulses la chincheta';
+      }
+
+      toolbar.dataset.hasSavedLayout = hasSavedLayout ? 'true' : 'false';
+      toolbar.dataset.savedLayoutActive = matchesSavedLayout ? 'true' : 'false';
+    }
+
+    async function togglePuestosPinnedLayout() {
+      const user = LoginModal.getCurrentUser();
+      if (!user) {
+        showNotification('Debes iniciar sesión para guardar el layout', 'warning');
+        return;
+      }
+
+      const currentLayout = getCurrentPuestosLayoutSelection();
+      const hasSavedLayout = !!savedPuestosLayout;
+      const matchesSavedLayout = hasSavedLayout && arePuestosLayoutsEqual(savedPuestosLayout, currentLayout);
+
+      try {
+        if (matchesSavedLayout) {
+          const response = await fetch('/api/preferencias-vista/puestos', getPuestosPreferencesRequestOptions('DELETE'));
+          const data = await response.json();
+
+          if (!response.ok || !data.success) {
+            throw new Error(data.message || 'No se pudo eliminar el layout guardado');
+          }
+
+          savedPuestosLayout = null;
+          showNotification('Layout guardado eliminado', 'success');
+        } else {
+          const response = await fetch('/api/preferencias-vista/puestos', getPuestosPreferencesRequestOptions('POST', {
+              puestos: currentLayout.puestos,
+              pautas: currentLayout.pautas,
+              auto_aplicar: true
+            }));
+
+          const data = await response.json();
+          if (!response.ok || !data.success) {
+            throw new Error(data.message || 'No se pudo guardar el layout');
+          }
+
+          savedPuestosLayout = {
+            puestos: [...currentLayout.puestos],
+            pautas: [...currentLayout.pautas]
+          };
+          showNotification('Layout preferido guardado', 'success');
+        }
+      } catch (error) {
+        console.error('💥 Error gestionando layout guardado:', error);
+        showNotification(error.message || 'Error al gestionar el layout guardado', 'error');
+      }
+
+      updatePuestosPinButtonState();
+    }
+
+    function getPautaNames(pauta) {
+      if (Array.isArray(pauta.pautas_reales) && pauta.pautas_reales.length > 0) {
+        return pauta.pautas_reales;
+      }
+
+      return pauta.nombre_pauta ? [pauta.nombre_pauta] : [];
+    }
+
+    function getAvailablePuestos(puestos) {
+      return Array.from(new Set(
+        puestos
+          .filter(puesto => selectedPautaFilters.length === 0 || (puesto.pautas || []).some(pauta => pautaMatchesFilter(pauta, selectedPautaFilters)))
+          .map(puesto => puesto.nombre_puesto)
+      )).sort((a, b) => a.localeCompare(b, 'es'));
+    }
+
+    function getAvailablePautas(puestos) {
+      const pautasUnicas = new Set();
+
+      puestos.forEach(puesto => {
+        if (selectedPuestoFilters.length > 0 && !selectedPuestoFilters.includes(puesto.nombre_puesto)) {
+          return;
+        }
+
+        (puesto.pautas || []).forEach(pauta => {
+          getPautaNames(pauta).forEach(nombre => pautasUnicas.add(nombre));
+        });
+      });
+
+      return Array.from(pautasUnicas).sort((a, b) => a.localeCompare(b, 'es'));
+    }
+
+    function normalizeSelectedFilters(selectedFilters, availableOptions) {
+      return selectedFilters.filter(item => availableOptions.includes(item));
+    }
+
+    function renderToggleButtons(containerId, options, selectedOptions, toggleHandlerName, emptyMessage) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      if (options.length === 0) {
+        container.innerHTML = `<span class="puestos-filter-empty">${emptyMessage}</span>`;
+        return;
+      }
+
+      options.forEach(option => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `puestos-filter-toggle${selectedOptions.includes(option) ? ' active' : ''}`;
+        button.textContent = option;
+        button.addEventListener('click', () => window[toggleHandlerName](option));
+        container.appendChild(button);
+      });
+    }
+
+    function renderPuestoFilterToggles(puestos) {
+      const opciones = getAvailablePuestos(puestos);
+      selectedPuestoFilters = normalizeSelectedFilters(selectedPuestoFilters, opciones);
+      renderToggleButtons(
+        'puestos-puesto-filter-list',
+        opciones,
+        selectedPuestoFilters,
+        'togglePuestoFilter',
+        'No hay puestos disponibles para la selección actual.'
+      );
+    }
+
+    function renderPautaFilterToggles(puestos) {
+      const opciones = getAvailablePautas(puestos);
+      selectedPautaFilters = normalizeSelectedFilters(selectedPautaFilters, opciones);
+      renderToggleButtons(
+        'puestos-pauta-filter-list',
+        opciones,
+        selectedPautaFilters,
+        'togglePautaFilter',
+        'No hay pautas disponibles para la selección actual.'
+      );
+    }
+
+    function pautaMatchesFilter(pauta, filtrosPauta) {
+      if (!Array.isArray(filtrosPauta) || filtrosPauta.length === 0) return true;
+      return getPautaNames(pauta).some(nombre => filtrosPauta.includes(nombre));
+    }
+
+    function puestoMatchesFilter(puesto, filtrosPuesto) {
+      if (!Array.isArray(filtrosPuesto) || filtrosPuesto.length === 0) return true;
+      return filtrosPuesto.includes(puesto.nombre_puesto);
+    }
+
+    function getFilteredPuestosTreeData() {
+      if (selectedPuestoFilters.length === 0 && selectedPautaFilters.length === 0) {
+        return [];
+      }
+
+      return puestosTreeData
+        .filter(puesto => puestoMatchesFilter(puesto, selectedPuestoFilters))
+        .map(puesto => ({
+          ...puesto,
+          pautas: (puesto.pautas || []).filter(pauta => pautaMatchesFilter(pauta, selectedPautaFilters))
+        }))
+        .filter(puesto => puesto.pautas.length > 0);
+    }
+
+    function hasActiveTreeFilters() {
+      return selectedPuestoFilters.length > 0 || selectedPautaFilters.length > 0;
+    }
+
+    function getPuestosInterfaceMode(puestos) {
+      return selectedPuestoFilters.length === 1 &&
+             selectedPautaFilters.length === 1 &&
+             puestos.length === 1 &&
+             countVisiblePautas(puestos) === 1
+        ? 'work'
+        : 'comparison';
+    }
+
+    function syncExpandedPuestoSection(puestos, interfaceMode) {
+      if (interfaceMode !== 'comparison') {
+        expandedPuestoSection = puestos[0]?.nombre_puesto || null;
+        return;
+      }
+
+      const available = puestos.map(puesto => puesto.nombre_puesto);
+      if (expandedPuestoSection && available.includes(expandedPuestoSection)) {
+        return;
+      }
+
+      const preferred = selectedPuestoFilters.find(nombre => available.includes(nombre));
+      expandedPuestoSection = preferred || available[0] || null;
+    }
+
+    function togglePuestoSection(nombrePuesto) {
+      expandedPuestoSection = expandedPuestoSection === nombrePuesto ? null : nombrePuesto;
+      const puestosFiltrados = getFilteredPuestosTreeData();
+      if (puestosFiltrados.length > 0) {
+        renderFilteredPuestosTree();
+      }
+    }
+
+    function formatFilterList(items) {
+      return items.join(', ');
+    }
+
+    function updatePuestosEmptyState() {
+      const emptyTitle = document.querySelector('#no-puestos-message .empty-state h3');
+      const emptyText = document.querySelector('#no-puestos-message .empty-state p');
+
+      if (!emptyTitle || !emptyText) return;
+
+      if (selectedPuestoFilters.length > 0 && selectedPautaFilters.length > 0) {
+        emptyTitle.textContent = 'No hay resultados para la selección actual';
+        emptyText.textContent = `No se encontraron coincidencias entre los puestos "${formatFilterList(selectedPuestoFilters)}" y las pautas "${formatFilterList(selectedPautaFilters)}".`;
+      } else if (selectedPuestoFilters.length > 0) {
+        emptyTitle.textContent = 'No hay pautas para los puestos seleccionados';
+        emptyText.textContent = `No se encontraron pautas asociadas a: ${formatFilterList(selectedPuestoFilters)}.`;
+      } else if (selectedPautaFilters.length > 0) {
+        emptyTitle.textContent = 'No hay puestos para las pautas seleccionadas';
+        emptyText.textContent = `No se encontraron puestos asociados a: ${formatFilterList(selectedPautaFilters)}.`;
+      } else {
+        emptyTitle.textContent = 'No hay puestos configurados';
+        emptyText.textContent = 'No se encontraron puestos con pautas asignadas en el sistema.';
+      }
+    }
+
+    function renderFilteredPuestosTree() {
+      const puestosFiltrados = getFilteredPuestosTreeData();
+      const interfaceMode = getPuestosInterfaceMode(puestosFiltrados);
+      const toolbar = document.getElementById('puestos-toolbar');
+
+      document.getElementById('loading-puestos').style.display = 'none';
+      updatePuestosPinButtonState();
+
+      if (puestosTreeData.length > 0 && !hasActiveTreeFilters()) {
+        document.getElementById('puestos-tree-content').style.display = 'none';
+        document.getElementById('no-puestos-message').style.display = 'none';
+        if (toolbar) toolbar.dataset.compact = 'false';
+        return;
+      }
+
+      if (puestosFiltrados.length > 0) {
+        syncExpandedPuestoSection(puestosFiltrados, interfaceMode);
+        renderPuestosTree(puestosFiltrados);
+        document.getElementById('puestos-tree-content').style.display = 'grid';
+        document.getElementById('no-puestos-message').style.display = 'none';
+        if (toolbar) {
+          toolbar.dataset.compact = interfaceMode === 'comparison' && !!expandedPuestoSection ? 'true' : 'false';
+        }
+      } else {
+        document.getElementById('puestos-tree-content').style.display = 'none';
+        updatePuestosEmptyState();
+        document.getElementById('no-puestos-message').style.display = 'block';
+        if (toolbar) toolbar.dataset.compact = 'false';
+      }
+    }
+
+    function togglePuestoFilter(puesto) {
+      if (selectedPuestoFilters.includes(puesto)) {
+        selectedPuestoFilters = selectedPuestoFilters.filter(item => item !== puesto);
+      } else {
+        selectedPuestoFilters = [...selectedPuestoFilters, puesto];
+      }
+
+      renderPuestoFilterToggles(puestosTreeData);
+      renderPautaFilterToggles(puestosTreeData);
+      renderFilteredPuestosTree();
+      console.log('🏭 Filtros de puesto actualizados:', selectedPuestoFilters);
+    }
+
+    function togglePautaFilter(pauta) {
+      if (selectedPautaFilters.includes(pauta)) {
+        selectedPautaFilters = selectedPautaFilters.filter(item => item !== pauta);
+      } else {
+        selectedPautaFilters = [...selectedPautaFilters, pauta];
+      }
+
+      renderPuestoFilterToggles(puestosTreeData);
+      renderPautaFilterToggles(puestosTreeData);
+      renderFilteredPuestosTree();
+      console.log('📋 Filtros de pauta actualizados:', selectedPautaFilters);
+    }
+
+    function clearPuestoFilters() {
+      selectedPuestoFilters = [];
+      renderPuestoFilterToggles(puestosTreeData);
+      renderPautaFilterToggles(puestosTreeData);
+      renderFilteredPuestosTree();
+    }
+
+    function clearPautaFilters() {
+      selectedPautaFilters = [];
+      renderPuestoFilterToggles(puestosTreeData);
+      renderPautaFilterToggles(puestosTreeData);
+      renderFilteredPuestosTree();
+    }
+
+    function countVisiblePautas(puestos) {
+      return puestos.reduce((total, puesto) => total + ((puesto.pautas || []).length), 0);
+    }
+
+    function getPuestosTreeLayoutMode(interfaceMode) {
+      return interfaceMode === 'work' ? 'focus' : 'compact';
+    }
+
+    function isPautaCardSelected(pauta) {
+      return selectedPautaFilters.length > 0 && pautaMatchesFilter(pauta, selectedPautaFilters);
+    }
+
     function renderPuestosTree(puestos) {
       const container = document.getElementById('puestos-tree-content');
+      const interfaceMode = getPuestosInterfaceMode(puestos);
+      const layoutMode = getPuestosTreeLayoutMode(interfaceMode);
+
+      container.dataset.interfaceMode = interfaceMode;
       
       container.innerHTML = puestos.map(puesto => `
-        <div class="puesto-section">
+        <div class="puesto-section" data-layout="${layoutMode}" data-interface-mode="${interfaceMode}" data-expanded="${interfaceMode === 'work' || expandedPuestoSection === puesto.nombre_puesto}">
+          ${interfaceMode === 'comparison' ? `
+            <button type="button" class="puesto-section__toggle" onclick="togglePuestoSection('${puesto.nombre_puesto.replace(/'/g, "\\'")}')">
+          ` : ''}
           <div class="puesto-header">
             <h2 class="puesto-title">
               <span class="puesto-icon">🏭</span>
               ${puesto.nombre_puesto}
+              ${interfaceMode === 'comparison' ? '<span class="puesto-section__toggle-icon">⌄</span>' : ''}
             </h2>
+            <div class="puesto-header__meta">
+              <span class="puesto-header__meta-badge">📋 ${puesto.pautas.length} ${puesto.pautas.length === 1 ? 'pauta' : 'pautas'}</span>
+              ${interfaceMode === 'work' && selectedPautaFilters.length > 0 ? `<span class="puesto-header__meta-badge">🎯 ${selectedPautaFilters[0]}</span>` : ''}
+            </div>
           </div>
-          <div class="pautas-grid">
+          ${interfaceMode === 'comparison' ? '</button>' : ''}
+          <div class="puesto-section__content">
+          <div class="pautas-grid" data-layout="${layoutMode}">
             ${puesto.pautas.map(pauta => {
               const pautasRealesSafe = pauta.es_agrupada ? JSON.stringify(pauta.pautas_reales).replace(/"/g, '&quot;') : 'null';
+              const isSelectedCard = isPautaCardSelected(pauta);
+              const cardClasses = [
+                'pauta-card',
+                isSelectedCard ? 'pauta-card--selected' : ''
+              ].filter(Boolean).join(' ');
+              const cardDescription = pauta.es_agrupada
+                ? 'Agrupa varias pautas relacionadas en una sola tarjeta.'
+                : 'Selecciona esta pauta para abrir el checklist correspondiente.';
+
               return `
-              <div class="pauta-card" 
+              <button type="button"
+                   class="${cardClasses}"
+                   data-layout="${layoutMode}"
+                   aria-pressed="${isSelectedCard ? 'true' : 'false'}"
                    onclick="onPautaClick('${pauta.nombre_pauta}', '${puesto.nombre_puesto}', ${pautasRealesSafe})">
-                <div class="pauta-name">
-                  ${pauta.es_agrupada ? '📦 ' : ''}${pauta.nombre_pauta}
+                <div class="pauta-card__header">
+                  <div class="pauta-card__title-row">
+                    <div class="pauta-name">
+                      ${pauta.es_agrupada ? '📦 ' : ''}${pauta.nombre_pauta}
+                    </div>
+                  </div>
+                  <p class="pauta-card__subtitle">${cardDescription}</p>
                 </div>
-                <div class="pauta-badge">
-                  <span class="badge-icon">📋</span>
-                  ${pauta.num_pautas} ${pauta.num_pautas === 1 ? 'control' : 'controles'}
+                <div class="pauta-card__footer">
+                  <div class="pauta-badge">
+                    <span class="badge-icon">📋</span>
+                    ${pauta.num_pautas} ${pauta.num_pautas === 1 ? 'control' : 'controles'}
+                  </div>
+                  <div class="pauta-card__action">${interfaceMode === 'work' ? 'Abrir checklist' : 'Abrir pauta'}</div>
                 </div>
-              </div>
+              </button>
             `;
             }).join('')}
+          </div>
           </div>
         </div>
       `).join('');
@@ -7971,8 +9070,11 @@
       if (inputElement.files && inputElement.files[0]) {
         const file = inputElement.files[0];
         const formData = new FormData();
+        const pedidoActual = window.pedidoActual || {};
         formData.append('photo', file);
         formData.append('controlId', controlId);
+        if (pedidoActual.ID_Pedido) formData.append('idPedido', pedidoActual.ID_Pedido);
+        if (pedidoActual.Armario) formData.append('armario', pedidoActual.Armario);
         
         // Mostrar estado cargando
         const statusSpan = document.getElementById(`status-${controlId}`);
@@ -7996,6 +9098,15 @@
             }
             // Marcar como OK automáticamente
             setResultado(controlId, 'FOTO_OK', btnCamera);
+            const fila = document.querySelector(`tr[data-control-id="${controlId}"]`);
+            if (fila) {
+              fila.setAttribute('data-modified', 'true');
+              console.log(`📝 Fila marcada como modificada tras foto: ${controlId}`);
+            }
+            setTimeout(() => {
+              console.log(`💾 Auto-guardando tras subida de foto: ${controlId}`);
+              autoGuardarChecklist();
+            }, 50);
             showNotification('Foto subida correctamente', 'success');
           } else {
             if (statusSpan) {
@@ -8331,6 +9442,9 @@
       
       botones.forEach(boton => {
         boton.addEventListener('click', function() {
+          if (this.classList.contains('btn-camera')) {
+            return;
+          }
           // Marcar la fila como modificada
           const fila = this.closest('tr');
           if (fila) {
@@ -8862,6 +9976,24 @@
 
       // Decidir qué valor usar según disponibilidad
       const valorParaInput = resultado_txt || resultado || '';
+
+      if (resultadoCell.classList.contains('photo-control')) {
+        const botonFoto = resultadoCell.querySelector('.btn-camera');
+        const statusFoto = resultadoCell.querySelector('.photo-status');
+
+        if (valorParaInput === 'FOTO_OK' && botonFoto) {
+          setResultado(controlId, 'FOTO_OK', botonFoto);
+
+          if (statusFoto) {
+            statusFoto.textContent = '✅ Foto guardada';
+            statusFoto.style.color = 'green';
+          }
+
+          console.log(`✅ Foto reaplicada: Control ${controlId} = "${valorParaInput}"`);
+        }
+
+        return;
+      }
 
       if (botones.length > 0 && !inputMedicion && !inputTexto) {
         // Es un control de botones SOLO (OK/NOK sin medición ni input)
@@ -9609,7 +10741,7 @@
         const idPedido = borrador.ID_Pedido || borrador.id_pedido;
         const armario = borrador.Armario || '?';
         const referencia = borrador.Referencia || '?';
-        const fecha = borrador.Fecha ? new Date(borrador.Fecha).toLocaleDateString('es-ES') : '-';
+        const fecha = formatearFechaPedido(borrador.Fecha);
         const estado = borrador.ControlesCompletados && borrador.TotalEsperado ? 
                        `${borrador.ControlesCompletados}/${borrador.TotalEsperado}` : 
                        'Incompleto';
@@ -10023,7 +11155,7 @@
           
           if (armarioExistente.Nombre_Pauta === pautaActual) {
             // Mismo armario + misma pauta → Reutilizar pedido
-            statusText.textContent = `✅ Pedido encontrado para ${pautaActual}. Fecha: ${new Date(armarioExistente.Fecha).toLocaleDateString('es-ES')}`;
+            statusText.textContent = `✅ Pedido encontrado para ${pautaActual}. Fecha: ${formatearFechaPedido(armarioExistente.Fecha)}`;
             statusDiv.classList.add('show');
             window.pedidoActual = armarioExistente;
           } else {
@@ -10313,6 +11445,34 @@
     function cerrarPedidosModal() {
       document.getElementById('pedidosDisponiblesModal').style.display = 'none';
       console.log('❌ Modal de pedidos cerrado sin seleccionar');
+    }
+
+    function formatearFechaPedido(fecha) {
+      if (!fecha) return '-';
+
+      if (typeof fecha !== 'string') {
+        const fechaConvertida = new Date(fecha);
+        return Number.isNaN(fechaConvertida.getTime()) ? '-' : fechaConvertida.toLocaleDateString('es-ES');
+      }
+
+      const fechaLimpia = fecha.trim();
+      if (!fechaLimpia) return '-';
+
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(fechaLimpia)) {
+        return fechaLimpia;
+      }
+
+      const fechaConvertida = new Date(fechaLimpia);
+      if (!Number.isNaN(fechaConvertida.getTime())) {
+        return fechaConvertida.toLocaleDateString('es-ES');
+      }
+
+      const partesIso = fechaLimpia.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (partesIso) {
+        return `${partesIso[3]}/${partesIso[2]}/${partesIso[1]}`;
+      }
+
+      return fechaLimpia;
     }
 
     // ====================================================================================
@@ -11033,7 +12193,7 @@
         // Actualizar los valores
         document.getElementById('info-armario').textContent = window.pedidoActual.Armario;
         document.getElementById('info-referencia').textContent = window.pedidoActual.Referencia;
-        document.getElementById('info-fecha').textContent = new Date(window.pedidoActual.Fecha).toLocaleDateString('es-ES');
+        document.getElementById('info-fecha').textContent = formatearFechaPedido(window.pedidoActual.Fecha);
         
         // Mostrar número de pedido con posición si existe
         const numPedidoElement = document.getElementById('info-numpedido');
@@ -11582,12 +12742,12 @@
       noMessageEl.style.display = 'none';
       
       try {
-        console.log('📡 Enviando petición GET a /api/monitoreo/estado-armarios');
+        console.log('📡 Enviando petición GET a /api/monitoreo/pautas');
         
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 180000); // Timeout de 180 segundos (3 minutos)
         
-        const response = await fetch('/api/monitoreo/estado-armarios', {
+        const response = await fetch('/api/monitoreo/pautas', {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -11630,7 +12790,7 @@
         console.log(`🔢 Estructura de datos:`, {
           pautas: data.pautas.length,
           pauta_puestos: Object.keys(data.pauta_puestos || {}).length,
-          estado_armarios: Object.keys(data.estado_armarios || {}).length
+          armarios_por_pauta: Object.keys(data.armarios_por_pauta || {}).length
         });
         
         // Store globally for use in filter functions
@@ -11641,7 +12801,9 @@
           pautas: data.pautas,
           pauta_puestos: data.pauta_puestos,
           pauta_primer_ultimo: data.pauta_primer_ultimo,
-          estado_armarios: data.estado_armarios
+          armarios_por_pauta: data.armarios_por_pauta || {},
+          estado_armarios: {},
+          pautaCargando: null
         };
         
         // Renderizar selector de pautas (dropdown)
@@ -11652,19 +12814,23 @@
               <option value="">-- Elige una pauta --</option>
               ${data.pautas.map(pauta => {
                 const puestos = data.pauta_puestos[pauta] || [];
-                const armarios = data.estado_armarios[pauta] || {};
+                const totalArmarios = data.armarios_por_pauta?.[pauta] || 0;
                 
-                if (puestos.length === 0 || Object.keys(armarios).length === 0) {
+                if (puestos.length === 0) {
                   return '';
                 }
                 
-                const totalArmarios = Object.keys(armarios).length;
                 return `<option value="${pauta}">${pauta} (${totalArmarios} armarios)</option>`;
               }).join('')}
             </select>
           </div>
           
           <div id="monitoreo-pauta-content" style="display: none;">
+            <div class="empty-state" style="margin-top: 24px;">
+              <div class="empty-icon">📋</div>
+              <h3>Selecciona una pauta</h3>
+              <p>Los armarios se cargarán solo cuando elijas una pauta del desplegable.</p>
+            </div>
           </div>
         `;
         
@@ -11710,20 +12876,105 @@
       }
     }
 
-    function mostrarPautaMonitoreo(pauta) {
+    async function mostrarPautaMonitoreo(pauta) {
       console.log(`📊 Mostrando pauta: ${pauta}`);
+
+      const contentDiv = document.getElementById('monitoreo-pauta-content');
+      const selector = document.getElementById('pauta-select');
       
       if (!pauta) {
-        document.getElementById('monitoreo-pauta-content').innerHTML = '';
-        document.getElementById('monitoreo-pauta-content').style.display = 'none';
+        if (contentDiv) {
+          contentDiv.innerHTML = '';
+          contentDiv.style.display = 'none';
+        }
         return;
       }
       
       const data = window.monitoreoData;
+      if (!data) {
+        return;
+      }
+
+      if (!data.estado_armarios[pauta]) {
+        try {
+          data.pautaCargando = pauta;
+          if (selector) {
+            selector.disabled = true;
+          }
+
+          if (contentDiv) {
+            contentDiv.style.display = 'block';
+            contentDiv.innerHTML = `
+              <div class="loading-message" style="padding: 32px 0;">
+                <div class="spinner"></div>
+                <span>Cargando armarios de ${pauta}...</span>
+              </div>
+            `;
+          }
+
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 180000);
+          const response = await fetch(`/api/monitoreo/estado-armarios?pauta=${encodeURIComponent(pauta)}`, {
+            method: 'GET',
+            headers: {
+              'Accept': 'application/json',
+              'Content-Type': 'application/json'
+            },
+            signal: controller.signal
+          });
+          clearTimeout(timeoutId);
+
+          if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`HTTP ${response.status}: ${errorText}`);
+          }
+
+          const pautaData = await response.json();
+          if (!pautaData.success) {
+            throw new Error(pautaData.message || 'No se pudo cargar la pauta seleccionada');
+          }
+
+          data.pauta_puestos[pauta] = pautaData.pauta_puestos?.[pauta] || [];
+          data.pauta_primer_ultimo[pauta] = pautaData.pauta_primer_ultimo?.[pauta] || {};
+          data.armarios_por_pauta[pauta] = pautaData.armarios_por_pauta?.[pauta] || 0;
+          data.estado_armarios[pauta] = pautaData.estado_armarios?.[pauta] || {};
+          window.pauta_primer_ultimo[pauta] = data.pauta_primer_ultimo[pauta];
+        } catch (error) {
+          console.error('💥 Error cargando pauta de monitorización:', error);
+          if (contentDiv) {
+            contentDiv.style.display = 'block';
+            contentDiv.innerHTML = `
+              <div class="empty-state" style="margin-top: 24px;">
+                <div class="empty-icon">❌</div>
+                <h3>Error cargando la pauta</h3>
+                <p>${error.message}</p>
+              </div>
+            `;
+          }
+          return;
+        } finally {
+          data.pautaCargando = null;
+          if (selector) {
+            selector.disabled = false;
+            selector.value = pauta;
+          }
+        }
+      }
+
       const puestos = data.pauta_puestos[pauta] || [];
       const armarios = data.estado_armarios[pauta] || {};
       
       if (puestos.length === 0 || Object.keys(armarios).length === 0) {
+        if (contentDiv) {
+          contentDiv.style.display = 'block';
+          contentDiv.innerHTML = `
+            <div class="empty-state" style="margin-top: 24px;">
+              <div class="empty-icon">📭</div>
+              <h3>Sin armarios para esta pauta</h3>
+              <p>No se encontraron armarios monitorizables para ${pauta}.</p>
+            </div>
+          `;
+        }
         return;
       }
       
@@ -11801,7 +13052,6 @@
         </div>
       `;
       
-      const contentDiv = document.getElementById('monitoreo-pauta-content');
       contentDiv.innerHTML = html;
       contentDiv.style.display = 'block';
       
@@ -15040,54 +16290,75 @@
     }
 
     async function loadDropdownOptions() {
-      try {
-        // Cargar proveedores
-        const proveedoresResponse = await fetch('/api/proveedores');
-        if (proveedoresResponse.ok) {
-          const proveedores = await proveedoresResponse.json();
-          const selectProveedor = document.getElementById('selectProveedor');
-          selectProveedor.innerHTML = '<option value="">Selecciona un proveedor...</option>';
-          proveedores.forEach(proveedor => {
+      setSelectLoadingState('selectProveedor', 'Cargando proveedores...');
+      setSelectLoadingState('selectPauta', 'Cargando pautas...');
+      setSelectLoadingState('selectPuesto', 'Cargando puestos...');
+
+      const [proveedoresResult, pautasResult] = await Promise.allSettled([
+        fetchJsonWithTimeout('/api/proveedores'),
+        fetchJsonWithTimeout('/api/get-pautas')
+      ]);
+
+      const selectProveedor = document.getElementById('selectProveedor');
+      if (selectProveedor) {
+        selectProveedor.innerHTML = '<option value="">Selecciona un proveedor...</option>';
+        if (proveedoresResult.status === 'fulfilled' && Array.isArray(proveedoresResult.value)) {
+          proveedoresResult.value.forEach(proveedor => {
             const option = document.createElement('option');
             option.value = proveedor.id;
             option.textContent = proveedor.nombre;
             selectProveedor.appendChild(option);
           });
+        } else {
+          console.error('Error cargando proveedores dropdown:', proveedoresResult.reason);
+          setSelectErrorState('selectProveedor', 'Error cargando proveedores');
         }
-        
-        // Cargar pautas
-        const pautasResponse = await fetch('/api/get-pautas');
-        if (pautasResponse.ok) {
-          const data = await pautasResponse.json();
-          const selectPauta = document.getElementById('selectPauta');
-          selectPauta.innerHTML = '<option value="">Selecciona una pauta...</option>';
-          if (data.success && data.pautas) {
-            data.pautas.forEach(pauta => {
-              const option = document.createElement('option');
-              option.value = pauta.id_pauta;
-              option.textContent = pauta.nombre_pauta;
-              selectPauta.appendChild(option);
-            });
-          }
+      }
+
+      const selectPauta = document.getElementById('selectPauta');
+      if (selectPauta) {
+        selectPauta.innerHTML = '<option value="">Selecciona una pauta...</option>';
+        if (pautasResult.status === 'fulfilled' && pautasResult.value.success && Array.isArray(pautasResult.value.pautas)) {
+          pautasResult.value.pautas.forEach(pauta => {
+            const option = document.createElement('option');
+            option.value = pauta.id_pauta;
+            option.textContent = pauta.nombre_pauta;
+            selectPauta.appendChild(option);
+          });
+        } else {
+          console.error('Error cargando pautas dropdown:', pautasResult.reason || pautasResult.value);
+          setSelectErrorState('selectPauta', 'Error cargando pautas');
         }
-        
-        // Cargar puestos
-        const puestosResponse = await fetch('/api/get-puestos-dropdown');
-        if (puestosResponse.ok) {
-          const data = await puestosResponse.json();
-          const selectPuesto = document.getElementById('selectPuesto');
+      }
+
+      const selectPuesto = document.getElementById('selectPuesto');
+      if (selectPuesto) {
+        const previousPuestoValue = selectPuesto.value;
+
+        try {
+          const puestosResult = await fetchJsonWithTimeout('/api/get-puestos-dropdown');
+
           selectPuesto.innerHTML = '<option value="">Selecciona un puesto...</option>';
-          if (data.success && data.puestos) {
-            data.puestos.forEach(puesto => {
+
+          if (puestosResult.success && Array.isArray(puestosResult.puestos)) {
+            puestosResult.puestos.forEach(puesto => {
               const option = document.createElement('option');
               option.value = puesto.id_puesto;
               option.textContent = puesto.nombre_puesto;
               selectPuesto.appendChild(option);
             });
+
+            if (previousPuestoValue && Array.from(selectPuesto.options).some(option => option.value === previousPuestoValue)) {
+              selectPuesto.value = previousPuestoValue;
+            }
+          } else {
+            console.error('Error cargando puestos dropdown:', puestosResult);
+            setSelectErrorState('selectPuesto', 'Error cargando puestos');
           }
+        } catch (error) {
+          console.error('Error cargando puestos dropdown:', error);
+          setSelectErrorState('selectPuesto', 'Error cargando puestos');
         }
-      } catch (error) {
-        console.error('Error cargando opciones dropdown:', error);
       }
     }
 
@@ -15871,6 +17142,17 @@
     
     // ==================== FUNCIONES PARA EDITAR / ELIMINAR ARMARIO ====================
 
+    function formatNombrePautaParaModal(nombrePauta) {
+      if (!nombrePauta) {
+        return '';
+      }
+
+      return nombrePauta
+        .replace(/_/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
     async function abrirModalEditarArmario() {
       const idPedido = parseInt(document.getElementById('correccionesArmarioId').value);
 
@@ -15898,8 +17180,34 @@
         document.getElementById('editarArmarioIdPedido').value = pedido.id_pedido || idPedido;
         document.getElementById('editarNumPedido').value = pedido.num_pedido || '';
         document.getElementById('editarArmario').value = pedido.armario || '';
-        document.getElementById('editarReferencia').value = pedido.referencia || '';
-        document.getElementById('editarNombrePauta').value = pedido.nombre_pauta || '';
+        document.getElementById('editarNombrePauta').value = formatNombrePautaParaModal(pedido.nombre_pauta || '');
+
+        const referenciaSelect = document.getElementById('editarReferencia');
+        const referenciasValidas = Array.isArray(pedido.referencias_validas) ? [...pedido.referencias_validas].sort((first, second) => first.localeCompare(second, 'es', { sensitivity: 'base' })) : [];
+        const referenciaActual = pedido.referencia || '';
+
+        referenciaSelect.innerHTML = '<option value="">Selecciona una referencia...</option>';
+
+        if (referenciaActual) {
+          const currentOption = document.createElement('option');
+          currentOption.value = referenciaActual;
+          currentOption.textContent = referenciasValidas.includes(referenciaActual) ? `${referenciaActual} (actual)` : `${referenciaActual} (actual no configurada)`;
+          referenciaSelect.appendChild(currentOption);
+        }
+
+        referenciasValidas.forEach(referencia => {
+          if (referencia === referenciaActual) {
+            return;
+          }
+
+          const option = document.createElement('option');
+          option.value = referencia;
+          option.textContent = referencia;
+          referenciaSelect.appendChild(option);
+        });
+
+        referenciaSelect.value = referenciaActual;
+        referenciaSelect.disabled = referenciasValidas.length === 0;
 
         document.getElementById('modalEditarArmario').style.display = 'flex';
       } catch (error) {
@@ -15916,6 +17224,7 @@
       const idPedido = parseInt(document.getElementById('editarArmarioIdPedido').value);
       const numPedido = document.getElementById('editarNumPedido').value.trim();
       const armario = document.getElementById('editarArmario').value.trim();
+      const referencia = document.getElementById('editarReferencia').value.trim();
 
       if (!idPedido) {
         showNotification('No hay ID de pedido seleccionado', 'error');
@@ -15928,6 +17237,12 @@
         return;
       }
 
+      if (!referencia) {
+        showNotification('Selecciona una referencia válida para la pauta', 'warning');
+        document.getElementById('editarReferencia').focus();
+        return;
+      }
+
       try {
         const response = await fetch(`/api/correcciones/pedido/${idPedido}`, {
           method: 'PUT',
@@ -15937,7 +17252,8 @@
           },
           body: JSON.stringify({
             num_pedido: numPedido,
-            armario: armario
+            armario: armario,
+            referencia: referencia
           })
         });
 
