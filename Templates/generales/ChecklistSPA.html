@@ -698,6 +698,321 @@
       color: white !important;
     }
 
+    .gestion-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+    }
+
+    .gestion-summary {
+      color: #445;
+      font-size: 14px;
+    }
+
+    .gestion-table-wrapper {
+      margin-top: 0;
+      overflow-x: auto;
+    }
+
+    .gestion-pedidos-table th,
+    .gestion-pedidos-table td {
+      white-space: nowrap;
+    }
+
+    .gestion-pedidos-table td {
+      text-align: left;
+    }
+
+    .gestion-pedidos-table td.gestion-cantidad {
+      text-align: right;
+      font-weight: 600;
+    }
+
+    .gestion-join-table {
+      table-layout: fixed;
+      width: 100%;
+    }
+    .gestion-join-table th,
+    .gestion-join-table td {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .gestion-join-table td.col-traz {
+      white-space: normal;
+      word-break: break-word;
+      font-size: 0.83em;
+      color: #444;
+    }
+
+    .gestion-empty-state {
+      text-align: center;
+      padding: 28px;
+      color: #7a7a7a;
+    }
+
+    .selector-multiple {
+      position: relative;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      overflow: visible;
+      margin-top: 6px;
+    }
+
+    .selector-boton {
+      width: 100%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(56, 128, 199, 0.35);
+      color: #1f3f68;
+      font: inherit;
+      font-size: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 16px rgba(63, 120, 224, 0.12);
+      transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+      position: relative;
+      background: #ffffff;
+    }
+
+    .selector-boton:hover {
+      transform: translateY(-1px);
+      border-color: rgba(63, 120, 224, 0.5);
+      box-shadow: 0 10px 22px rgba(63, 120, 224, 0.18);
+    }
+
+    .selector-multiple.selector-activo .selector-boton {
+      background: #dff7e3;
+      border-color: rgba(56, 201, 107, 0.55);
+      box-shadow: 0 12px 26px rgba(56, 201, 107, 0.22);
+      color: #1f6b38;
+    }
+
+    .selector-multiple.selector-abierto .selector-boton {
+      border-color: rgba(63, 120, 224, 0.65);
+    }
+
+    .selector-resumen {
+      flex: 1 1 auto;
+      min-width: 0;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-align: left;
+      padding-right: 28px;
+    }
+
+    .selector-icono {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid rgba(63, 120, 224, 0.45);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      flex: 0 0 auto;
+    }
+
+    .selector-icono::before,
+    .selector-icono::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      height: 2px;
+      background: rgba(63, 120, 224, 0.75);
+      border-radius: 999px;
+      transition: transform 0.2s ease;
+    }
+
+    .selector-icono::before {
+      transform: translateY(2px) rotate(45deg);
+    }
+
+    .selector-icono::after {
+      transform: translateY(-2px) rotate(-45deg);
+    }
+
+    .selector-multiple.selector-abierto .selector-icono::before {
+      transform: translateX(2px) rotate(-45deg);
+    }
+
+    .selector-multiple.selector-abierto .selector-icono::after {
+      transform: translateX(-2px) rotate(-135deg);
+    }
+
+    .selector-clear-icon {
+      position: absolute;
+      right: 28px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 14px;
+      height: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      color: #27ae60;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .selector-clear-icon::before,
+    .selector-clear-icon::after {
+      content: '';
+      position: absolute;
+      width: 10px;
+      height: 2px;
+      background: currentColor;
+      border-radius: 999px;
+    }
+
+    .selector-clear-icon::before {
+      transform: rotate(45deg);
+    }
+
+    .selector-clear-icon::after {
+      transform: rotate(-45deg);
+    }
+
+    .selector-multiple.selector-activo .selector-clear-icon {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .selector-panel {
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      width: max(100%, 260px);
+      max-height: 260px;
+      display: none;
+      flex-direction: column;
+      gap: 6px;
+      padding: 10px;
+      border-radius: 12px;
+      background: #fff;
+      box-shadow: 0 16px 36px rgba(22, 68, 120, 0.22);
+      border: 1px solid rgba(56, 128, 199, 0.2);
+      z-index: 60;
+    }
+
+    .selector-panel[hidden] {
+      display: none !important;
+    }
+
+    .selector-busqueda {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .selector-todos {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: #1f3f68;
+      padding: 3px 6px;
+      border-radius: 8px;
+      cursor: pointer;
+      background: #eef5fc;
+      margin-bottom: 0;
+    }
+
+    .selector-todos input[type='checkbox'] {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+    }
+
+    .selector-buscar {
+      margin: 0 !important;
+      padding: 7px 10px !important;
+      font-size: 12px !important;
+      border-radius: 999px !important;
+    }
+
+    .selector-opciones {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      max-height: 150px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .selector-opcion {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 12px;
+      color: #24476f;
+      background: #f8fbff;
+      margin-bottom: 0;
+    }
+
+    .selector-opcion:hover {
+      background: #eaf4ff;
+    }
+
+    .selector-opcion.is-selected {
+      background: #dff7e3;
+      color: #1f6b38;
+    }
+
+    .selector-opcion input[type='checkbox'] {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      flex: 0 0 auto;
+    }
+
+    .selector-empty {
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+      padding: 10px 6px;
+    }
+
+    .selector-controles {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .selector-controles button {
+      border: none;
+      border-radius: 8px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .selector-limpiar {
+      background: #f2f5f9;
+      color: #32567e;
+    }
+
+    .selector-cerrar {
+      background: #3880c7;
+      color: white;
+    }
+
     /* Estilos para controles interactivos de checklist */
     .resultado-controls {
       display: flex;
@@ -5381,7 +5696,7 @@
       </div>
       
       <!-- Grid principal usando estilos de global-styles.css -->
-      <div class="main-grid">
+      <div class="main-grid main-grid-home">
         <div class="card" onclick="showScreen('screen-puestos')">
           <div class="card-title">Puestos</div>
           <div class="card-icon-emoji">📊</div>
@@ -5402,6 +5717,12 @@
           <div class="card-icon-emoji">⚙️</div>
           <div style="font-size: 11px; color: #999; margin-top: 5px;">Nivel insuficiente</div>
         </div>
+
+        <div class="card card-main-wide" id="gestionCard" onclick="accessGestion()" style="cursor: not-allowed; opacity: 0.5;">
+          <div class="card-title">Gestión</div>
+          <div class="card-icon-emoji">🗂️</div>
+          <div style="font-size: 11px; color: #999; margin-top: 5px;">Nivel insuficiente</div>
+        </div>
       </div>
     </div>
 
@@ -5414,7 +5735,7 @@
       </div>
       
       <!-- Grid principal usando estilos de global-styles.css -->
-      <div class="main-grid">
+      <div class="main-grid main-grid-home">
         <div class="card" onclick="showScreen('screen-config-puestos')">
           <div class="card-title">Configuración de Puestos</div>
           <div class="card-icon-emoji">🏭</div>
@@ -5430,9 +5751,344 @@
           <div class="card-icon-emoji">📋</div>
         </div>
 
-        <div class="card" onclick="showScreen('screen-config-proveedores')">
+        <div class="card" onclick="openProveedoresScreen('configuracion')">
           <div class="card-title">Configuración Proveedores</div>
           <div class="card-icon-emoji">🏢</div>
+        </div>
+
+        <div class="card" onclick="showScreen('screen-rutas-gestion')">
+          <div class="card-title">Rutas Gestión</div>
+          <div class="card-icon-emoji">🗺️</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANTALLA: RUTAS GESTIÓN -->
+    <div id="screen-rutas-gestion" class="screen">
+      <div class="breadcrumb">
+        <a href="#" onclick="showScreen('screen-main')">Inicio</a>
+        <span class="separator">></span>
+        <a href="#" onclick="showScreen('screen-config-menu')">Configuración</a>
+        <span class="separator">></span>
+        <span class="current">Rutas Gestión</span>
+      </div>
+
+      <div style="max-width: 860px; margin: 0 auto; padding: 20px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
+          <h2 style="margin: 0; color: #2c6bb3; font-size: 20px;">🗺️ Configuración de Rutas</h2>
+          <button onclick="guardarRutasGestion()" style="background:#2196F3;color:white;border:none;padding:10px 22px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;">💾 Guardar cambios</button>
+        </div>
+
+        <div id="rutas-gestion-status" style="display:none; margin-bottom:16px; padding:10px 16px; border-radius:6px; font-size:14px;"></div>
+
+        <!-- GAP Trazabilidad -->
+        <div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:20px; margin-bottom:20px;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <span style="font-size:20px;">⏱️</span>
+            <label for="gap-trazabilidad-input" style="font-size:14px; font-weight:600; color:#333;">GAP Trazabilidad Fabricación-Entrega (en semanas)</label>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px;">
+            <input
+              type="number"
+              id="gap-trazabilidad-input"
+              min="0"
+              step="1"
+              value=""
+              placeholder="Ej: 4"
+              style="width:120px; padding:10px 12px; border:1px solid #ccc; border-radius:6px; font-size:15px; text-align:center;"
+            >
+            <span style="font-size:13px; color:#888;">semanas</span>
+          </div>
+          <div style="margin-top:6px; font-size:12px; color:#999;">Diferencia máxima esperada entre la semana de fabricación (chapa) y la semana de entrega del pedido.</div>
+        </div>
+
+        <div id="rutas-gestion-container">
+          <div style="text-align:center; padding:40px; color:#888;">⏳ Cargando rutas...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="screen-gestion" class="screen">
+      <div class="breadcrumb">
+        <a href="#" onclick="showScreen('screen-main')">Inicio</a>
+        <span class="separator">></span>
+        <span class="current">Gestión</span>
+      </div>
+
+      <div class="gestion-header">
+        <h1>🗂️ Gestión de Pedidos</h1>
+        <p class="subtitle">Pedidos ERP, Checklist y vista combinada</p>
+      </div>
+
+      <div class="form-card" style="max-width: none;">
+
+        <!-- Tabs toggle -->
+        <div class="gestion-tabs" style="display:flex; gap:8px; margin-bottom:14px; flex-wrap:wrap;">
+          <button id="gestionTabJoin"          class="btn btn-primary gestion-tab-btn gestion-tab-active" onclick="switchGestionTab('join')">🔗 Vista Combinada</button>
+          <button id="gestionTabErp"           class="btn btn-secondary gestion-tab-btn" onclick="switchGestionTab('erp')">📦 Pedidos ERP</button>
+          <button id="gestionTabChecklist"     class="btn btn-secondary gestion-tab-btn" onclick="switchGestionTab('checklist')">✅ Pedidos Checklist</button>
+          <button id="gestionTabTrazabilidad"  class="btn btn-secondary gestion-tab-btn" onclick="switchGestionTab('trazabilidad')">🔍 Trazabilidad</button>
+          <button id="gestionTabCertificados" class="btn btn-secondary gestion-tab-btn" onclick="switchGestionTab('certificados')">🎨 Certificados Pintura</button>
+          <button id="gestionTabCertificadosChapa" class="btn btn-secondary gestion-tab-btn" onclick="switchGestionTab('certificados-chapa')">🔩 Certificados Chapa</button>
+          <div style="flex:1;"></div>
+          <button class="btn btn-primary" type="button" onclick="loadGestionPedidosData(true)">🔄 Refrescar</button>
+        </div>
+
+        <div id="gestionPedidosSummary" class="gestion-summary" style="margin-bottom:8px;">Cargando...</div>
+
+        <div id="gestionLoadingMessage" class="loading-message" style="display: none;">
+          <div class="spinner"></div>
+          <span>Cargando datos...</span>
+        </div>
+
+        <!-- ===== TAB 1: ERP ===== -->
+        <div id="gestionTableContainer" class="controls-table gestion-table-wrapper" style="display: none;">
+          <table id="gestionPedidosTable" class="gestion-pedidos-table">
+            <thead>
+              <tr>
+                <th data-gestion-sort="num_pedido" onclick="sortGestionPedidos('num_pedido')" class="sortable-header" title="Click para ordenar" style="cursor: pointer;">
+                  <span style="color: white; display: block; margin-bottom: 5px;">NumPedido</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionTextFilter('num_pedido', this.value)">
+                </th>
+                <th data-gestion-sort="cantidad" onclick="sortGestionPedidos('cantidad')" class="sortable-header" title="Click para ordenar" style="cursor: pointer;">
+                  <span style="color: white; display: block; margin-bottom: 5px;">Cantidad</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionTextFilter('cantidad', this.value)">
+                </th>
+                <th data-gestion-sort="semana_entrega" onclick="sortGestionPedidos('semana_entrega')" class="sortable-header" title="Click para ordenar" style="cursor: pointer; min-width: 250px;">
+                  <span style="color: white; display: block; margin-bottom: 5px;">Semana Entrega</span>
+                  <div class="selector-multiple" id="gestionSemanaEntregaSelector" data-panel="gestion" data-campo="semana_entrega" onclick="event.stopPropagation()">
+                    <button type="button" class="selector-boton" aria-haspopup="listbox" aria-expanded="false" aria-label="Filtrar por semana de entrega" onclick="toggleGestionSemanaEntregaPanel(event)">
+                      <span class="selector-resumen" id="gestionSemanaEntregaResumen">Todas</span>
+                      <span class="selector-clear-icon" aria-hidden="true" onclick="clearGestionSemanaEntregaFilter(event)"></span>
+                      <span class="selector-icono" aria-hidden="true"></span>
+                    </button>
+                    <div class="selector-panel" id="gestionSemanaEntregaPanel" role="listbox" aria-multiselectable="true" hidden onclick="event.stopPropagation()">
+                      <div class="selector-busqueda">
+                        <label class="selector-todos" id="gestionSemanaEntregaTodosLabel">
+                          <input type="checkbox" id="gestionSemanaEntregaTodos" onchange="toggleGestionSemanaEntregaAll(this.checked)">
+                          <span class="selector-todos-texto">Todas</span>
+                        </label>
+                        <input type="text" class="selector-buscar filtro-cabecera" id="gestionSemanaEntregaBuscar" placeholder="Buscar semana..." oninput="setGestionSemanaEntregaSearch(this.value)">
+                      </div>
+                      <ul class="selector-opciones" id="gestionSemanaEntregaOpciones"></ul>
+                      <div class="selector-controles">
+                        <button type="button" class="selector-limpiar" onclick="clearGestionSemanaEntregaFilter(event)">Limpiar</button>
+                        <button type="button" class="selector-cerrar" onclick="closeGestionSemanaEntregaPanel()">Cerrar</button>
+                      </div>
+                    </div>
+                  </div>
+                </th>
+                <th data-gestion-sort="fecha_refresco" onclick="sortGestionPedidos('fecha_refresco')" class="sortable-header" title="Click para ordenar" style="cursor: pointer;">
+                  <span style="color: white; display: block; margin-bottom: 5px;">Fecha Refresco</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionTextFilter('fecha_refresco', this.value)">
+                </th>
+              </tr>
+            </thead>
+            <tbody id="gestionPedidosTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- ===== TAB 2: CHECKLIST ===== -->
+        <div id="gestionChecklistContainer" class="controls-table gestion-table-wrapper" style="display: none;">
+          <table class="gestion-pedidos-table">
+            <thead>
+              <tr>
+                <th class="sortable-header" style="cursor:pointer;" onclick="sortGestionChecklist('num_pedido')">
+                  <span style="color:white;display:block;margin-bottom:5px;">NumPedido</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionChecklistFilter('num_pedido', this.value)">
+                </th>
+                <th class="sortable-header" style="cursor:pointer;" onclick="sortGestionChecklist('num_armario')">
+                  <span style="color:white;display:block;margin-bottom:5px;">NumArmario</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionChecklistFilter('num_armario', this.value)">
+                </th>
+                <th class="sortable-header" style="cursor:pointer;" onclick="sortGestionChecklist('fecha_modificacion')">
+                  <span style="color:white;display:block;margin-bottom:5px;">Fecha Modificación</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionChecklistFilter('fecha_modificacion', this.value)">
+                </th>
+                <th style="width:52px;text-align:center;"><span style="color:white;">Borrar</span></th>
+              </tr>
+            </thead>
+            <tbody id="gestionChecklistTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- ===== TAB 3: JOIN ===== -->
+        <div id="gestionJoinContainer" class="controls-table gestion-table-wrapper" style="display: block;">
+          <table class="gestion-pedidos-table gestion-join-table">
+            <thead>
+              <tr>
+                <th class="sortable-header" style="cursor:pointer;width:36px;"></th>
+                <th class="sortable-header" style="cursor:pointer;width:130px;" onclick="sortGestionJoin('num_pedido')">
+                  <span style="color:white;display:block;margin-bottom:5px;">NumPedido</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionJoinFilter('num_pedido', this.value)">
+                </th>
+                <th class="sortable-header" style="cursor:pointer;width:140px;" onclick="sortGestionJoin('cuenta_armarios')">
+                  <span style="color:white;display:block;margin-bottom:5px;">Armarios (Checklist)</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar armario..." onclick="event.stopPropagation()" oninput="setGestionJoinFilter('num_armario', this.value)">
+                </th>
+                <th class="sortable-header" style="cursor:pointer;width:100px;" onclick="sortGestionJoin('cantidad')">
+                  <span style="color:white;display:block;margin-bottom:5px;">Cantidad ERP</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionJoinFilter('cantidad', this.value)">
+                </th>
+                <th class="sortable-header" style="cursor:pointer;width:120px;" onclick="sortGestionJoin('semana_entrega')">
+                  <span style="color:white;display:block;margin-bottom:5px;">Semana Entrega</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionJoinFilter('semana_entrega', this.value)">
+                </th>
+                <th class="sortable-header" style="cursor:pointer;" onclick="sortGestionJoin('trazabilidad')">
+                  <span style="color:white;display:block;margin-bottom:5px;">Trazabilidad Fabricación</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar trazabilidad..." onclick="event.stopPropagation()" oninput="setGestionJoinFilter('trazabilidad', this.value)">
+                </th>
+                <th style="min-width:260px;">
+                  <span style="color:white;display:block;margin-bottom:5px;">Semáforo</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="gestionJoinTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- ===== TAB 5: CERTIFICADOS PINTURA ===== -->
+        <div id="gestionCertificadosContainer" class="controls-table gestion-table-wrapper" style="display: none;">
+          <!-- Toggle bar -->
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;padding:8px 0;border-bottom:1px solid #dce3ee;">
+            <span style="font-size:0.92em;color:#555;">Vista:</span>
+            <button id="btnCertificadosVistaNormal" class="btn btn-primary" style="font-size:0.85em;padding:4px 14px;" onclick="setCertificadosVista('normal')">🎨 Con certificado</button>
+            <button id="btnCertificadosVistaFaltantes" class="btn btn-secondary" style="font-size:0.85em;padding:4px 14px;" onclick="setCertificadosVista('faltantes')">⚠️ Sin certificado</button>
+            <span id="gestionCertificadosFaltantesCount" style="font-size:0.82em;color:#c0392b;font-weight:600;"></span>
+            <button id="btnExportFaltantes" class="btn btn-secondary" style="font-size:0.85em;padding:4px 14px;display:none;margin-left:auto;" onclick="exportarFaltantesExcel()">📥 Exportar Excel</button>
+          </div>
+          <!-- Tabla: con certificado -->
+          <div id="gestionCertificadosTablaConCert">
+          <table class="gestion-pedidos-table">
+            <thead>
+              <tr>
+                <th class="sortable-header" style="cursor:pointer;width:130px;" onclick="sortGestionCertificados('num_pedido')">
+                  <span style="color:white;display:block;margin-bottom:5px;">NumPedido</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionCertificadosFilter('num_pedido', this.value)">
+                </th>
+                <th class="sortable-header" style="cursor:pointer;" onclick="sortGestionCertificados('num_armario')">
+                  <span style="color:white;display:block;margin-bottom:5px;">NumArmario</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionCertificadosFilter('num_armario', this.value)">
+                </th>
+                <th class="sortable-header" style="cursor:pointer;" onclick="sortGestionCertificados('nombre_archivo')">
+                  <span style="color:white;display:block;margin-bottom:5px;">Archivo</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionCertificadosFilter('nombre_archivo', this.value)">
+                </th>
+                <th class="sortable-header" style="cursor:pointer;" onclick="sortGestionCertificados('fecha_modificacion')">
+                  <span style="color:white;display:block;margin-bottom:5px;">Fecha Modificación</span>
+                  <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionCertificadosFilter('fecha_modificacion', this.value)">
+                </th>
+                <th style="width:52px;text-align:center;"><span style="color:white;">Borrar</span></th>
+              </tr>
+            </thead>
+            <tbody id="gestionCertificadosTableBody"></tbody>
+          </table>
+          </div><!-- /gestionCertificadosTablaConCert -->
+
+          <!-- Tabla: sin certificado (faltantes) -->
+          <div id="gestionCertificadosTablaFaltantes" style="display:none;">
+            <table class="gestion-pedidos-table">
+              <thead>
+                <tr>
+                  <th class="sortable-header" style="cursor:pointer;width:130px;" onclick="sortGestionCertificadosFaltantes('num_pedido')">
+                    <span style="color:white;display:block;margin-bottom:5px;">NumPedido</span>
+                    <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionCertificadosFaltantesFilter('num_pedido', this.value)">
+                  </th>
+                  <th class="sortable-header" style="cursor:pointer;" onclick="sortGestionCertificadosFaltantes('num_armario')">
+                    <span style="color:white;display:block;margin-bottom:5px;">NumArmario</span>
+                    <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionCertificadosFaltantesFilter('num_armario', this.value)">
+                  </th>
+                  <th class="sortable-header" style="cursor:pointer;" onclick="sortGestionCertificadosFaltantes('fecha_checklist')">
+                    <span style="color:white;display:block;margin-bottom:5px;">Fecha Checklist</span>
+                    <input type="text" class="filtro-cabecera" placeholder="🔍 Filtrar..." onclick="event.stopPropagation()" oninput="setGestionCertificadosFaltantesFilter('fecha_checklist', this.value)">
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="gestionCertificadosFaltantesTableBody"></tbody>
+            </table>
+          </div><!-- /gestionCertificadosTablaFaltantes -->
+        </div>
+
+        <!-- ===== TAB 6: CERTIFICADOS CHAPA ===== -->
+        <div id="gestionCertificadosChapaContainer" class="controls-table gestion-table-wrapper" style="display: none;">
+          <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
+            <span id="gestionCertificadosChapaCount" style="font-size:13px;color:#666;"></span>
+          </div>
+          <div id="gestionCertificadosChapaTablaDiv">
+            <table class="gestion-pedidos-table" id="gestionCertificadosChapaTable">
+              <thead>
+                <tr>
+                  <th class="sortable-header" onclick="sortGestionCertificadosChapa('dato')" style="cursor:pointer;">
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                      <span style="color:white;">DATO ↕</span>
+                      <input type="text" placeholder="Filtrar..." onclick="event.stopPropagation()" oninput="setGestionCertificadosChapaFilter('dato', this.value)" style="font-size:11px;padding:2px 4px;border-radius:3px;border:1px solid #ccc;width:100%;">
+                    </div>
+                  </th>
+                  <th class="sortable-header" onclick="sortGestionCertificadosChapa('nombre_archivo')" style="cursor:pointer;">
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                      <span style="color:white;">Nombre Archivo ↕</span>
+                      <input type="text" placeholder="Filtrar..." onclick="event.stopPropagation()" oninput="setGestionCertificadosChapaFilter('nombre_archivo', this.value)" style="font-size:11px;padding:2px 4px;border-radius:3px;border:1px solid #ccc;width:100%;">
+                    </div>
+                  </th>
+                  <th>
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                      <span style="color:white;">Subcarpeta</span>
+                      <input type="text" placeholder="Filtrar..." onclick="event.stopPropagation()" oninput="setGestionCertificadosChapaFilter('ruta_relativa', this.value)" style="font-size:11px;padding:2px 4px;border-radius:3px;border:1px solid #ccc;width:100%;">
+                    </div>
+                  </th>
+                  <th class="sortable-header" onclick="sortGestionCertificadosChapa('fecha_modificacion')" style="cursor:pointer;">
+                    <div style="display:flex;flex-direction:column;gap:2px;">
+                      <span style="color:white;">Fecha Modificación ↕</span>
+                      <input type="text" placeholder="Filtrar..." onclick="event.stopPropagation()" oninput="setGestionCertificadosChapaFilter('fecha_modificacion', this.value)" style="font-size:11px;padding:2px 4px;border-radius:3px;border:1px solid #ccc;width:100%;">
+                    </div>
+                  </th>
+                  <th style="text-align:center;"><span style="color:white;">Borrar</span></th>
+                </tr>
+              </thead>
+              <tbody id="gestionCertificadosChapaTableBody"></tbody>
+            </table>
+            <div id="gestionCertificadosChapaEmpty" style="display:none;text-align:center;padding:20px;color:#999;">No hay registros que coincidan.</div>
+            <div id="gestionCertificadosChapaLoading" style="display:none;text-align:center;padding:20px;"><div class="spinner" style="display:inline-block;"></div> <span>Cargando Certificados Chapa...</span></div>
+          </div>
+        </div>
+
+        <!-- ===== TAB 4: TRAZABILIDAD ===== -->
+        <div id="gestionTrazabilidadContainer" class="controls-table gestion-table-wrapper" style="display:none;">
+          <div style="display:flex;gap:8px;margin-bottom:10px;align-items:center;flex-wrap:wrap;">
+            <span id="trazabilidadRefreshInfo" style="font-size:13px;color:#666;"></span>
+            <input type="text" id="trazabilidadFiltroSemana" placeholder="🔍 Filtrar semana/año..." oninput="renderGestionTrazabilidadTable()"
+              style="border:1px solid #ccc;border-radius:4px;padding:4px 8px;font-size:13px;">
+          </div>
+          <table class="gestion-pedidos-table" id="gestionTrazabilidadTable">
+            <thead>
+              <tr>
+                <th style="width:36px;"></th>
+                <th class="sortable-header" style="cursor:pointer;" onclick="sortGestionTrazabilidad('semana')">
+                  <span style="color:white;display:block;">Semana/Año ↕</span>
+                </th>
+                <th style="text-align:center;">
+                  <span style="color:white;">Nº Trazabilidades únicas</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody id="gestionTrazabilidadTableBody"></tbody>
+          </table>
+          <style>
+            .traz-detail-row { display:none; }
+            .traz-detail-row.open { display:table-row; }
+            .traz-detail-cell { padding:0 !important; }
+            .traz-detail-inner { padding:8px 16px; background:#f0f7ff; border-left:4px solid #3880c7; }
+            .traz-sub-table { width:100%; border-collapse:collapse; font-size:12px; }
+            .traz-sub-table th { background:#3880c7; color:#fff; padding:4px 8px; text-align:left; }
+            .traz-sub-table td { padding:4px 8px; border-bottom:1px solid #dde; }
+            .traz-sub-table tr:nth-child(even) td { background:#e8f0fb; }
+            .traz-expand-btn { background:none; border:1px solid #aaa; border-radius:4px; cursor:pointer; font-size:14px; width:26px; height:26px; display:flex; align-items:center; justify-content:center; }
+            .traz-expand-btn:hover { background:#e0e8ff; }
+          </style>
+        </div>
+
+        <div id="gestionEmptyMessage" class="gestion-empty-state" style="display: none;">
+          No hay datos disponibles para mostrar.
         </div>
       </div>
     </div>
@@ -5781,9 +6437,9 @@
       <div class="breadcrumb">
         <a href="#" onclick="showScreen('screen-main')">Inicio</a>
         <span class="separator">></span>
-        <a href="#" onclick="showScreen('screen-config-menu')">Configuración</a>
-        <span class="separator">></span>
-        <span class="current">Configuración Proveedores</span>
+        <a href="#" id="proveedores-breadcrumb-parent-link" onclick="navigateToProveedoresParent()">Configuración</a>
+        <span class="separator" id="proveedores-breadcrumb-parent-separator">></span>
+        <span class="current" id="proveedores-breadcrumb-current">Configuración Proveedores</span>
       </div>
       
       <!-- Vista Principal: Navegación por secciones -->
@@ -5806,7 +6462,7 @@
       <!-- Vista de Gestión de Proveedores -->
       <div id="config-proveedores-list" class="config-view" style="display: none;">
         <div class="breadcrumb">
-          <a href="#" onclick="showProveedoresMenu()">Configuración Proveedores</a>
+          <a href="#" id="proveedores-section-root-link" onclick="showProveedoresMenu()">Configuración Proveedores</a>
           <span class="separator">></span>
           <span class="current">Gestión de Proveedores</span>
         </div>
@@ -5896,7 +6552,7 @@
       <!-- Vista de Gestión Proveedor-Pauta -->
       <div id="config-proveedor-pauta-list" class="config-view" style="display: none;">
         <div class="breadcrumb">
-          <a href="#" onclick="showProveedoresMenu()">Configuración Proveedores</a>
+          <a href="#" id="proveedor-pauta-root-link" onclick="showProveedoresMenu()">Configuración Proveedores</a>
           <span class="separator">></span>
           <span class="current">Proveedor-Pauta</span>
         </div>
@@ -6054,6 +6710,11 @@
           <div class="info-group">
             <span class="info-label">NÚMERO PEDIDO</span>
             <span class="info-value" id="info-numpedido">-</span>
+          </div>
+          <div class="info-separator"></div>
+          <div class="info-group">
+            <span class="info-label">ARMARIOS/PEDIDO</span>
+            <span class="info-value" id="info-cantidad-pedido">-</span>
           </div>
         </div>
         
@@ -6627,6 +7288,53 @@
   <script src="/assets/css/loginModal.js?v=4.0"></script>
   
   <script>
+    // ===== DECLARACIONES DE FUNCIONES CRÍTICAS PARA EVITAR ERRORES DE REFERENCIA =====
+    
+    // Función principal para mostrar pantallas - declarada temprano para onclick
+    window.showScreen = function(screenId, addToHistory = true) {
+      // Cargar datos de pantallas específicas al navegar a ellas
+      if (screenId === 'screen-rutas-gestion') {
+        setTimeout(loadRutasGestion, 50);
+      }
+      // Si la implementación real está disponible, usarla
+      if (
+        window.showScreenImpl &&
+        typeof window.showScreenImpl === 'function' &&
+        window.showScreenImpl !== window.showScreen
+      ) {
+        return window.showScreenImpl(screenId, addToHistory);
+      }
+      // Si no, usar implementación básica
+      document.querySelectorAll('.screen').forEach(screen => {
+        screen.classList.remove('active');
+      });
+      const targetScreen = document.getElementById(screenId);
+      if (targetScreen) {
+        targetScreen.classList.add('active');
+      }
+    };
+    
+    // Funciones de acceso - declaradas temprano para onclick
+    async function accessConfiguration() {
+      try {
+        await validateRestrictedAccess('Configuración', 'screen-config-menu');
+      } catch (error) {
+        console.error('💥 Error validando acceso:', error);
+        showNotification('Error validando acceso', 'error');
+      }
+    }
+
+    async function accessGestion() {
+      try {
+        await validateRestrictedAccess('Gestión', 'screen-gestion');
+      } catch (error) {
+        console.error('💥 Error validando acceso a Gestión:', error);
+        showNotification('Error validando acceso', 'error');
+      }
+    }
+    
+    // ===== VARIABLES GLOBALES =====
+    
     // Variables globales
     let currentEditingPuesto = null;
     let currentEditingPuestoNombre = null; // 🆕 Guardar nombre del puesto para endpoints
@@ -6646,51 +7354,185 @@
     let applyingSavedPuestosLayout = false;
     let navigationHistory = ['screen-main']; // Historial de navegación interna
     let currentScreenIndex = 0; // Índice actual en el historial
+    let gestionPedidosData = [];
+    let gestionPedidosLoaded = false;
+    let gestionPedidosSort = { field: 'fecha_refresco', direction: 'desc' };
+    let gestionPedidosFilters = {
+      num_pedido: '',
+      cantidad: '',
+      fecha_refresco: '',
+      semana_entrega: []
+    };
+    let gestionSemanaEntregaSearch = '';
+
+    // ===== GESTIÓN TABS STATE =====
+    let gestionActiveTab = 'join'; // 'erp' | 'checklist' | 'join' | 'trazabilidad' | 'certificados'
+    let gestionCertificadosData   = [];
+    let gestionCertificadosLoaded = false;
+    let gestionCertificadosFilters = { num_armario: '', nombre_archivo: '', fecha_modificacion: '', num_pedido: '' };
+    let gestionCertificadosSort    = { field: 'fecha_modificacion', direction: 'desc' };
+    let gestionCertificadosVista   = 'normal'; // 'normal' | 'faltantes'
+    let gestionCertificadosFaltantesData   = [];
+    let gestionCertificadosFaltantesLoaded = false;
+    let gestionCertificadosFaltantesFilters = { num_armario: '', num_pedido: '', fecha_checklist: '' };
+    let gestionCertificadosFaltantesSort    = { field: 'fecha_checklist', direction: 'desc' };
+
+    // Tab 6: Certificados Chapa
+    let gestionCertificadosChapaData   = [];
+    let gestionCertificadosChapaLoaded = false;
+    let gestionCertificadosChapaFilters = { dato: '', nombre_archivo: '', ruta_relativa: '', fecha_modificacion: '' };
+    let gestionCertificadosChapaSort    = { field: 'fecha_modificacion', direction: 'desc' };
+
+    // Tab 2: Checklist
+    let gestionChecklistData = [];
+    let gestionChecklistLoaded = false;
+    let gestionChecklistFilters = { num_pedido: '', num_armario: '', fecha_modificacion: '' };
+    let gestionChecklistSort = { field: 'fecha_modificacion', direction: 'desc' };
+
+    // Tab 3: Join
+    let gestionJoinData = [];      // raw rows
+    let gestionJoinLoaded = false;
+    let gestionExportacionesData = {};  // NumPedido -> {fecha, carpeta}
+    let gestionExportandoPedidos = new Set(); // NumPedidos actualmente exportando
+    let gestionJoinFilters = { num_pedido: '', num_armario: '', cantidad: '', semana_entrega: '', trazabilidad: '' };
+    let gestionJoinSort = { field: 'semana_entrega', direction: 'desc' };
+    let gestionJoinExpanded = new Set(); // set of num_pedido expanded
+
+    // Tab 4: Trazabilidad
+    let gestionTrazabilidadData = [];
+    let gestionTrazabilidadLoaded = false;
+    let gestionTrazabilidadFilters = { num_orden: '', semana: '', codigopieza: '', dato: '', fecha_inicio: '', codigo: '' };
+    let gestionTrazabilidadSort = { field: 'semana', direction: 'desc' };
 
     // Función para validar acceso a Configuración y mostrar si es permitido
+    let currentProveedoresContext = 'configuracion';
+
+    function getProveedoresNavigationConfig() {
+      if (currentProveedoresContext === 'gestion') {
+        return {
+          headerTitle: 'GESTIÓN',
+          rootCurrent: 'Gestión',
+          hasParent: false,
+          parentLabel: '',
+          sectionRootLabel: 'Gestión'
+        };
+      }
+
+      return {
+        headerTitle: 'CONFIGURACIÓN PROVEEDORES',
+        rootCurrent: 'Configuración Proveedores',
+        hasParent: true,
+        parentLabel: 'Configuración',
+        sectionRootLabel: 'Configuración Proveedores'
+      };
+    }
+
+    function navigateToProveedoresParent() {
+      if (currentProveedoresContext === 'gestion') {
+        showScreen('screen-main');
+        return;
+      }
+
+      showScreen('screen-config-menu');
+    }
+
+    function updateProveedoresBreadcrumbs() {
+      const config = getProveedoresNavigationConfig();
+      const parentLink = document.getElementById('proveedores-breadcrumb-parent-link');
+      const parentSeparator = document.getElementById('proveedores-breadcrumb-parent-separator');
+      const currentLabel = document.getElementById('proveedores-breadcrumb-current');
+      const proveedoresSectionRootLink = document.getElementById('proveedores-section-root-link');
+      const proveedorPautaRootLink = document.getElementById('proveedor-pauta-root-link');
+
+      if (parentLink) {
+        parentLink.textContent = config.parentLabel;
+        parentLink.style.display = config.hasParent ? '' : 'none';
+      }
+
+      if (parentSeparator) {
+        parentSeparator.style.display = config.hasParent ? '' : 'none';
+      }
+
+      if (currentLabel) {
+        currentLabel.textContent = config.rootCurrent;
+      }
+
+      if (proveedoresSectionRootLink) {
+        proveedoresSectionRootLink.textContent = config.sectionRootLabel;
+      }
+
+      if (proveedorPautaRootLink) {
+        proveedorPautaRootLink.textContent = config.sectionRootLabel;
+      }
+
+      const proveedoresScreen = document.getElementById('screen-config-proveedores');
+      if (proveedoresScreen && proveedoresScreen.classList.contains('active')) {
+        const headerTitle = document.getElementById('headerTitle');
+        if (headerTitle) {
+          headerTitle.textContent = config.headerTitle;
+        }
+      }
+    }
+
+    function openProveedoresScreen(context = 'configuracion') {
+      currentProveedoresContext = context === 'gestion' ? 'gestion' : 'configuracion';
+      showScreen('screen-config-proveedores');
+    }
+
     async function accessConfiguration() {
       try {
-        const user = LoginModal.getCurrentUser();
-        
-        if (!user) {
-          showNotification('Debes iniciar sesión', 'error');
-          return;
-        }
-        
-        console.log('🔐 Usuario actual:', user);
-        console.log('📊 Nivel de usuario:', user.nivel);
-        
-        // Validar acceso al backend
-        const response = await fetch('/api/validar-acceso-pantalla', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ pantalla: 'configuracion' })
-        });
-        
-        const result = await response.json();
-        console.log('🔐 Resultado validación:', result);
-        
-        if (result.acceso_permitido) {
-          console.log('✅ Acceso permitido a Configuración');
-          showScreen('screen-config-menu');
-        } else {
-          console.log('❌ Acceso denegado a Configuración');
-          showNotification(
-            `Acceso denegado. Se requiere nivel > 2 (Tienes nivel: ${user.nivel})`,
-            'error'
-          );
-        }
-        
+        await validateRestrictedAccess('Configuración', 'screen-config-menu');
       } catch (error) {
         console.error('💥 Error validando acceso:', error);
         showNotification('Error validando acceso', 'error');
       }
     }
 
+    async function accessGestion() {
+      try {
+        await validateRestrictedAccess('Gestión', 'screen-gestion');
+      } catch (error) {
+        console.error('💥 Error validando acceso a Gestión:', error);
+        showNotification('Error validando acceso', 'error');
+      }
+    }
+
+    async function validateRestrictedAccess(sectionName, targetScreenId) {
+      const user = LoginModal.getCurrentUser();
+
+      if (!user) {
+        showNotification('Debes iniciar sesión', 'error');
+        return;
+      }
+
+      console.log('🔐 Usuario actual:', user);
+      console.log('📊 Nivel de usuario:', user.nivel);
+
+      const response = await fetch('/api/validar-acceso-pantalla', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ pantalla: 'configuracion' })
+      });
+
+      const result = await response.json();
+      console.log(`🔐 Resultado validación ${sectionName}:`, result);
+
+      if (result.acceso_permitido) {
+        console.log(`✅ Acceso permitido a ${sectionName}`);
+        showScreen(targetScreenId);
+      } else {
+        console.log(`❌ Acceso denegado a ${sectionName}`);
+        showNotification(
+          `Acceso denegado. Se requiere nivel > 2 (Tienes nivel: ${user.nivel})`,
+          'error'
+        );
+      }
+    }
+
     // Función para mostrar una pantalla específica
-    function showScreen(screenId, addToHistory = true) {
+    function showScreenCore(screenId, addToHistory = true) {
       // Ocultar todas las pantallas
       document.querySelectorAll('.screen').forEach(screen => {
         screen.classList.remove('active');
@@ -6725,6 +7567,8 @@
       // Cargar datos específicos si es necesario
       loadScreenData(screenId);
     }
+
+    window.showScreenImpl = showScreenCore;
 
     // Función para controlar qué botón mostrar en el header
     function updateHeaderButtons(screenId) {
@@ -6770,12 +7614,13 @@
       const titles = {
         'screen-main': 'CHECKLIST CALIDAD',
         'screen-config-menu': 'CONFIGURACIÓN',
+        'screen-gestion': 'GESTIÓN',
         'screen-puestos': 'PUESTOS',
         'screen-listado-armarios': 'LISTADO ARMARIOS',
         'screen-config-puestos': 'CONFIGURACIÓN DE PUESTOS',
         'screen-config-controles': 'CONFIGURACIÓN DE CONTROLES',
         'screen-config-pautas': 'CONFIGURACIÓN DE PAUTAS',
-        'screen-config-proveedores': 'CONFIGURACIÓN PROVEEDORES',
+        'screen-config-proveedores': getProveedoresNavigationConfig().headerTitle,
         'screen-checklist': 'CHECKLIST'
       };
       headerTitle.textContent = titles[screenId] || 'CHECKLIST';
@@ -6784,6 +7629,9 @@
     // Función para cargar datos específicos de cada pantalla
     async function loadScreenData(screenId) {
       switch(screenId) {
+        case 'screen-gestion':
+          await loadGestionJoinData();
+          break;
         case 'screen-puestos':
           await loadPuestosTree();
           break;
@@ -6803,12 +7651,1280 @@
           await loadConfigPautas();
           break;
         case 'screen-config-proveedores':
+          updateProveedoresBreadcrumbs();
           showProveedoresMenu();
           break;
         case 'screen-checklist':
           // El checklist se carga cuando se navega desde onPautaClick
           break;
       }
+    }
+
+    function normalizeGestionValue(value) {
+      return (value ?? '').toString().toLowerCase().trim();
+    }
+
+    function escapeGestionHtml(value) {
+      return (value ?? '').toString()
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getGestionSemanaEntregaLabel(value) {
+      const normalized = (value ?? '').toString().trim();
+      return normalized || 'Sin semana';
+    }
+
+    function formatGestionCantidad(value) {
+      if (value === null || value === undefined || value === '') {
+        return '';
+      }
+
+      const numericValue = Number(value);
+      if (Number.isNaN(numericValue)) {
+        return value;
+      }
+
+      if (Number.isInteger(numericValue)) {
+        return numericValue.toLocaleString('es-ES');
+      }
+
+      return numericValue.toLocaleString('es-ES', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function getGestionSemanaEntregaOptions() {
+      return Array.from(
+        new Set(gestionPedidosData.map(item => getGestionSemanaEntregaLabel(item.semana_entrega)))
+      ).sort((a, b) => a.localeCompare(b, 'es', { numeric: true, sensitivity: 'base' }));
+    }
+
+    function compareGestionPedidos(a, b, field, direction) {
+      let valueA;
+      let valueB;
+
+      switch (field) {
+        case 'cantidad':
+          valueA = Number(a.cantidad ?? 0);
+          valueB = Number(b.cantidad ?? 0);
+          break;
+        case 'fecha_refresco':
+          valueA = Date.parse(a.fecha_refresco_sort || a.fecha_refresco || '') || 0;
+          valueB = Date.parse(b.fecha_refresco_sort || b.fecha_refresco || '') || 0;
+          break;
+        case 'semana_entrega':
+          valueA = getGestionSemanaEntregaLabel(a.semana_entrega);
+          valueB = getGestionSemanaEntregaLabel(b.semana_entrega);
+          break;
+        default:
+          valueA = (a[field] ?? '').toString();
+          valueB = (b[field] ?? '').toString();
+          break;
+      }
+
+      let comparison = 0;
+
+      if (typeof valueA === 'number' && typeof valueB === 'number') {
+        comparison = valueA - valueB;
+      } else {
+        comparison = valueA.toString().localeCompare(valueB.toString(), 'es', {
+          numeric: true,
+          sensitivity: 'base'
+        });
+      }
+
+      return direction === 'asc' ? comparison : -comparison;
+    }
+
+    function getFilteredSortedGestionPedidos() {
+      const filtered = gestionPedidosData.filter(item => {
+        const numPedido = normalizeGestionValue(item.num_pedido);
+        const cantidad = normalizeGestionValue(formatGestionCantidad(item.cantidad));
+        const fechaRefresco = normalizeGestionValue(item.fecha_refresco);
+        const semanaEntrega = getGestionSemanaEntregaLabel(item.semana_entrega);
+
+        const matchesNumPedido = !gestionPedidosFilters.num_pedido || numPedido.includes(normalizeGestionValue(gestionPedidosFilters.num_pedido));
+        const matchesCantidad = !gestionPedidosFilters.cantidad || cantidad.includes(normalizeGestionValue(gestionPedidosFilters.cantidad));
+        const matchesFecha = !gestionPedidosFilters.fecha_refresco || fechaRefresco.includes(normalizeGestionValue(gestionPedidosFilters.fecha_refresco));
+        const matchesSemana = gestionPedidosFilters.semana_entrega.length === 0 || gestionPedidosFilters.semana_entrega.includes(semanaEntrega);
+
+        return matchesNumPedido && matchesCantidad && matchesFecha && matchesSemana;
+      });
+
+      return filtered.sort((a, b) => compareGestionPedidos(a, b, gestionPedidosSort.field, gestionPedidosSort.direction));
+    }
+
+    function updateGestionPedidosSummary(visibleCount) {
+      const summary = document.getElementById('gestionPedidosSummary');
+      if (!summary) {
+        return;
+      }
+
+      const selectedWeeksText = gestionPedidosFilters.semana_entrega.length > 0
+        ? ` · Semanas: ${gestionPedidosFilters.semana_entrega.join(', ')}`
+        : '';
+
+      summary.innerHTML = `Mostrando <strong>${visibleCount}</strong> de <strong>${gestionPedidosData.length}</strong> pedidos${selectedWeeksText}`;
+    }
+
+    function updateGestionSortHeaders() {
+      document.querySelectorAll('#gestionPedidosTable thead th[data-gestion-sort]').forEach(header => {
+        header.classList.remove('sorted', 'sort-asc', 'sort-desc');
+
+        if (header.getAttribute('data-gestion-sort') === gestionPedidosSort.field) {
+          header.classList.add('sorted', gestionPedidosSort.direction === 'asc' ? 'sort-asc' : 'sort-desc');
+        }
+      });
+    }
+
+    function renderGestionSemanaEntregaOptions() {
+      const selector = document.getElementById('gestionSemanaEntregaSelector');
+      const resumen = document.getElementById('gestionSemanaEntregaResumen');
+      const opcionesList = document.getElementById('gestionSemanaEntregaOpciones');
+      const selectAllCheckbox = document.getElementById('gestionSemanaEntregaTodos');
+      const searchInput = document.getElementById('gestionSemanaEntregaBuscar');
+
+      if (!selector || !resumen || !opcionesList || !selectAllCheckbox || !searchInput) {
+        return;
+      }
+
+      const allOptions = getGestionSemanaEntregaOptions();
+      const visibleOptions = allOptions.filter(option =>
+        normalizeGestionValue(option).includes(normalizeGestionValue(gestionSemanaEntregaSearch))
+      );
+
+      if (visibleOptions.length === 0) {
+        opcionesList.innerHTML = '<li class="selector-empty">No hay semanas que coincidan.</li>';
+      } else {
+        opcionesList.innerHTML = visibleOptions.map(option => {
+          const checked = gestionPedidosFilters.semana_entrega.includes(option);
+          const encodedOption = encodeURIComponent(option);
+
+          return `
+            <li>
+              <label class="selector-opcion ${checked ? 'is-selected' : ''}">
+                <input type="checkbox" ${checked ? 'checked' : ''} onchange="toggleGestionSemanaEntregaOption(decodeURIComponent('${encodedOption}'), this.checked)">
+                <span>${escapeGestionHtml(option)}</span>
+              </label>
+            </li>
+          `;
+        }).join('');
+      }
+
+      searchInput.value = gestionSemanaEntregaSearch;
+
+      const selectedCount = gestionPedidosFilters.semana_entrega.length;
+      const totalCount = allOptions.length;
+      const allSelected = totalCount > 0 && selectedCount === totalCount;
+      const partiallySelected = selectedCount > 0 && selectedCount < totalCount;
+
+      selectAllCheckbox.checked = allSelected;
+      selectAllCheckbox.indeterminate = partiallySelected;
+
+      if (selectedCount === 0) {
+        resumen.textContent = 'Todas';
+        selector.classList.remove('selector-activo');
+      } else if (selectedCount === 1) {
+        resumen.textContent = gestionPedidosFilters.semana_entrega[0];
+        selector.classList.add('selector-activo');
+      } else {
+        resumen.textContent = `${selectedCount} semanas seleccionadas`;
+        selector.classList.add('selector-activo');
+      }
+    }
+
+    function renderGestionPedidosTable() {
+      const tbody = document.getElementById('gestionPedidosTableBody');
+      const tableContainer = document.getElementById('gestionTableContainer');
+      const emptyMessage = document.getElementById('gestionEmptyMessage');
+      const loadingMessage = document.getElementById('gestionLoadingMessage');
+
+      if (!tbody || !tableContainer || !emptyMessage || !loadingMessage) {
+        return;
+      }
+
+      const rows = getFilteredSortedGestionPedidos();
+      updateGestionSortHeaders();
+      renderGestionSemanaEntregaOptions();
+      updateGestionPedidosSummary(rows.length);
+
+      if (gestionPedidosData.length === 0) {
+        tbody.innerHTML = '';
+        tableContainer.style.display = 'none';
+        loadingMessage.style.display = 'none';
+        emptyMessage.style.display = 'block';
+        emptyMessage.textContent = 'No hay pedidos disponibles para mostrar.';
+        return;
+      }
+
+      tbody.innerHTML = rows.map(item => `
+        <tr>
+          <td data-filtro="num_pedido">${escapeGestionHtml(item.num_pedido || '')}</td>
+          <td data-filtro="cantidad" class="gestion-cantidad" data-value="${escapeGestionHtml(item.cantidad ?? '')}">${escapeGestionHtml(formatGestionCantidad(item.cantidad))}</td>
+          <td data-filtro="semana_entrega">${escapeGestionHtml(getGestionSemanaEntregaLabel(item.semana_entrega))}</td>
+          <td data-filtro="fecha_refresco" data-value="${escapeGestionHtml(item.fecha_refresco_sort || item.fecha_refresco || '')}">${escapeGestionHtml(item.fecha_refresco || '')}</td>
+        </tr>
+      `).join('');
+
+      tableContainer.style.display = 'block';
+      loadingMessage.style.display = 'none';
+
+      if (rows.length === 0) {
+        emptyMessage.style.display = 'block';
+        emptyMessage.textContent = 'No hay pedidos que coincidan con los filtros aplicados.';
+      } else {
+        emptyMessage.style.display = 'none';
+      }
+    }
+
+    // ===== TAB SWITCHING =====
+    function switchGestionTab(tab) {
+      gestionActiveTab = tab;
+      ['erp', 'checklist', 'join', 'trazabilidad', 'certificados', 'certificados-chapa'].forEach(t => {
+        const btnId = 'gestionTab' + t.split('-').map(s => s.charAt(0).toUpperCase() + s.slice(1)).join('');
+        const btn = document.getElementById(btnId);
+        if (btn) {
+          btn.classList.toggle('gestion-tab-active', t === tab);
+          btn.classList.toggle('btn-primary', t === tab);
+          btn.classList.toggle('btn-secondary', t !== tab);
+        }
+      });
+      document.getElementById('gestionTableContainer').style.display               = tab === 'erp'                ? 'block' : 'none';
+      document.getElementById('gestionChecklistContainer').style.display            = tab === 'checklist'          ? 'block' : 'none';
+      document.getElementById('gestionJoinContainer').style.display                 = tab === 'join'               ? 'block' : 'none';
+      document.getElementById('gestionTrazabilidadContainer').style.display         = tab === 'trazabilidad'       ? 'block' : 'none';
+      document.getElementById('gestionCertificadosContainer').style.display         = tab === 'certificados'       ? 'block' : 'none';
+      document.getElementById('gestionCertificadosChapaContainer').style.display    = tab === 'certificados-chapa' ? 'block' : 'none';
+      document.getElementById('gestionEmptyMessage').style.display = 'none';
+      if (tab === 'checklist'          && !gestionChecklistLoaded)         loadGestionChecklistData();
+      if (tab === 'join'               && !gestionJoinLoaded)              loadGestionJoinData();
+      if (tab === 'erp')                                                    loadGestionPedidosData();
+      if (tab === 'trazabilidad'       && !gestionTrazabilidadLoaded)      loadGestionTrazabilidadData();
+      if (tab === 'certificados'       && !gestionCertificadosLoaded)      loadGestionCertificadosData();
+      if (tab === 'certificados-chapa' && !gestionCertificadosChapaLoaded) loadGestionCertificadosChapaData();
+    }
+
+    // ===== TAB 2: CHECKLIST =====
+    function setGestionChecklistFilter(field, value) {
+      gestionChecklistFilters[field] = value || '';
+      renderGestionChecklistTable();
+    }
+    function sortGestionChecklist(field) {
+      if (gestionChecklistSort.field === field) {
+        gestionChecklistSort.direction = gestionChecklistSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        gestionChecklistSort.field = field;
+        gestionChecklistSort.direction = 'desc';
+      }
+      renderGestionChecklistTable();
+    }
+    function getFilteredSortedGestionChecklist() {
+      let rows = gestionChecklistData.filter(item => {
+        const matchPedido  = !gestionChecklistFilters.num_pedido        || (item.num_pedido || '').toLowerCase().includes(gestionChecklistFilters.num_pedido.toLowerCase());
+        const matchArmario = !gestionChecklistFilters.num_armario       || (item.num_armario || '').toLowerCase().includes(gestionChecklistFilters.num_armario.toLowerCase());
+        const matchFecha   = !gestionChecklistFilters.fecha_modificacion || (item.fecha_modificacion || '').toLowerCase().includes(gestionChecklistFilters.fecha_modificacion.toLowerCase());
+        return matchPedido && matchArmario && matchFecha;
+      });
+      const f = gestionChecklistSort.field;
+      const dir = gestionChecklistSort.direction === 'asc' ? 1 : -1;
+      rows.sort((a, b) => {
+        const va = (a[f] || '').toString().toLowerCase();
+        const vb = (b[f] || '').toString().toLowerCase();
+        return va < vb ? -dir : va > vb ? dir : 0;
+      });
+      return rows;
+    }
+    function renderGestionChecklistTable() {
+      const tbody = document.getElementById('gestionChecklistTableBody');
+      const container = document.getElementById('gestionChecklistContainer');
+      const emptyMsg  = document.getElementById('gestionEmptyMessage');
+      const loading   = document.getElementById('gestionLoadingMessage');
+      if (!tbody) return;
+      const rows = getFilteredSortedGestionChecklist();
+      const summary = document.getElementById('gestionPedidosSummary');
+      if (summary) summary.textContent = `Mostrando ${rows.length} de ${gestionChecklistData.length} registros Checklist`;
+      if (gestionChecklistData.length === 0) {
+        container.style.display = 'none';
+        loading.style.display = 'none';
+        emptyMsg.style.display = 'block';
+        emptyMsg.textContent = 'No hay documentos Checklist registrados. Pulse Refrescar para escanear la carpeta.';
+        return;
+      }
+      tbody.innerHTML = rows.map(item => `
+        <tr>
+          <td>${escapeGestionHtml(item.num_pedido)}</td>
+          <td>${escapeGestionHtml(item.num_armario)}</td>
+          <td>${escapeGestionHtml(item.fecha_modificacion)}</td>
+          <td style="text-align:center;">
+            <button onclick="deleteChecklistDoc(${item.id}, '${escapeGestionHtml(item.num_armario)}')"
+              title="Eliminar registro"
+              style="background:none;border:none;cursor:pointer;font-size:1.1em;color:#c0392b;padding:2px 6px;border-radius:4px;"
+              onmouseover="this.style.background='#fde8e8'" onmouseout="this.style.background='none'">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+      container.style.display = 'block';
+      loading.style.display = 'none';
+      emptyMsg.style.display = rows.length === 0 ? 'block' : 'none';
+      if (rows.length === 0) emptyMsg.textContent = 'No hay registros con los filtros aplicados.';
+    }
+    async function loadGestionChecklistData(force = false) {
+      if (gestionChecklistLoaded && !force) { renderGestionChecklistTable(); return; }
+      const loading = document.getElementById('gestionLoadingMessage');
+      const container = document.getElementById('gestionChecklistContainer');
+      if (loading) { loading.style.display = 'block'; loading.textContent = '⏳ Cargando Checklist...'; }
+      if (container) container.style.display = 'none';
+      try {
+        const resp = await fetch('/api/gestion/checklist-documentos', { headers: { 'Accept': 'application/json' } });
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.message);
+        gestionChecklistData = data.docs || [];
+        gestionChecklistLoaded = true;
+        renderGestionChecklistTable();
+      } catch (err) {
+        if (loading) loading.style.display = 'none';
+        showNotification('Error Checklist: ' + err.message, 'error');
+      }
+    }
+
+    // ===== TAB 5: CERTIFICADOS PINTURA =====
+    function setGestionCertificadosFilter(field, value) {
+      gestionCertificadosFilters[field] = value || '';
+      renderGestionCertificadosTable();
+    }
+    function sortGestionCertificados(field) {
+      if (gestionCertificadosSort.field === field) {
+        gestionCertificadosSort.direction = gestionCertificadosSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        gestionCertificadosSort.field = field;
+        gestionCertificadosSort.direction = 'desc';
+      }
+      renderGestionCertificadosTable();
+    }
+    function getFilteredSortedGestionCertificados() {
+      let rows = gestionCertificadosData.filter(item => {
+        const matchArmario  = !gestionCertificadosFilters.num_armario       || (item.num_armario || '').toLowerCase().includes(gestionCertificadosFilters.num_armario.toLowerCase());
+        const matchArchivo  = !gestionCertificadosFilters.nombre_archivo    || (item.nombre_archivo || '').toLowerCase().includes(gestionCertificadosFilters.nombre_archivo.toLowerCase());
+        const matchFecha    = !gestionCertificadosFilters.fecha_modificacion || (item.fecha_modificacion || '').toLowerCase().includes(gestionCertificadosFilters.fecha_modificacion.toLowerCase());
+        const matchPedido   = !gestionCertificadosFilters.num_pedido         || (item.num_pedido || '').toLowerCase().includes(gestionCertificadosFilters.num_pedido.toLowerCase());
+        return matchArmario && matchArchivo && matchFecha && matchPedido;
+      });
+      const f   = gestionCertificadosSort.field;
+      const dir = gestionCertificadosSort.direction === 'asc' ? 1 : -1;
+      rows.sort((a, b) => {
+        const fSort = f === 'fecha_modificacion' ? 'fecha_modificacion_iso' : f;
+        const va = (a[fSort] || '').toString().toLowerCase();
+        const vb = (b[fSort] || '').toString().toLowerCase();
+        return va < vb ? -dir : va > vb ? dir : 0;
+      });
+      return rows;
+    }
+    function renderGestionCertificadosTable() {
+      const tbody     = document.getElementById('gestionCertificadosTableBody');
+      const container = document.getElementById('gestionCertificadosContainer');
+      const emptyMsg  = document.getElementById('gestionEmptyMessage');
+      const loading   = document.getElementById('gestionLoadingMessage');
+      if (!tbody) return;
+      const rows    = getFilteredSortedGestionCertificados();
+      const summary = document.getElementById('gestionPedidosSummary');
+      if (summary) summary.textContent = `Mostrando ${rows.length} de ${gestionCertificadosData.length} certificados de pintura`;
+      if (gestionCertificadosData.length === 0) {
+        container.style.display = 'none';
+        loading.style.display   = 'none';
+        emptyMsg.style.display  = 'block';
+        emptyMsg.textContent    = 'No hay certificados de pintura registrados. Pulse Refrescar para escanear la carpeta.';
+        return;
+      }
+      tbody.innerHTML = rows.map(item => `
+        <tr>
+          <td>${escapeGestionHtml(item.num_pedido || '—')}</td>
+          <td>${escapeGestionHtml(item.num_armario)}</td>
+          <td style="font-size:0.9em;color:#444;">${escapeGestionHtml(item.nombre_archivo)}</td>
+          <td>${escapeGestionHtml(item.fecha_modificacion)}</td>
+          <td style="text-align:center;">
+            <button onclick="deleteCertificadoPintura(${item.id}, '${escapeGestionHtml(item.num_armario)}')"
+              title="Eliminar registro"
+              style="background:none;border:none;cursor:pointer;font-size:1.1em;color:#c0392b;padding:2px 6px;border-radius:4px;"
+              onmouseover="this.style.background='#fde8e8'" onmouseout="this.style.background='none'">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+      container.style.display = 'block';
+      loading.style.display   = 'none';
+      emptyMsg.style.display  = rows.length === 0 ? 'block' : 'none';
+      if (rows.length === 0) emptyMsg.textContent = 'No hay registros con los filtros aplicados.';
+    }
+    async function loadGestionCertificadosData(force = false) {
+      if (gestionCertificadosLoaded && !force) { renderGestionCertificadosTable(); return; }
+      const loading   = document.getElementById('gestionLoadingMessage');
+      const container = document.getElementById('gestionCertificadosContainer');
+      if (loading)    { loading.style.display = 'block'; loading.textContent = '⏳ Cargando Certificados Pintura...'; }
+      if (container)  container.style.display = 'none';
+      try {
+        const resp = await fetch('/api/gestion/certificados-pintura', { headers: { 'Accept': 'application/json' } });
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.message);
+        gestionCertificadosData   = data.docs || [];
+        gestionCertificadosLoaded = true;
+        renderGestionCertificadosTable();
+      } catch (err) {
+        if (loading) loading.style.display = 'none';
+        showNotification('Error Certificados Pintura: ' + err.message, 'error');
+      }
+    }
+    async function deleteCertificadoPintura(id, numArmario) {
+      if (!confirm(`¿Eliminar el registro del armario "${numArmario}"?\nEsta acción no se puede deshacer.`)) return;
+      try {
+        const resp = await fetch(`/api/gestion/certificados-pintura/${id}`, { method: 'DELETE', headers: { 'Accept': 'application/json' } });
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.message);
+        gestionCertificadosData = gestionCertificadosData.filter(d => d.id !== id);
+        renderGestionCertificadosTable();
+        showNotification(`Registro del armario "${numArmario}" eliminado`, 'success');
+      } catch (err) {
+        showNotification('Error eliminando: ' + err.message, 'error');
+      }
+    }
+
+    // ===== CERTIFICADOS PINTURA: TOGGLE VISTA =====
+    function setCertificadosVista(vista) {
+      gestionCertificadosVista = vista;
+      document.getElementById('btnCertificadosVistaNormal').className    = 'btn ' + (vista === 'normal'    ? 'btn-primary' : 'btn-secondary');
+      document.getElementById('btnCertificadosVistaFaltantes').className  = 'btn ' + (vista === 'faltantes' ? 'btn-primary' : 'btn-secondary');
+      const btnExport = document.getElementById('btnExportFaltantes');
+      if (btnExport) btnExport.style.display = vista === 'faltantes' ? '' : 'none';
+      document.getElementById('gestionCertificadosTablaConCert').style.display   = vista === 'normal'    ? '' : 'none';
+      document.getElementById('gestionCertificadosTablaFaltantes').style.display = vista === 'faltantes' ? '' : 'none';
+      if (vista === 'faltantes') loadGestionCertificadosFaltantes();
+      else renderGestionCertificadosTable();
+    }
+
+    function setGestionCertificadosFaltantesFilter(field, value) {
+      gestionCertificadosFaltantesFilters[field] = value || '';
+      renderGestionCertificadosFaltantesTable();
+    }
+    function sortGestionCertificadosFaltantes(field) {
+      if (gestionCertificadosFaltantesSort.field === field) {
+        gestionCertificadosFaltantesSort.direction = gestionCertificadosFaltantesSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        gestionCertificadosFaltantesSort.field = field;
+        gestionCertificadosFaltantesSort.direction = 'desc';
+      }
+      renderGestionCertificadosFaltantesTable();
+    }
+    function getFilteredSortedFaltantes() {
+      let rows = gestionCertificadosFaltantesData.filter(item => {
+        const mA = !gestionCertificadosFaltantesFilters.num_armario   || (item.num_armario || '').toLowerCase().includes(gestionCertificadosFaltantesFilters.num_armario.toLowerCase());
+        const mP = !gestionCertificadosFaltantesFilters.num_pedido    || (item.num_pedido || '').toLowerCase().includes(gestionCertificadosFaltantesFilters.num_pedido.toLowerCase());
+        const mF = !gestionCertificadosFaltantesFilters.fecha_checklist || (item.fecha_checklist || '').toLowerCase().includes(gestionCertificadosFaltantesFilters.fecha_checklist.toLowerCase());
+        return mA && mP && mF;
+      });
+      const f   = gestionCertificadosFaltantesSort.field;
+      const dir = gestionCertificadosFaltantesSort.direction === 'asc' ? 1 : -1;
+      rows.sort((a, b) => {
+        // Para fecha usar el campo ISO para orden cronológico correcto
+        const fSort = f === 'fecha_checklist' ? 'fecha_checklist_iso' : f;
+        const va = (a[fSort] || '').toString().toLowerCase();
+        const vb = (b[fSort] || '').toString().toLowerCase();
+        return va < vb ? -dir : va > vb ? dir : 0;
+      });
+      return rows;
+    }
+    function renderGestionCertificadosFaltantesTable() {
+      const tbody  = document.getElementById('gestionCertificadosFaltantesTableBody');
+      const count  = document.getElementById('gestionCertificadosFaltantesCount');
+      if (!tbody) return;
+      const rows = getFilteredSortedFaltantes();
+      if (count) count.textContent = gestionCertificadosFaltantesLoaded
+        ? `${gestionCertificadosFaltantesData.length} armario${gestionCertificadosFaltantesData.length !== 1 ? 's' : ''} sin certificado`
+        : '';
+      tbody.innerHTML = rows.length === 0
+        ? `<tr><td colspan="3" style="text-align:center;padding:18px;color:#888;">${gestionCertificadosFaltantesLoaded ? 'Todos los armarios tienen certificado de pintura ✅' : 'Cargando...'}</td></tr>`
+        : rows.map(item => `
+          <tr style="background:#fff8f0;">
+            <td>${escapeGestionHtml(item.num_pedido || '—')}</td>
+            <td style="font-weight:600;color:#c0392b;">${escapeGestionHtml(item.num_armario)}</td>
+            <td style="color:#888;font-size:0.9em;">${escapeGestionHtml(item.fecha_checklist)}</td>
+          </tr>`).join('');
+    }
+    async function loadGestionCertificadosFaltantes(force = false) {
+      if (gestionCertificadosFaltantesLoaded && !force) { renderGestionCertificadosFaltantesTable(); return; }
+      const tbody = document.getElementById('gestionCertificadosFaltantesTableBody');
+      if (tbody) tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:18px;color:#888;">Cargando...</td></tr>';
+      try {
+        const resp = await fetch('/api/gestion/certificados-pintura/faltantes', { headers: { 'Accept': 'application/json' } });
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.message);
+        gestionCertificadosFaltantesData   = data.faltantes || [];
+        gestionCertificadosFaltantesLoaded = true;
+        renderGestionCertificadosFaltantesTable();
+        // Actualizar contador en toggle
+        const count = document.getElementById('gestionCertificadosFaltantesCount');
+        if (count) count.textContent = `${gestionCertificadosFaltantesData.length} armario${gestionCertificadosFaltantesData.length !== 1 ? 's' : ''} sin certificado`;
+      } catch (err) {
+        showNotification('Error cargando faltantes: ' + err.message, 'error');
+      }
+    }
+
+    async function exportarFaltantesExcel() {
+      const btn = document.getElementById('btnExportFaltantes');
+      const originalText = btn ? btn.textContent : '';
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Exportando...'; }
+      try {
+        const resp = await fetch('/api/gestion/certificados-pintura/faltantes/export', {
+          headers: { 'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+        });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const blob = await resp.blob();
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = `armarios_sin_certificado_pintura_${new Date().toISOString().slice(0,10)}.xlsx`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showNotification('Excel exportado correctamente', 'success');
+      } catch (err) {
+        showNotification('Error exportando Excel: ' + err.message, 'error');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = originalText; }
+      }
+    }
+
+    async function deleteChecklistDoc(id, numArmario) {
+      if (!confirm(`¿Eliminar el registro del armario "${numArmario}"?\nEsta acción no se puede deshacer.`)) return;
+      try {
+        const resp = await fetch(`/api/gestion/checklist-documentos/${id}`, { method: 'DELETE', headers: { 'Accept': 'application/json' } });
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.message);
+        // Eliminar del array local y re-renderizar
+        gestionChecklistData = gestionChecklistData.filter(d => d.id !== id);
+        gestionJoinLoaded = false; // invalidar join también
+        renderGestionChecklistTable();
+        showNotification(`Registro eliminado correctamente`, 'success');
+      } catch (err) {
+        showNotification('Error al eliminar: ' + err.message, 'error');
+      }
+    }
+
+    // ===== TAB 3: JOIN =====
+    function setGestionJoinFilter(field, value) {
+      gestionJoinFilters[field] = value || '';
+      renderGestionJoinTable();
+    }
+    function mergeUniqueJoinValues(target, source) {
+      if (!Array.isArray(source) || !source.length) return;
+      source.forEach(value => {
+        if (!value || target.includes(value)) return;
+        target.push(value);
+      });
+    }
+    function sortGestionJoin(field) {
+      if (gestionJoinSort.field === field) {
+        gestionJoinSort.direction = gestionJoinSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        gestionJoinSort.field = field;
+        gestionJoinSort.direction = 'asc';
+      }
+      renderGestionJoinTable();
+    }
+    function getFilteredGroupedJoin() {
+      const map = new Map();
+      gestionJoinData.forEach(item => {
+        const k = item.num_pedido;
+        if (!map.has(k)) {
+          map.set(k, {
+            num_pedido: k,
+            armarios: [],
+            cantidad: item.cantidad,
+            semana_entrega: item.semana_entrega,
+            trazabilidades: item.trazabilidades || [],
+            certificados_chapa_encontrados: item.certificados_chapa_encontrados || [],
+            certificados_chapa_faltantes: item.certificados_chapa_faltantes || []
+          });
+        }
+        if (item.num_armario) map.get(k).armarios.push({ num_armario: item.num_armario, cert_pintura: item.cert_pintura || '' });
+        // Merge trazabilidades (union)
+        if (item.trazabilidades && item.trazabilidades.length) {
+          const existing = map.get(k).trazabilidades;
+          item.trazabilidades.forEach(t => { if (!existing.includes(t)) existing.push(t); });
+        }
+        mergeUniqueJoinValues(map.get(k).certificados_chapa_encontrados, item.certificados_chapa_encontrados || []);
+        mergeUniqueJoinValues(map.get(k).certificados_chapa_faltantes, item.certificados_chapa_faltantes || []);
+      });
+      let groups = Array.from(map.values());
+      groups.forEach(g => g.trazabilidades.sort());
+      groups.forEach(g => {
+        g.certificados_chapa_encontrados.sort();
+        g.certificados_chapa_faltantes = g.certificados_chapa_faltantes.filter(t => !g.certificados_chapa_encontrados.includes(t)).sort();
+      });
+      groups = groups.filter(g => {
+        const matchPedido   = !gestionJoinFilters.num_pedido    || g.num_pedido.toLowerCase().includes(gestionJoinFilters.num_pedido.toLowerCase());
+        const matchArmario  = !gestionJoinFilters.num_armario   || g.armarios.some(a => a.num_armario.toLowerCase().includes(gestionJoinFilters.num_armario.toLowerCase()));
+        const matchCant     = !gestionJoinFilters.cantidad      || String(g.cantidad ?? '').includes(gestionJoinFilters.cantidad);
+        const matchSemana   = !gestionJoinFilters.semana_entrega || (g.semana_entrega || '').toLowerCase().includes(gestionJoinFilters.semana_entrega.toLowerCase());
+        const matchTraz     = !gestionJoinFilters.trazabilidad  || g.trazabilidades.some(t => t.toLowerCase().includes(gestionJoinFilters.trazabilidad.toLowerCase()));
+        return matchPedido && matchArmario && matchCant && matchSemana && matchTraz;
+      });
+      const f = gestionJoinSort.field;
+      const dir = gestionJoinSort.direction === 'asc' ? 1 : -1;
+      groups.sort((a, b) => {
+        if (f === 'semana_entrega') {
+          const va = (a.semana_entrega || '').trim();
+          const vb = (b.semana_entrega || '').trim();
+          const emptyA = va === '' || va === '—' || va === '--';
+          const emptyB = vb === '' || vb === '—' || vb === '--';
+          if (emptyA && emptyB) return 0;
+          if (emptyA) return -1;  // vacíos siempre primero
+          if (emptyB) return 1;
+          return va < vb ? -dir : va > vb ? dir : 0;  // Z→A cuando dir=desc
+        }
+        const va = f === 'cuenta_armarios' ? a.armarios.length : (a[f] ?? '').toString().toLowerCase();
+        const vb = f === 'cuenta_armarios' ? b.armarios.length : (b[f] ?? '').toString().toLowerCase();
+        return va < vb ? -dir : va > vb ? dir : 0;
+      });
+      return groups;
+    }
+    function toggleJoinRow(numPedido) {
+      if (gestionJoinExpanded.has(numPedido)) { gestionJoinExpanded.delete(numPedido); }
+      else { gestionJoinExpanded.add(numPedido); }
+      renderGestionJoinTable();
+    }
+    function renderJoinStatusBadge(label, ok, detail) {
+      const bg = ok ? '#d4edda' : '#f8d7da';
+      const color = ok ? '#155724' : '#721c24';
+      const icon = ok ? '🟢' : '🔴';
+      return `<div style="margin-top:4px;color:${color};font-size:12px;line-height:1.35;background:${bg};border-radius:6px;padding:4px 6px;">
+        <strong>${icon} ${escapeGestionHtml(label)}</strong>: ${escapeGestionHtml(detail)}
+      </div>`;
+    }
+    function renderGestionJoinTable() {
+      const tbody = document.getElementById('gestionJoinTableBody');
+      const container = document.getElementById('gestionJoinContainer');
+      const emptyMsg  = document.getElementById('gestionEmptyMessage');
+      const loading   = document.getElementById('gestionLoadingMessage');
+      if (!tbody) return;
+      const groups = getFilteredGroupedJoin();
+      const summary = document.getElementById('gestionPedidosSummary');
+      if (summary) summary.textContent = `Mostrando ${groups.length} pedidos combinados (${gestionJoinData.length} armarios totales)`;
+      if (gestionJoinData.length === 0) {
+        container.style.display = 'none';
+        loading.style.display = 'none';
+        emptyMsg.style.display = 'block';
+        emptyMsg.textContent = 'No hay datos combinados. Pulse Refrescar para cargar.';
+        return;
+      }
+      const html = [];
+      groups.forEach(g => {
+        const isExpanded = gestionJoinExpanded.has(g.num_pedido);
+        const cuentaLabel = g.armarios.length > 0 ? g.armarios.length + ' armario' + (g.armarios.length > 1 ? 's' : '') : '—';
+        const expandIcon  = g.armarios.length > 0 ? (isExpanded ? '▼' : '▶') : '';
+        const cantidad    = g.cantidad !== null && g.cantidad !== undefined ? g.cantidad : '—';
+        const cantidadEsperada = Number(cantidad);
+        const checklistOk = cantidad !== '—' && !Number.isNaN(cantidadEsperada) && g.armarios.length === cantidadEsperada;
+        const certificadosPinturaEncontrados = g.armarios.filter(arm => !!arm.cert_pintura).length;
+        const pinturaOk = g.armarios.length > 0 && certificadosPinturaEncontrados === g.armarios.length;
+        const chapaEsperados = g.trazabilidades.length;
+        const chapaEncontrados = g.certificados_chapa_encontrados.length;
+        const chapaOk = chapaEsperados > 0 && g.certificados_chapa_faltantes.length === 0;
+        const semaforoOk = checklistOk && pinturaOk && chapaOk;
+        const rowBg       = semaforoOk ? 'background:#d4edda;' : 'background:#fdecea;';
+        const onclickJoin = g.armarios.length > 0 ? `toggleJoinRow('${g.num_pedido}')` : '';
+        const faltantesSet = new Set(g.certificados_chapa_faltantes || []);
+        const trazTexto = g.trazabilidades && g.trazabilidades.length
+          ? g.trazabilidades.map(t =>
+              faltantesSet.has(t)
+                ? `<span style="color:#8b0000;font-weight:600;" title="Certificado no encontrado">${escapeGestionHtml(t)}</span>`
+                : escapeGestionHtml(t)
+            ).join(', ')
+          : '<span style="color:#bbb;">—</span>';
+        const semaforoHeader = `<div style="display:flex;align-items:center;gap:8px;font-weight:700;color:${semaforoOk ? '#155724' : '#721c24'};">
+          <span style="display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:${semaforoOk ? '#28a745' : '#dc3545'};color:#fff;font-size:13px;">${semaforoOk ? '✓' : '✕'}</span>
+          <span>${semaforoOk ? 'VERDE (OK)' : 'ROJO (NOK)'}</span>
+        </div>`;
+        const checklistDetail = cantidad === '—'
+          ? `Checklist sin cantidad ERP (${g.armarios.length} registrados)`
+          : `${g.armarios.length}/${escapeGestionHtml(String(cantidad))} armarios`;
+        const pinturaDetail = `${certificadosPinturaEncontrados}/${g.armarios.length} certificados encontrados`;
+        const chapaDetail = chapaEsperados === 0
+          ? 'Sin trazabilidad de fabricación — semana entrega no configurada o GAP = 0'
+          : `${chapaEncontrados}/${chapaEsperados} certificados encontrados`;
+        const faltantesChapaHtml = g.certificados_chapa_faltantes.length
+          ? `<div style="margin-top:4px;color:#721c24;font-size:11px;line-height:1.3;"><strong>Faltan:</strong> ${escapeGestionHtml(g.certificados_chapa_faltantes.join(', '))}</div>`
+          : '';
+        const expMarca = gestionExportacionesData[g.num_pedido];
+        const exportadoBadge = expMarca
+          ? `<div style="margin-top:6px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+               <span style="background:#0d6efd;color:#fff;border-radius:12px;padding:2px 10px;font-size:11px;font-weight:600;">📤 Exportado ${expMarca.fecha}</span>
+               <button onclick="desmarcarExportacion('${escapeGestionHtml(g.num_pedido)}', event)" title="Quitar marca de exportado"
+                 style="padding:2px 8px;background:#6c757d;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:11px;">✕ Desmarcar</button>
+             </div>`
+          : '';
+        const exportando = gestionExportandoPedidos.has(g.num_pedido);
+        const exportBtn = semaforoOk
+          ? `<button onclick="exportarDocumentacionPedido('${escapeGestionHtml(g.num_pedido)}', event)" title="Exportar documentación a carpeta destino"
+               ${exportando ? 'disabled' : ''}
+               style="margin-top:8px;padding:4px 10px;background:${exportando ? '#adb5bd' : expMarca ? '#6c757d' : '#155724'};color:#fff;border:none;border-radius:4px;cursor:${exportando ? 'not-allowed' : 'pointer'};font-size:12px;display:flex;align-items:center;gap:5px;opacity:${exportando ? '0.8' : '1'}">
+               ${exportando ? '⏳ Exportando...' : expMarca ? '📤 Volver a exportar' : '📤 Exportar documentación'}
+             </button>`
+          : '';
+        const semaforoHtml = `${semaforoHeader}
+          ${renderJoinStatusBadge('Checklist', checklistOk, checklistDetail)}
+          ${renderJoinStatusBadge('Certificados pintura', pinturaOk, pinturaDetail)}
+          ${renderJoinStatusBadge('Certificados chapa', chapaOk, chapaDetail)}
+          ${faltantesChapaHtml}
+          ${exportadoBadge}
+          ${exportBtn}`;
+        html.push(`<tr style="cursor:${g.armarios.length > 0 ? 'pointer' : 'default'};${rowBg}" onclick="${onclickJoin}">
+          <td style="text-align:center;width:36px;">${expandIcon}</td>
+          <td>${escapeGestionHtml(g.num_pedido)}</td>
+          <td><span style="font-weight:600;color:${checklistOk ? '#155724' : '#2c6bb3'};">${cuentaLabel}</span></td>
+          <td>${escapeGestionHtml(String(cantidad))}</td>
+          <td>${escapeGestionHtml(g.semana_entrega || '—')}</td>
+          <td class="col-traz">${trazTexto}</td>
+          <td>${semaforoHtml}</td>
+        </tr>`);
+        if (isExpanded) {
+          g.armarios.forEach(arm => {
+            const cert = arm.cert_pintura || '';
+            const certHtml = cert
+              ? `<span title="${escapeGestionHtml(cert)}" style="color:#27ae60;font-size:0.88em;margin-left:10px;">🟢 ${escapeGestionHtml(cert)}</span>`
+              : `<span style="color:#c0392b;font-size:0.85em;margin-left:10px;">🔴 Sin certificado pintura</span>`;
+            html.push(`<tr style="background:#f0f7ff;">
+              <td></td>
+              <td style="color:#999;padding-left:24px;">↳</td>
+              <td colspan="5" style="color:#333;font-size:0.92em;">🔢 ${escapeGestionHtml(arm.num_armario)}${certHtml}</td>
+            </tr>`);
+          });
+        }
+      });
+      tbody.innerHTML = html.join('');
+      container.style.display = 'block';
+      loading.style.display = 'none';
+      emptyMsg.style.display = groups.length === 0 ? 'block' : 'none';
+      if (groups.length === 0) emptyMsg.textContent = 'No hay resultados con los filtros aplicados.';
+    }
+    async function exportarDocumentacionPedido(numPedido, event) {
+      if (event) event.stopPropagation();
+      if (gestionExportandoPedidos.has(numPedido)) return;
+      if (!confirm(`¿Exportar documentación del pedido ${numPedido} a la carpeta destino?`)) return;
+      gestionExportandoPedidos.add(numPedido);
+      renderGestionJoinTable();
+      showNotification(`⏳ Exportando documentación del pedido ${numPedido}...`, 'info');
+      try {
+        const resp = await fetch('/api/gestion/exportar-documentacion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ num_pedido: numPedido })
+        });
+        const data = await resp.json();
+        if (data.success) {
+          showNotification(`✅ ${data.message}`, 'success');
+          // Recargar marcas y redibujar tabla
+          try {
+            const expResp = await fetch('/api/gestion/exportaciones-documentacion');
+            const expData = await expResp.json();
+            if (expData.success) {
+              gestionExportacionesData = {};
+              (expData.exportaciones || []).forEach(e => { gestionExportacionesData[e.num_pedido] = e; });
+            }
+          } catch (_) {}
+        } else {
+          showNotification(`⚠️ ${data.message}`, data.errores && data.errores.length ? 'warning' : 'error');
+        }
+      } catch (err) {
+        showNotification('❌ Error al exportar: ' + err.message, 'error');
+      } finally {
+        gestionExportandoPedidos.delete(numPedido);
+        renderGestionJoinTable();
+      }
+    }
+
+    async function desmarcarExportacion(numPedido, event) {
+      if (event) event.stopPropagation();
+      if (!confirm(`¿Quitar la marca de exportado del pedido ${numPedido}?`)) return;
+      try {
+        const resp = await fetch(`/api/gestion/exportaciones-documentacion/${encodeURIComponent(numPedido)}`, { method: 'DELETE' });
+        const data = await resp.json();
+        if (data.success) {
+          delete gestionExportacionesData[numPedido];
+          renderGestionJoinTable();
+          showNotification(`🗑️ Marca de exportado eliminada para pedido ${numPedido}`, 'info');
+        } else {
+          showNotification(`⚠️ ${data.message}`, 'error');
+        }
+      } catch (err) {
+        showNotification('❌ Error al desmarcar: ' + err.message, 'error');
+      }
+    }
+
+    async function loadGestionJoinData(force = false) {
+      if (gestionJoinLoaded && !force) { renderGestionJoinTable(); return; }
+      const loading = document.getElementById('gestionLoadingMessage');
+      const container = document.getElementById('gestionJoinContainer');
+      if (loading) { loading.style.display = 'block'; loading.textContent = '⏳ Cargando vista combinada...'; }
+      if (container) container.style.display = 'none';
+      try {
+        const resp = await fetch('/api/gestion/pedidos-join', { headers: { 'Accept': 'application/json' } });
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.message);
+        // Cargar marcas de exportación en paralelo
+        try {
+          const expResp = await fetch('/api/gestion/exportaciones-documentacion');
+          const expData = await expResp.json();
+          if (expData.success) {
+            gestionExportacionesData = {};
+            (expData.exportaciones || []).forEach(e => { gestionExportacionesData[e.num_pedido] = e; });
+          }
+        } catch (_) {}
+        gestionJoinData = data.items || [];
+        gestionJoinLoaded = true;
+        renderGestionJoinTable();
+      } catch (err) {
+        if (loading) loading.style.display = 'none';
+        showNotification('Error vista combinada: ' + err.message, 'error');
+      }
+    }
+
+    // ===== TAB 6: CERTIFICADOS CHAPA =====
+    function setGestionCertificadosChapaFilter(field, value) {
+      gestionCertificadosChapaFilters[field] = value || '';
+      renderGestionCertificadosChapaTable();
+    }
+    function sortGestionCertificadosChapa(field) {
+      if (gestionCertificadosChapaSort.field === field) {
+        gestionCertificadosChapaSort.direction = gestionCertificadosChapaSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        gestionCertificadosChapaSort.field = field;
+        gestionCertificadosChapaSort.direction = field === 'fecha_modificacion' ? 'desc' : 'asc';
+      }
+      renderGestionCertificadosChapaTable();
+    }
+    function getFilteredSortedCertificadosChapa() {
+      let rows = gestionCertificadosChapaData.filter(item => {
+        const f = gestionCertificadosChapaFilters;
+        return (!f.dato           || (item.dato           || '').toLowerCase().includes(f.dato.toLowerCase()))
+            && (!f.nombre_archivo || (item.nombre_archivo || '').toLowerCase().includes(f.nombre_archivo.toLowerCase()))
+            && (!f.ruta_relativa  || (item.ruta_relativa  || '').toLowerCase().includes(f.ruta_relativa.toLowerCase()))
+            && (!f.fecha_modificacion || (item.fecha_modificacion || '').includes(f.fecha_modificacion));
+      });
+      const { field, direction } = gestionCertificadosChapaSort;
+      rows.sort((a, b) => {
+        let va = field === 'fecha_modificacion' ? (a.fecha_modificacion_iso || '') : (a[field] || '');
+        let vb = field === 'fecha_modificacion' ? (b.fecha_modificacion_iso || '') : (b[field] || '');
+        if (va < vb) return direction === 'asc' ? -1 : 1;
+        if (va > vb) return direction === 'asc' ? 1 : -1;
+        return 0;
+      });
+      return rows;
+    }
+    async function loadGestionCertificadosChapaData(force = false) {
+      if (gestionCertificadosChapaLoaded && !force) { renderGestionCertificadosChapaTable(); return; }
+      const loading = document.getElementById('gestionCertificadosChapaLoading');
+      const empty   = document.getElementById('gestionCertificadosChapaEmpty');
+      if (loading) { loading.style.display = 'block'; }
+      if (empty)   { empty.style.display = 'none'; }
+      try {
+        const resp = await fetch('/api/gestion/certificados-chapa', { headers: { 'Accept': 'application/json' } });
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.message || 'Error cargando chapa');
+        gestionCertificadosChapaData   = data.docs || [];
+        gestionCertificadosChapaLoaded = true;
+        if (loading) loading.style.display = 'none';
+        renderGestionCertificadosChapaTable();
+      } catch (err) {
+        if (loading) loading.style.display = 'none';
+        if (empty)   { empty.style.display = 'block'; empty.textContent = 'Error: ' + err.message; }
+        showNotification('Error Certificados Chapa: ' + err.message, 'error');
+      }
+    }
+    function renderGestionCertificadosChapaTable() {
+      const tbody = document.getElementById('gestionCertificadosChapaTableBody');
+      const count = document.getElementById('gestionCertificadosChapaCount');
+      const empty = document.getElementById('gestionCertificadosChapaEmpty');
+      if (!tbody) return;
+      const rows = getFilteredSortedCertificadosChapa();
+      if (count) count.textContent = `🔩 ${rows.length} certificados de chapa`;
+      if (rows.length === 0) {
+        tbody.innerHTML = '';
+        if (empty) { empty.style.display = 'block'; empty.textContent = 'No hay registros que coincidan.'; }
+        return;
+      }
+      if (empty) empty.style.display = 'none';
+      tbody.innerHTML = rows.map(item => `
+        <tr>
+            <td style="font-weight:600;">${escapeGestionHtml(item.dato)}</td>
+            <td style="font-size:12px;">${escapeGestionHtml(item.nombre_archivo)}</td>
+            <td style="font-size:11px;color:#666;">${escapeGestionHtml(item.ruta_relativa) || '<em style="color:#bbb;">raíz</em>'}</td>
+            <td style="font-size:12px;">${escapeGestionHtml(item.fecha_modificacion)}</td>
+          <td style="text-align:center;">
+              <button class="btn btn-danger" style="padding:2px 8px;font-size:11px;" onclick="deleteGestionCertificadoChapa(${item.id}, '${escapeGestionHtml(item.nombre_archivo).replace(/'/g,'&apos;')}')">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+    }
+    async function deleteGestionCertificadoChapa(id, nombre) {
+      if (!confirm(`¿Eliminar el registro de chapa:\n"${nombre}"?`)) return;
+      try {
+        const resp = await fetch(`/api/gestion/certificados-chapa/${id}`, { method: 'DELETE' });
+        const data = await resp.json();
+        if (data.success) {
+          showNotification('🗑️ Registro chapa eliminado', 'success');
+          gestionCertificadosChapaData = gestionCertificadosChapaData.filter(d => d.id !== id);
+          renderGestionCertificadosChapaTable();
+        } else {
+          showNotification('Error: ' + data.message, 'error');
+        }
+      } catch (err) {
+        showNotification('Error eliminando: ' + err.message, 'error');
+      }
+    }
+
+    // ===== TAB 4: TRAZABILIDAD =====
+    function sortGestionTrazabilidad(field) {
+      if (gestionTrazabilidadSort.field === field) {
+        gestionTrazabilidadSort.direction = gestionTrazabilidadSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        gestionTrazabilidadSort.field = field;
+        gestionTrazabilidadSort.direction = 'asc';
+      }
+      renderGestionTrazabilidadTable();
+    }
+    function toggleTrazabilidadRow(semanaKey) {
+      const detailRow = document.getElementById('traz-detail-' + semanaKey);
+      const btn = document.getElementById('traz-btn-' + semanaKey);
+      if (!detailRow) return;
+      const isOpen = detailRow.classList.contains('open');
+      detailRow.classList.toggle('open', !isOpen);
+      if (btn) btn.textContent = isOpen ? '▶' : '▼';
+    }
+    function renderGestionTrazabilidadTable() {
+      const tbody = document.getElementById('gestionTrazabilidadTableBody');
+      if (!tbody) return;
+      const filtro = (document.getElementById('trazabilidadFiltroSemana') || {}).value || '';
+
+      // Agrupar por (numsemana, ano)
+      const grupos = {};
+      for (const item of gestionTrazabilidadData) {
+        const semanaKey = `${String(item.numsemana || '').padStart(2,'0')}_${item.ano || ''}`;
+        const semanaLabel = item.numsemana != null ? `${String(item.numsemana).padStart(2,'0')}/${item.ano}` : '—';
+        if (!grupos[semanaKey]) grupos[semanaKey] = { semanaKey, semanaLabel, ano: item.ano || 0, numsemana: item.numsemana || 0, lotes: [], datosUnicos: new Set() };
+        if (item.dato && item.dato.trim()) grupos[semanaKey].datosUnicos.add(item.dato.trim());
+        grupos[semanaKey].lotes.push(item);
+      }
+
+      // Filtrar
+      let lista = Object.values(grupos).filter(g =>
+        !filtro || g.semanaLabel.toLowerCase().includes(filtro.toLowerCase())
+      );
+
+      // Ordenar
+      const dir = gestionTrazabilidadSort.direction === 'asc' ? 1 : -1;
+      lista.sort((a, b) => {
+        const va = `${a.ano}${String(a.numsemana).padStart(2,'0')}`;
+        const vb = `${b.ano}${String(b.numsemana).padStart(2,'0')}`;
+        return va < vb ? -dir : va > vb ? dir : 0;
+      });
+
+      // Renderizar
+      tbody.innerHTML = lista.map((g, i) => {
+        const bg = i % 2 === 0 ? '#fff' : '#f9f9f9';
+        const count = g.datosUnicos.size;
+        // Lotes únicos ordenados alfabéticamente
+        const lotesUnicos = [...g.datosUnicos].sort();
+        const subRows = lotesUnicos.map(dato => `<tr><td>${dato}</td></tr>`).join('');
+        return `
+          <tr style="background:${bg};">
+            <td style="text-align:center;padding:6px;">
+              <button class="traz-expand-btn" id="traz-btn-${g.semanaKey}" onclick="toggleTrazabilidadRow('${g.semanaKey}')" title="Ver lotes">▶</button>
+            </td>
+            <td style="font-weight:600;white-space:nowrap;padding:8px;">${g.semanaLabel}</td>
+            <td style="text-align:center;font-weight:700;color:${count > 0 ? '#2c6bb3' : '#999'};padding:8px;">${count}</td>
+          </tr>
+          <tr class="traz-detail-row" id="traz-detail-${g.semanaKey}">
+            <td class="traz-detail-cell" colspan="3">
+              <div class="traz-detail-inner">
+                <strong style="font-size:12px;color:#555;">Lotes únicos encontrados (${count}):</strong>
+                <table class="traz-sub-table" style="margin-top:6px;">
+                  <thead><tr><th>DATO (Trazabilidad / Lote)</th></tr></thead>
+                  <tbody>${subRows || '<tr><td style="color:#999;">Sin datos de trazabilidad</td></tr>'}</tbody>
+                </table>
+              </div>
+            </td>
+          </tr>`;
+      }).join('');
+
+      const info = document.getElementById('trazabilidadRefreshInfo');
+      if (info) {
+        const totalLotes = lista.reduce((s, g) => s + g.datosUnicos.size, 0);
+        info.textContent = `${lista.length} semanas · ${totalLotes} trazabilidades únicas`;
+      }
+      const container = document.getElementById('gestionTrazabilidadContainer');
+      const loading   = document.getElementById('gestionLoadingMessage');
+      if (container) container.style.display = 'block';
+      if (loading)   loading.style.display   = 'none';
+    }
+    async function loadGestionTrazabilidadData(force = false) {
+      if (gestionTrazabilidadLoaded && !force) { renderGestionTrazabilidadTable(); return; }
+      const loading   = document.getElementById('gestionLoadingMessage');
+      const container = document.getElementById('gestionTrazabilidadContainer');
+      if (loading)   { loading.style.display = 'block'; loading.textContent = '⏳ Cargando trazabilidad...'; }
+      if (container) container.style.display = 'none';
+      try {
+        const resp = await fetch('/api/gestion/trazabilidad-cache');
+        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.message || 'Error cargando trazabilidad');
+        gestionTrazabilidadData = data.items || [];
+        gestionTrazabilidadLoaded = true;
+        const info = document.getElementById('trazabilidadRefreshInfo');
+        if (info) info.textContent = `${gestionTrazabilidadData.length} registros en caché`;
+        renderGestionTrazabilidadTable();
+      } catch (err) {
+        if (loading) loading.style.display = 'none';
+        showNotification('Error trazabilidad: ' + err.message, 'error');
+      }
+    }
+    async function refrescarTrazabilidad() {
+      const btn = document.getElementById('btnRefrescarTrazabilidad');
+      const info = document.getElementById('trazabilidadRefreshInfo');
+      if (btn) { btn.disabled = true; btn.textContent = '⏳ Actualizando...'; }
+      if (info) info.textContent = 'Consultando Datalake, puede tardar unos segundos...';
+      try {
+        const resp = await fetch('/api/gestion/refrescar-trazabilidad', { method: 'POST' });
+        const data = await resp.json();
+        if (data.success) {
+          showNotification(`✅ ${data.message}`, 'success');
+          gestionTrazabilidadLoaded = false;
+          await loadGestionTrazabilidadData(true);
+        } else {
+          showNotification(`❌ ${data.message}`, 'error');
+          if (info) info.textContent = 'Error al refrescar.';
+        }
+      } catch (err) {
+        showNotification('Error refrescando trazabilidad: ' + err.message, 'error');
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = '🔄 Refrescar trazabilidad'; }
+      }
+    }
+
+    async function loadGestionPedidosData(force = false) {
+      const loadingMessage = document.getElementById('gestionLoadingMessage');
+      const tableContainer = document.getElementById('gestionTableContainer');
+      const emptyMessage = document.getElementById('gestionEmptyMessage');
+
+      if (gestionPedidosLoaded && !force) {
+        renderGestionPedidosTable();
+        return;
+      }
+
+      if (loadingMessage) loadingMessage.style.display = 'block';
+      if (tableContainer) tableContainer.style.display = 'none';
+      if (emptyMessage) emptyMessage.style.display = 'none';
+
+      try {
+        // Si es refresco manual, escanear carpeta Checklist e invalidar datos de otros tabs
+        if (force) {
+          try {
+            if (loadingMessage) loadingMessage.textContent = '🔄 1/3 Escaneando carpeta Checklist...';
+            const respChecklist = await fetch('/api/gestion/refrescar-checklist', {
+              method: 'POST',
+              headers: { 'Accept': 'application/json' }
+            });
+            const dataChecklist = await respChecklist.json();
+            if (dataChecklist.success) {
+                if (dataChecklist.nuevos > 0) {
+                  showNotification(`✅ Checklist: ${dataChecklist.nuevos} nuevos`, 'success');
+                }
+            } else {
+              showNotification(`⚠️ Checklist: ${dataChecklist.message}`, 'warning');
+            }
+          } catch (errChecklist) {
+            console.warn('⚠️ No se pudo refrescar checklist:', errChecklist);
+          }
+          // 2️⃣ SEGUNDO: certificados de pintura (secuencial, usa Checklist_Documentos ya actualizado)
+          try {
+            if (loadingMessage) loadingMessage.textContent = '🔄 2/3 Escaneando carpeta Certificados Pintura...';
+            const respCert = await fetch('/api/gestion/refrescar-certificados-pintura', {
+              method: 'POST',
+              headers: { 'Accept': 'application/json' }
+            });
+            const dataCert = await respCert.json();
+            if (dataCert.success) {
+              if (dataCert.nuevos > 0) showNotification(`🎨 Certificados Pintura: ${dataCert.nuevos} nuevos`, 'success');
+            } else {
+              console.warn('⚠️ Certificados Pintura:', dataCert.message);
+            }
+          } catch (errCert) {
+            console.warn('⚠️ No se pudo refrescar certificados pintura:', errCert);
+          }
+          // 3️⃣ TERCERO: certificados de chapa (escaneo recursivo de carpeta recepción)
+          try {
+            if (loadingMessage) loadingMessage.textContent = '🔄 3/3 Escaneando carpeta Certificados Chapa...';
+            const respChapa = await fetch('/api/gestion/refrescar-certificados-chapa', {
+              method: 'POST',
+              headers: { 'Accept': 'application/json' }
+            });
+            const dataChapa = await respChapa.json();
+            if (dataChapa.success) {
+              if (dataChapa.nuevos > 0) showNotification(`🔩 Certificados Chapa: ${dataChapa.nuevos} nuevos`, 'success');
+            } else {
+              console.warn('⚠️ Certificados Chapa:', dataChapa.message);
+            }
+          } catch (errChapa) {
+            console.warn('⚠️ No se pudo refrescar certificados chapa:', errChapa);
+          }
+          // Invalidar los otros tabs para forzar recarga en próxima visita
+          gestionChecklistLoaded    = false;
+          gestionJoinLoaded         = false;
+          gestionCertificadosLoaded = false;
+          gestionCertificadosFaltantesLoaded = false;
+          gestionCertificadosChapaLoaded     = false;
+          if (loadingMessage) loadingMessage.textContent = '⏳ Cargando pedidos ERP...';
+        }
+
+        const response = await fetch('/api/gestion/pedidos-cache', {
+          method: 'GET',
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        if (!data.success) throw new Error(data.message || 'No se pudieron cargar los pedidos');
+
+        gestionPedidosData = Array.isArray(data.pedidos) ? data.pedidos : [];
+        gestionPedidosLoaded = true;
+
+        const validOptions = new Set(getGestionSemanaEntregaOptions());
+        gestionPedidosFilters.semana_entrega = gestionPedidosFilters.semana_entrega.filter(option => validOptions.has(option));
+
+        // Si estamos en tab checklist o join tras el refresco, cargar también
+        if (force && gestionActiveTab === 'checklist')          loadGestionChecklistData(true);
+        if (force && gestionActiveTab === 'join')                loadGestionJoinData(true);
+        if (force && gestionActiveTab === 'certificados')        loadGestionCertificadosData(true);
+        if (force && gestionActiveTab === 'certificados-chapa')  loadGestionCertificadosChapaData(true);
+
+        if (gestionActiveTab === 'erp') renderGestionPedidosTable();
+      } catch (error) {
+        console.error('❌ Error cargando pedidos de gestión:', error);
+        gestionPedidosData = [];
+        gestionPedidosLoaded = false;
+        if (loadingMessage) loadingMessage.style.display = 'none';
+        if (emptyMessage) { emptyMessage.style.display = 'block'; emptyMessage.textContent = 'Error cargando los pedidos de gestión.'; }
+        showNotification(`Error cargando gestión: ${error.message}`, 'error');
+      }
+    }
+
+    function setGestionTextFilter(field, value) {
+      gestionPedidosFilters[field] = value || '';
+      renderGestionPedidosTable();
+    }
+
+    function sortGestionPedidos(field) {
+      if (gestionPedidosSort.field === field) {
+        gestionPedidosSort.direction = gestionPedidosSort.direction === 'asc' ? 'desc' : 'asc';
+      } else {
+        gestionPedidosSort.field = field;
+        gestionPedidosSort.direction = field === 'fecha_refresco' ? 'desc' : 'asc';
+      }
+
+      renderGestionPedidosTable();
+    }
+
+    function toggleGestionSemanaEntregaPanel(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      const selector = document.getElementById('gestionSemanaEntregaSelector');
+      const panel = document.getElementById('gestionSemanaEntregaPanel');
+      const button = selector ? selector.querySelector('.selector-boton') : null;
+
+      if (!selector || !panel || !button) {
+        return;
+      }
+
+      const willOpen = panel.hidden;
+      panel.hidden = !willOpen;
+      panel.style.display = willOpen ? 'flex' : 'none';
+      selector.classList.toggle('selector-abierto', willOpen);
+      button.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+
+      if (willOpen) {
+        setTimeout(() => {
+          const searchInput = document.getElementById('gestionSemanaEntregaBuscar');
+          if (searchInput) {
+            searchInput.focus();
+          }
+        }, 0);
+      }
+    }
+
+    function closeGestionSemanaEntregaPanel() {
+      const selector = document.getElementById('gestionSemanaEntregaSelector');
+      const panel = document.getElementById('gestionSemanaEntregaPanel');
+      const button = selector ? selector.querySelector('.selector-boton') : null;
+
+      if (!selector || !panel || !button) {
+        return;
+      }
+
+      panel.hidden = true;
+      panel.style.display = 'none';
+      selector.classList.remove('selector-abierto');
+      button.setAttribute('aria-expanded', 'false');
+    }
+
+    function setGestionSemanaEntregaSearch(value) {
+      gestionSemanaEntregaSearch = value || '';
+      renderGestionSemanaEntregaOptions();
+    }
+
+    function toggleGestionSemanaEntregaOption(value, checked) {
+      const currentSelection = new Set(gestionPedidosFilters.semana_entrega);
+
+      if (checked) {
+        currentSelection.add(value);
+      } else {
+        currentSelection.delete(value);
+      }
+
+      gestionPedidosFilters.semana_entrega = Array.from(currentSelection).sort((a, b) =>
+        a.localeCompare(b, 'es', { numeric: true, sensitivity: 'base' })
+      );
+
+      renderGestionPedidosTable();
+    }
+
+    function toggleGestionSemanaEntregaAll(checked) {
+      gestionPedidosFilters.semana_entrega = checked ? getGestionSemanaEntregaOptions() : [];
+      renderGestionPedidosTable();
+    }
+
+    function clearGestionSemanaEntregaFilter(event) {
+      if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+
+      gestionPedidosFilters.semana_entrega = [];
+      gestionSemanaEntregaSearch = '';
+
+      const searchInput = document.getElementById('gestionSemanaEntregaBuscar');
+      if (searchInput) {
+        searchInput.value = '';
+      }
+
+      renderGestionPedidosTable();
     }
 
     // Funciones de navegación
@@ -6821,6 +8937,197 @@
       navigationHistory = ['screen-main'];
       currentScreenIndex = 0;
       showScreen('screen-main', false);
+    }
+
+    // ===== FUNCIONES PARA RUTAS GESTIÓN =====
+
+    async function loadRutasGestion() {
+      const container = document.getElementById('rutas-gestion-container');
+      const status = document.getElementById('rutas-gestion-status');
+      if (!container) return;
+
+      // Cargar GAP trazabilidad
+      try {
+        const cfgResp = await fetch('/api/config');
+        const cfgData = await cfgResp.json();
+        if (cfgData.success) {
+          const gapInput = document.getElementById('gap-trazabilidad-input');
+          if (gapInput && cfgData.config.gap_trazabilidad_semanas !== undefined) {
+            gapInput.value = cfgData.config.gap_trazabilidad_semanas;
+          }
+        }
+      } catch (e) { /* ignorar */ }
+
+      try {
+        const resp = await fetch('/api/rutas-gestion');
+        const data = await resp.json();
+
+        if (!data.success) throw new Error(data.message || 'Error cargando rutas');
+
+        const CHAPA_DESC = 'Ruta certificados de chapa';
+        const rutasChapa = data.rutas.filter(r => r.descripcion_ruta === CHAPA_DESC);
+        const rutasOtras = data.rutas.filter(r => r.descripcion_ruta !== CHAPA_DESC);
+
+        let html = '<div style="display:flex; flex-direction:column; gap:16px;">';
+
+        // ---- Rutas NO chapa (editables, sin borrar) ----
+        rutasOtras.forEach(r => {
+          html += `
+            <div style="background:#fff; border:1px solid #e0e0e0; border-radius:8px; padding:20px;">
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+                <span style="font-size:13px; font-weight:700; color:#2c6bb3; min-width:28px;">#${r.id_ruta}</span>
+                <label style="font-size:14px; font-weight:600; color:#333; flex:1;">${r.descripcion_ruta}</label>
+              </div>
+              <input type="text" id="ruta-input-${r.id_ruta}"
+                value="${r.ruta ? r.ruta.replace(/"/g, '&quot;') : ''}"
+                placeholder="Introduce la ruta (ej: \\\\servidor\\carpeta\\...)"
+                style="width:100%; box-sizing:border-box; padding:10px 12px; border:1px solid #ccc; border-radius:6px; font-size:14px; font-family:monospace;">
+              <div style="margin-top:6px; font-size:12px; color:#999;">
+                ${r.fecha_modificacion ? `Última modificación: ${r.fecha_modificacion}${r.usuario_modificacion ? ' por ' + r.usuario_modificacion : ''}` : 'Sin modificaciones registradas'}
+              </div>
+            </div>`;
+        });
+
+        // ---- Rutas chapa (con botón eliminar + botón añadir) ----
+        html += `<div style="background:#fff; border:2px solid #b3d9f7; border-radius:8px; padding:20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:18px;">📂</span>
+              <span style="font-size:14px; font-weight:700; color:#2c6bb3;">Rutas certificados de chapa</span>
+              <span style="font-size:12px; color:#888;">(se escanean todas al refrescar)</span>
+            </div>
+            <button onclick="agregarRutaChapa()" style="background:#43a047;color:white;border:none;padding:7px 14px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;">➕ Añadir ruta</button>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:10px;" id="chapa-rutas-list">`;
+
+        if (rutasChapa.length === 0) {
+          html += `<div style="color:#999; font-size:13px; padding:10px;">Sin rutas configuradas — pulsa ➕ Añadir ruta.</div>`;
+        } else {
+          rutasChapa.forEach(r => {
+            html += `
+              <div style="display:flex; align-items:center; gap:8px;">
+                <span style="font-size:12px; color:#aaa; min-width:30px;">#${r.id_ruta}</span>
+                <input type="text" id="ruta-input-${r.id_ruta}"
+                  value="${r.ruta ? r.ruta.replace(/"/g, '&quot;') : ''}"
+                  placeholder="\\\\servidor\\carpeta\\..."
+                  style="flex:1; padding:9px 12px; border:1px solid #ccc; border-radius:6px; font-size:14px; font-family:monospace;">
+                <button onclick="eliminarRutaChapa(${r.id_ruta})" title="Eliminar esta ruta"
+                  style="background:#e53935;color:white;border:none;padding:8px 12px;border-radius:6px;font-size:14px;cursor:pointer;flex-shrink:0;">🗑️</button>
+              </div>
+              <div style="font-size:11px; color:#aaa; margin-top:-6px; padding-left:38px;">
+                ${r.fecha_modificacion ? `Última modificación: ${r.fecha_modificacion}${r.usuario_modificacion ? ' por ' + r.usuario_modificacion : ''}` : 'Sin modificaciones registradas'}
+              </div>`;
+          });
+        }
+
+        html += `</div></div>`;
+        html += '</div>';
+        container.innerHTML = html;
+
+      } catch (err) {
+        container.innerHTML = `<div style="color:#c62828; padding:16px;">❌ Error: ${err.message}</div>`;
+      }
+    }
+
+    async function agregarRutaChapa() {
+      const user = (typeof LoginModal !== 'undefined' && LoginModal.getCurrentUser)
+        ? (LoginModal.getCurrentUser()?.nombre || '') : '';
+      try {
+        const resp = await fetch('/api/rutas-gestion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ descripcion_ruta: 'Ruta certificados de chapa', ruta: '', usuario: user })
+        });
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.message || 'Error al crear ruta');
+        await loadRutasGestion();
+      } catch (err) {
+        showNotification('Error añadiendo ruta: ' + err.message, 'error');
+      }
+    }
+
+    async function eliminarRutaChapa(idRuta) {
+      if (!confirm('¿Eliminar esta ruta de certificados de chapa?')) return;
+      try {
+        const resp = await fetch(`/api/rutas-gestion/${idRuta}`, { method: 'DELETE' });
+        const data = await resp.json();
+        if (!data.success) throw new Error(data.message || 'Error al eliminar');
+        showNotification('Ruta eliminada', 'success');
+        await loadRutasGestion();
+      } catch (err) {
+        showNotification('Error eliminando ruta: ' + err.message, 'error');
+      }
+    }
+
+    async function guardarRutasGestion() {
+      const status = document.getElementById('rutas-gestion-status');
+      const inputs = document.querySelectorAll('[id^="ruta-input-"]');
+
+      if (inputs.length === 0) {
+        showNotification('No hay rutas cargadas', 'error');
+        return;
+      }
+
+      const user = (typeof LoginModal !== 'undefined' && LoginModal.getCurrentUser)
+        ? (LoginModal.getCurrentUser()?.nombre || '')
+        : '';
+
+      // Guardar GAP trazabilidad
+      const gapInput = document.getElementById('gap-trazabilidad-input');
+      if (gapInput && gapInput.value !== '') {
+        const gapVal = parseInt(gapInput.value, 10);
+        if (!isNaN(gapVal) && gapVal >= 0) {
+          try {
+            await fetch('/api/config', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ gap_trazabilidad_semanas: gapVal })
+            });
+          } catch (e) { console.error('Error guardando GAP:', e); }
+        }
+      }
+
+      let errores = 0;
+      let guardados = 0;
+
+      for (const input of inputs) {
+        const idRuta = input.id.replace('ruta-input-', '');
+        const ruta = input.value.trim();
+
+        try {
+          const resp = await fetch(`/api/rutas-gestion/${idRuta}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ruta, usuario: user })
+          });
+          const data = await resp.json();
+          if (data.success) {
+            guardados++;
+          } else {
+            errores++;
+            console.error(`Error en ruta ${idRuta}: ${data.message}`);
+          }
+        } catch (err) {
+          errores++;
+          console.error(`Error guardando ruta ${idRuta}:`, err);
+        }
+      }
+
+      if (errores === 0) {
+        status.style.display = 'block';
+        status.style.background = '#e8f5e9';
+        status.style.color = '#2e7d32';
+        status.textContent = `✅ ${guardados} ruta(s) guardada(s) correctamente`;
+        showNotification('Rutas guardadas correctamente', 'success');
+        await loadRutasGestion();
+      } else {
+        status.style.display = 'block';
+        status.style.background = '#ffebee';
+        status.style.color = '#c62828';
+        status.textContent = `⚠️ Se guardaron ${guardados} rutas pero hubo ${errores} error(es)`;
+      }
+
+      setTimeout(() => { status.style.display = 'none'; }, 4000);
     }
 
     // ===== FUNCIONES PARA CONFIGURACIÓN DE PUESTOS =====
@@ -8128,14 +10435,33 @@
         console.log('🔄 Cargando vista árbol de puestos y pautas...');
         
         // Mostrar spinner de carga
-        document.getElementById('loading-puestos').style.display = 'flex';
-        document.getElementById('puestos-tree-content').style.display = 'none';
-        document.getElementById('no-puestos-message').style.display = 'none';
+        const loadingElement = document.getElementById('loading-puestos');
+        const contentElement = document.getElementById('puestos-tree-content');
+        const noDataElement = document.getElementById('no-puestos-message');
         
+        console.log('🔍 Elementos del DOM:', {
+          loading: loadingElement ? 'Encontrado' : 'NO ENCONTRADO',
+          content: contentElement ? 'Encontrado' : 'NO ENCONTRADO', 
+          noData: noDataElement ? 'Encontrado' : 'NO ENCONTRADO'
+        });
+        
+        if (loadingElement) loadingElement.style.display = 'flex';
+        if (contentElement) contentElement.style.display = 'none';
+        if (noDataElement) noDataElement.style.display = 'none';
+        
+        console.log('📡 Realizando petición a /api/get-puesto-pauta...');
         const response = await fetch('/api/get-puesto-pauta');
+        console.log('📥 Respuesta recibida:', {
+          ok: response.ok,
+          status: response.status,
+          statusText: response.statusText
+        });
+        
         const data = await response.json();
+        console.log('📊 Datos procesados:', data);
         
         if (data.success && data.puestos && data.puestos.length > 0) {
+          console.log(`✅ ${data.puestos.length} puestos encontrados`);
           puestosTreeData = data.puestos;
           await loadSavedPuestosLayout();
           applySavedPuestosLayoutIfAvailable();
@@ -8143,8 +10469,9 @@
           renderPautaFilterToggles(data.puestos);
           updatePuestosPinButtonState();
           renderFilteredPuestosTree();
-          console.log(`✅ ${data.puestos.length} puestos cargados exitosamente`);
+          console.log(`✅ Vista árbol renderizada exitosamente`);
         } else {
+          console.warn('⚠️ No se encontraron puestos:', data);
           // No hay puestos para mostrar
           puestosTreeData = [];
           savedPuestosLayout = null;
@@ -8158,13 +10485,30 @@
         
       } catch (error) {
         console.error('💥 Error cargando puestos:', error);
+        console.error('📍 Detalles del error:', {
+          message: error.message,
+          stack: error.stack,
+          name: error.name
+        });
+        
+        // Manejar elementos del DOM de forma segura
+        const loadingElement = document.getElementById('loading-puestos');
+        const noDataElement = document.getElementById('no-puestos-message');
+        
+        if (loadingElement) loadingElement.style.display = 'none';
+        if (noDataElement) noDataElement.style.display = 'block';
+        
         puestosTreeData = [];
         savedPuestosLayout = null;
-        renderPuestoFilterToggles([]);
-        renderPautaFilterToggles([]);
-        updatePuestosPinButtonState();
-        document.getElementById('loading-puestos').style.display = 'none';
-        document.getElementById('no-puestos-message').style.display = 'block';
+        
+        // Renderizar filtros vacíos de forma segura
+        try {
+          renderPuestoFilterToggles([]);
+          renderPautaFilterToggles([]);
+          updatePuestosPinButtonState();
+        } catch (renderError) {
+          console.error('💥 Error adicional en renderizado:', renderError);
+        }
       }
     }
 
@@ -8462,7 +10806,12 @@
 
     function getFilteredPuestosTreeData() {
       if (selectedPuestoFilters.length === 0 && selectedPautaFilters.length === 0) {
-        return [];
+        return puestosTreeData
+          .map(puesto => ({
+            ...puesto,
+            pautas: [...(puesto.pautas || [])]
+          }))
+          .filter(puesto => puesto.pautas.length > 0);
       }
 
       return puestosTreeData
@@ -8542,13 +10891,6 @@
 
       document.getElementById('loading-puestos').style.display = 'none';
       updatePuestosPinButtonState();
-
-      if (puestosTreeData.length > 0 && !hasActiveTreeFilters()) {
-        document.getElementById('puestos-tree-content').style.display = 'none';
-        document.getElementById('no-puestos-message').style.display = 'none';
-        if (toolbar) toolbar.dataset.compact = 'false';
-        return;
-      }
 
       if (puestosFiltrados.length > 0) {
         syncExpandedPuestoSection(puestosFiltrados, interfaceMode);
@@ -12199,10 +14541,13 @@
         const numPedidoElement = document.getElementById('info-numpedido');
         if (numPedidoElement) {
           // Usar NumPedidoConPosicion si existe, si no usar NumPedido
-          const numPedidoMostrar = window.pedidoActual.NumPedidoConPosicion || window.pedidoActual.NumPedido || '-';
+          const numPedidoMostrar = window.pedidoActual.NumPedido || '-';
           numPedidoElement.textContent = numPedidoMostrar;
           console.log(`📍 Número de pedido mostrado en header: ${numPedidoMostrar}`);
         }
+
+        // Actualizar campo Armarios/pedido en header
+        actualizarHeaderCantidadPedido(window.pedidoActual.PosicionNumPedido, window.pedidoActual.CantidadPedido);
         
         // Mostrar el contenedor
         headerModern.style.display = 'block';
@@ -12435,10 +14780,19 @@
       } else {
         input.value = '';
       }
-      
+
+      actualizarCampoCantidadPedido(window.pedidoActual?.CantidadPedido ?? null);
+      updateNumPedidoValidationMessage('', 'neutral');
+      setConfirmarBtnEnabled(false);
+
       // Mostrar modal
       modal.style.display = 'block';
-      
+
+      // Si ya hay valor precargado, disparar validación automáticamente
+      if (input.value.trim()) {
+        onNumPedidoInput(input.value);
+      }
+
       // Enfocar input
       setTimeout(() => input.focus(), 100);
     }
@@ -12457,6 +14811,398 @@
         console.log('↩️ Volviendo a vista Puestos tras cancelar modal de número de pedido (modo PDF)');
         showScreen('screen-puestos');
       }
+    }
+
+    function updateNumPedidoValidationMessage(message, type = 'neutral') {
+      const messageElement = document.getElementById('numPedidoValidationMessage');
+      if (!messageElement) {
+        return;
+      }
+
+      if (!message) {
+        messageElement.style.display = 'none';
+        messageElement.textContent = '';
+        messageElement.style.background = '';
+        messageElement.style.color = '';
+        messageElement.style.border = 'none';
+        return;
+      }
+
+      const stylesByType = {
+        success: {
+          background: '#eefaf2',
+          color: '#1f6b38',
+          border: '1px solid #b8e2c4'
+        },
+        error: {
+          background: '#fff1f0',
+          color: '#b42318',
+          border: '1px solid #f3b5b2'
+        },
+        info: {
+          background: '#f0f7ff',
+          color: '#1e5a8e',
+          border: '1px solid #b9d5f0'
+        },
+        neutral: {
+          background: '#f5f7fa',
+          color: '#55606d',
+          border: '1px solid #d9e0e7'
+        }
+      };
+
+      const style = stylesByType[type] || stylesByType.neutral;
+      messageElement.style.display = 'block';
+      messageElement.textContent = message;
+      messageElement.style.background = style.background;
+      messageElement.style.color = style.color;
+      messageElement.style.border = style.border;
+    }
+
+    function formatearCantidadPedido(value) {
+      return formatGestionCantidad(value) || '-';
+    }
+
+    function actualizarCampoCantidadPedido(cantidad) {
+      const el = document.getElementById('inputCantidadPedido');
+      if (el) el.value = (cantidad === null || cantidad === undefined || cantidad === '') ? '' : formatearCantidadPedido(cantidad);
+    }
+
+    function actualizarHeaderCantidadPedido(posicion, cantidad) {
+      const el = document.getElementById('info-cantidad-pedido');
+      if (!el) return;
+      const tienePosicion = posicion !== null && posicion !== undefined && posicion !== 0;
+      const tieneCantidad = cantidad !== null && cantidad !== undefined && cantidad !== '';
+      if (!tienePosicion && !tieneCantidad) { el.textContent = '-'; return; }
+      const pos = tienePosicion ? posicion : '?';
+      const cant = tieneCantidad ? formatearCantidadPedido(cantidad) : '?';
+      el.textContent = `${pos}/${cant}`;
+    }
+
+    function aplicarDatosNumPedidoEnPedidoActual(resultado, fallbackNumPedido) {
+      if (!window.pedidoActual) window.pedidoActual = {};
+      window.pedidoActual.NumPedido = resultado?.NumPedido || fallbackNumPedido || '';
+      window.pedidoActual.NumPedidoConPosicion = resultado?.NumPedidoConPosicion || window.pedidoActual.NumPedido;
+      window.pedidoActual.TotalNumPedido = resultado?.TotalNumPedido ?? 0;
+      window.pedidoActual.PosicionNumPedido = resultado?.PosicionNumPedido ?? 0;
+      window.pedidoActual.CantidadPedido = resultado?.CantidadPedido ?? null;
+      window.pedidoActual.SemanaEntregaPedido = resultado?.SemanaEntregaPedido || '';
+      actualizarHeaderNumPedido(window.pedidoActual.NumPedido);
+      actualizarHeaderCantidadPedido(window.pedidoActual.PosicionNumPedido, window.pedidoActual.CantidadPedido);
+      actualizarCampoCantidadPedido(window.pedidoActual.CantidadPedido);
+    }
+
+    /** Habilita o deshabilita visualmente el botón confirmar */
+    function setConfirmarBtnEnabled(enabled) {
+      const btn = document.getElementById('confirmarNumPedidoBtn');
+      if (!btn) return;
+      btn.disabled = !enabled;
+      if (enabled) {
+        btn.style.background = 'linear-gradient(135deg, #27ae60 0%, #229954 100%)';
+        btn.style.cursor = 'pointer';
+        btn.style.opacity = '1';
+        btn.onmouseover = () => { btn.style.transform = 'translateY(-2px)'; btn.style.boxShadow = '0 4px 8px rgba(0,0,0,0.15)'; };
+        btn.onmouseout  = () => { btn.style.transform = 'translateY(0)';    btn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)'; };
+      } else {
+        btn.style.background = '#b0bec5';
+        btn.style.cursor = 'not-allowed';
+        btn.style.opacity = '0.7';
+        btn.style.transform = 'translateY(0)';
+        btn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.1)';
+        btn.onmouseover = null;
+        btn.onmouseout  = null;
+      }
+    }
+
+    let _numPedidoInputTimer = null;
+    /** Dispara validación con debounce al escribir en el input */
+    function onNumPedidoInput(value) {
+      setConfirmarBtnEnabled(false);
+      clearTimeout(_numPedidoInputTimer);
+      const trimmed = (value || '').trim();
+      if (!trimmed) {
+        updateNumPedidoValidationMessage('', 'neutral');
+        actualizarCampoCantidadPedido(null);
+        return;
+      }
+      updateNumPedidoValidationMessage('Comprobando número de pedido...', 'info');
+      _numPedidoInputTimer = setTimeout(async () => {
+        try {
+          const result = await validarNumPedidoCliente(trimmed, true, false);
+          setConfirmarBtnEnabled(result.ok === true);
+        } catch (_) {
+          setConfirmarBtnEnabled(false);
+        }
+      }, 600);
+    }
+
+    async function validarNumPedidoCliente(numPedido, showInlineMessage = true, mostrarModal = true) {
+      const normalizedNumPedido = (numPedido || '').trim();
+      console.log(`🔍 Iniciando validación de pedido: "${normalizedNumPedido}"`);
+
+      if (!normalizedNumPedido) {
+        console.log('⚠️ Número de pedido vacío');
+        actualizarCampoCantidadPedido(null);
+        if (showInlineMessage) {
+          updateNumPedidoValidationMessage('', 'neutral');
+        }
+        return { ok: false, allowWithoutClient: false };
+      }
+
+      if (showInlineMessage) {
+        updateNumPedidoValidationMessage('Comprobando número de pedido...', 'info');
+      }
+
+      try {
+        console.log('📡 Realizando petición al servidor...');
+        const pedidoId = window.pedidoActual?.ID_Pedido || '';
+        const url = `/api/validar-num-pedido-cliente?num_pedido=${encodeURIComponent(normalizedNumPedido)}${pedidoId ? '&pedido_id=' + pedidoId : ''}`;
+        const response = await fetch(url);
+        const result = await response.json().catch(() => ({ success: false, exists: false, message: 'Error validando el pedido' }));
+
+        console.log('📥 Respuesta del servidor:', result);
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.message || `Error ${response.status}`);
+        }
+
+        if (result.exists) {
+          console.log('✅ Pedido existe en cache de clientes');
+          actualizarCampoCantidadPedido(result.cantidad ?? null);
+
+          // Comprobar capacidad
+          const cantidad = result.cantidad ?? 0;
+          const yaAsignados = result.ya_asignados ?? 0;
+          if (cantidad > 0 && yaAsignados >= cantidad) {
+            if (showInlineMessage) {
+              updateNumPedidoValidationMessage(
+                `❌ Capacidad máxima alcanzada: el pedido "${normalizedNumPedido}" ya tiene ${yaAsignados}/${cantidad} armarios asignados. No se pueden añadir más.`,
+                'error'
+              );
+            }
+            return { ok: false, allowWithoutClient: false, cantidad, yaAsignados, semanaEntrega: result.semana_entrega || '' };
+          }
+
+          if (showInlineMessage) {
+            let msgExito = '✅ Pedido de cliente válido. Puedes continuar.';
+            if (cantidad > 0) {
+              msgExito += ` • Armarios asignados: ${yaAsignados}/${cantidad}`;
+            } else if (result.cantidad !== null && result.cantidad !== undefined) {
+              msgExito += ` • Armarios/pedido: ${formatearCantidadPedido(result.cantidad)}`;
+            }
+            updateNumPedidoValidationMessage(msgExito, 'success');
+          }
+          return { ok: true, allowWithoutClient: false, cantidad: result.cantidad ?? null, yaAsignados, semanaEntrega: result.semana_entrega || '' };
+        }
+
+        // Pedido NO existe
+        console.log('⚠️ Pedido NO existe en cache de clientes');
+        actualizarCampoCantidadPedido(null);
+
+        if (!mostrarModal) {
+          // Solo mensaje inline, sin abrir el modal de confirmación
+          if (showInlineMessage) {
+            updateNumPedidoValidationMessage('❌ El número de pedido no existe en el sistema ERP.', 'error');
+          }
+          return { ok: false, allowWithoutClient: false, cantidad: null, semanaEntrega: '' };
+        }
+
+        // Mostrar modal de confirmación
+        if (showInlineMessage) {
+          updateNumPedidoValidationMessage('ℹ️ Verificando en cache de clientes...', 'info');
+        }
+        
+        const usuarioAcepto = await mostrarModalConfirmacionPedidoNoCliente(normalizedNumPedido);
+        console.log(`👤 Decisión del usuario: ${usuarioAcepto ? 'Continuar' : 'Cancelar'}`);
+
+        return {
+          ok: usuarioAcepto,
+          allowWithoutClient: usuarioAcepto,
+          cantidad: null,
+          semanaEntrega: ''
+        };
+      } catch (error) {
+        console.error('💥 Error validando NumPedido de cliente:', error);
+        actualizarCampoCantidadPedido(null);
+        if (showInlineMessage) {
+          updateNumPedidoValidationMessage(`⚠️ No se pudo validar el pedido: ${error.message}`, 'error');
+        }
+        throw error;
+      }
+    }
+    
+    /**
+     * 🆕 Modal de confirmación cuando el pedido no existe en cache de clientes
+     */
+    async function mostrarModalConfirmacionPedidoNoCliente(numPedido) {
+      console.log(`⚠️ Mostrando modal de confirmación para pedido: ${numPedido}`);
+      
+      return new Promise((resolve) => {
+        // Crear el overlay del modal
+        const modal = document.createElement('div');
+        modal.id = 'modal-confirmacion-pedido';
+        modal.style.cssText = `
+          position: fixed !important;
+          top: 0 !important;
+          left: 0 !important;
+          width: 100vw !important;
+          height: 100vh !important;
+          background-color: rgba(0, 0, 0, 0.6) !important;
+          display: flex !important;
+          justify-content: center !important;
+          align-items: center !important;
+          z-index: 99999 !important;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+        `;
+        
+        const modalContent = document.createElement('div');
+        modalContent.style.cssText = `
+          background: white !important;
+          border-radius: 12px !important;
+          padding: 30px !important;
+          max-width: 500px !important;
+          width: 90% !important;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+          animation: modalSlideIn 0.3s ease-out !important;
+          position: relative !important;
+        `;
+        
+        modalContent.innerHTML = `
+          <div style="text-align: center; margin-bottom: 25px;">
+            <div style="color: #ff9800; font-size: 64px; margin-bottom: 15px; line-height: 1;">⚠️</div>
+            <h3 style="color: #333; margin: 0 0 20px 0; font-size: 20px; font-weight: 600;">Número de Pedido no encontrado</h3>
+            <div style="background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+              <p style="color: #856404; line-height: 1.5; margin: 0; font-size: 15px;">
+                El número de pedido <strong style="color: #d63384;">${numPedido}</strong> no se encuentra registrado<br>
+                en la base de datos de pedidos de clientes.
+              </p>
+            </div>
+            <p style="color: #666; font-size: 14px; margin: 0;">
+              ¿Deseas continuar de todas formas?
+            </p>
+          </div>
+          
+          <div style="display: flex; justify-content: center; gap: 20px; margin-top: 30px;">
+            <button id="btn-cancelar-pedido" style="
+              background: linear-gradient(135deg, #e74c3c, #c0392b);
+              color: white;
+              border: none;
+              padding: 12px 25px;
+              border-radius: 8px;
+              cursor: pointer;
+              font-size: 14px;
+              font-weight: 600;
+              transition: all 0.3s ease;
+              min-width: 120px;
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(231,76,60,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">❌ Cancelar</button>
+            
+            <button id="btn-continuar-pedido" style="
+              background: linear-gradient(135deg, #27ae60, #229954);
+              color: white;
+              border: none;
+              padding: 12px 25px;
+              border-radius: 8px;
+              cursor: pointer;
+              font-size: 14px;
+              font-weight: 600;
+              transition: all 0.3s ease;
+              min-width: 120px;
+            " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 15px rgba(39,174,96,0.4)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">✅ Continuar de todas formas</button>
+          </div>
+        `;
+        
+        // Añadir CSS para la animación
+        if (!document.getElementById('modal-animation-styles')) {
+          const style = document.createElement('style');
+          style.id = 'modal-animation-styles';
+          style.textContent = `
+            @keyframes modalSlideIn {
+              from { 
+                opacity: 0; 
+                transform: translateY(-50px) scale(0.95); 
+              }
+              to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+              }
+            }
+          `;
+          document.head.appendChild(style);
+        }
+        
+        modal.appendChild(modalContent);
+        document.body.appendChild(modal);
+        
+        console.log('✅ Modal de confirmación creado y añadido al DOM');
+        
+        // Forzar repaint
+        modal.offsetHeight;
+        
+        // Enfocar el botón de cancelar por defecto
+        setTimeout(() => {
+          const btnCancelar = modal.querySelector('#btn-cancelar-pedido');
+          if (btnCancelar) {
+            btnCancelar.focus();
+            console.log('🎯 Botón cancelar enfocado');
+          }
+        }, 150);
+        
+        // Función para limpiar y resolver
+        const limpiarModal = () => {
+          try {
+            if (document.body.contains(modal)) {
+              document.body.removeChild(modal);
+            }
+          } catch (e) {
+            console.warn('⚠️ Error removiendo modal:', e);
+          }
+        };
+        
+        // Manejar clic en Cancelar
+        const btnCancelar = modal.querySelector('#btn-cancelar-pedido');
+        if (btnCancelar) {
+          btnCancelar.addEventListener('click', () => {
+            console.log('❌ Usuario canceló la validación del pedido');
+            limpiarModal();
+            updateNumPedidoValidationMessage('❌ El número de pedido no es de un cliente registrado', 'error');
+            resolve(false);
+          });
+        }
+        
+        // Manejar clic en Continuar
+        const btnContinuar = modal.querySelector('#btn-continuar-pedido');
+        if (btnContinuar) {
+          btnContinuar.addEventListener('click', () => {
+            console.log('✅ Usuario decidió continuar sin validación de cliente');
+            limpiarModal();
+            updateNumPedidoValidationMessage('⚠️ Continuando sin verificación de cliente', 'info');
+            resolve(true);
+          });
+        }
+        
+        // Cerrar con Escape
+        const handleEscape = (e) => {
+          if (e.key === 'Escape') {
+            console.log('⌨️ Usuario cerró modal con Escape');
+            document.removeEventListener('keydown', handleEscape);
+            limpiarModal();
+            updateNumPedidoValidationMessage('❌ Validación cancelada', 'error');
+            resolve(false);
+          }
+        };
+        document.addEventListener('keydown', handleEscape);
+        
+        // Cerrar al hacer clic fuera del modal
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) {
+            console.log('👆 Usuario cerró modal haciendo clic fuera');
+            document.removeEventListener('keydown', handleEscape);
+            limpiarModal();
+            updateNumPedidoValidationMessage('❌ Validación cancelada', 'error');
+            resolve(false);
+          }
+        });
+      });
     }
     
     /**
@@ -12486,11 +15232,20 @@
       btn.textContent = 'Guardando...';
       
       try {
+        const validacionPedido = await validarNumPedidoCliente(numPedido, true);
+        if (!validacionPedido.ok) {
+          input.focus();
+          return;
+        }
+
         // Actualizar NumPedido en la base de datos
         const response = await fetch(`/api/pedido/${window.pedidoActual.ID_Pedido}/numpedido`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ NumPedido: numPedido })
+          body: JSON.stringify({
+            NumPedido: numPedido,
+            PermitirNoCliente: validacionPedido.allowWithoutClient
+          })
         });
         
         if (!response.ok) {
@@ -12501,11 +15256,8 @@
         const resultado = await response.json();
         console.log('✅ NumPedido actualizado exitosamente:', resultado);
         
-        // Actualizar window.pedidoActual con el nuevo NumPedido
-        window.pedidoActual.NumPedido = numPedido;
-        
-        // Actualizar el header para mostrar el número de pedido
-        actualizarHeaderNumPedido(numPedido);
+        // Actualizar window.pedidoActual con todos los datos enriquecidos
+        aplicarDatosNumPedidoEnPedidoActual(resultado, numPedido);
         
         // Cerrar modal
         cerrarNumPedidoModal();
@@ -12517,8 +15269,8 @@
         console.error('💥 Error guardando NumPedido:', error);
         alert(`Error al guardar el número de pedido: ${error.message}`);
       } finally {
-        btn.disabled = false;
         btn.textContent = textoOriginal;
+        setConfirmarBtnEnabled(true);
       }
     }
     
@@ -12529,10 +15281,8 @@
     function actualizarHeaderNumPedido(numPedido) {
       const infoElement = document.getElementById('info-numpedido');
       if (infoElement) {
-        // Si el pedido actual tiene NumPedidoConPosicion, usarlo, si no usar solo el número
-        const mostrar = window.pedidoActual?.NumPedidoConPosicion || numPedido;
-        infoElement.textContent = mostrar;
-        console.log(`📍 Header actualizado con número de pedido: ${mostrar}`);
+        infoElement.textContent = numPedido || '-';
+        console.log(`📍 Header actualizado con número de pedido: ${numPedido}`);
       }
     }
     
@@ -12564,11 +15314,20 @@
       btn.textContent = 'Guardando...';
       
       try {
+        const validacionPedido = await validarNumPedidoCliente(numPedido, true);
+        if (!validacionPedido.ok) {
+          input.focus();
+          return;
+        }
+
         // Actualizar NumPedido en la base de datos
         const response = await fetch(`/api/pedido/${window.pedidoActual.ID_Pedido}/numpedido`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ NumPedido: numPedido })
+          body: JSON.stringify({
+            NumPedido: numPedido,
+            PermitirNoCliente: validacionPedido.allowWithoutClient
+          })
         });
         
         if (!response.ok) {
@@ -12579,8 +15338,8 @@
         const resultado = await response.json();
         console.log('✅ NumPedido actualizado exitosamente:', resultado);
         
-        // Actualizar window.pedidoActual con el nuevo NumPedido
-        window.pedidoActual.NumPedido = numPedido;
+        // Actualizar window.pedidoActual con todos los datos enriquecidos
+        aplicarDatosNumPedidoEnPedidoActual(resultado, numPedido);
         
         // 🆕 GUARDAR PDF AUTOMÁTICAMENTE EN CARPETA COMPARTIDA
         console.log(`💾 Guardando PDF en carpeta compartida...`);
@@ -12618,19 +15377,35 @@
         console.error('💥 Error actualizando NumPedido:', error);
         alert(`Error al guardar el número de pedido: ${error.message}`);
       } finally {
-        // Rehabilitar botón
-        btn.disabled = false;
         btn.textContent = textoOriginal;
+        setConfirmarBtnEnabled(true);
       }
     }
     
-    // Event listener para Enter en el input de NumPedido
+    // Event listener para Enter y blur en el input de NumPedido
     document.addEventListener('DOMContentLoaded', function() {
       const input = document.getElementById('inputNumPedido');
       if (input) {
+        // Al perder el foco: validación completa con modal si no existe
+        input.addEventListener('blur', async function() {
+          const numPedido = this.value.trim();
+          if (!numPedido) return;
+          clearTimeout(_numPedidoInputTimer);
+          try {
+            const result = await validarNumPedidoCliente(numPedido, true, true);
+            setConfirmarBtnEnabled(result.ok === true);
+          } catch (_) {
+            setConfirmarBtnEnabled(false);
+          }
+        });
+
         input.addEventListener('keypress', function(e) {
           if (e.key === 'Enter') {
-            confirmarNumPedido();
+            if (window.modoModalNumPedido === 'generar_pdf') {
+              confirmarNumPedido();
+            } else {
+              guardarSoloNumPedido();
+            }
           }
         });
       }
@@ -15320,6 +18095,17 @@
       });
 
       // Navegación por teclado
+
+    document.addEventListener('click', function(event) {
+      const selector = document.getElementById('gestionSemanaEntregaSelector');
+      if (!selector) {
+        return;
+      }
+
+      if (!selector.contains(event.target)) {
+        closeGestionSemanaEntregaPanel();
+      }
+    });
       document.addEventListener('keydown', function(e) {
         if (modal.style.display === 'block') {
           switch(e.key) {
@@ -15487,6 +18273,43 @@
       
       console.log('🖼️ Event listeners del modal de imagen inicializados');
     });
+
+    // 🆕 Override de showScreen para manejar la pantalla de correcciones
+    (function() {
+      const originalShowScreen = window.showScreen;
+      window.showScreen = function(screenId, addToHistory = true) {
+        if (typeof originalShowScreen === 'function') {
+          originalShowScreen.call(this, screenId, addToHistory);
+        }
+        
+        if (screenId === 'screen-correcciones') {
+          // Actualizar títulos
+          const titles = {
+            'screen-main': 'CHECKLIST CALIDAD',
+            'screen-config-menu': 'CONFIGURACIÓN',
+            'screen-puestos': 'PUESTOS',
+            'screen-listado-armarios': 'LISTADO ARMARIOS',
+            'screen-config-puestos': 'CONFIGURACIÓN DE PUESTOS',
+            'screen-config-controles': 'CONFIGURACIÓN DE CONTROLES',
+            'screen-config-pautas': 'CONFIGURACIÓN DE PAUTAS',
+            'screen-config-proveedores': 'CONFIGURACIÓN PROVEEDORES',
+            'screen-checklist': 'CHECKLIST',
+            'screen-correcciones': 'CORRECCIONES',
+            'screen-gestion': 'GESTIÓN'
+          };
+          
+          const headerTitle = document.getElementById('headerTitle');
+          if (headerTitle && titles[screenId]) {
+            headerTitle.textContent = titles[screenId];
+          }
+          
+          // Cargar armarios
+          if (typeof cargarArmariosCorrecciones === 'function') {
+            cargarArmariosCorrecciones();
+          }
+        }
+      };
+    })();
 
   </script>
 
@@ -15712,7 +18535,21 @@
             style="width: 100%; padding: 12px 16px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; transition: border-color 0.3s;"
             onfocus="this.style.borderColor='#3880c7'"
             onblur="this.style.borderColor='#ddd'"
+            oninput="onNumPedidoInput(this.value)"
           />
+          <div id="numPedidoValidationMessage" style="display: none; margin-top: 10px; padding: 10px 12px; border-radius: 8px; font-size: 13px; line-height: 1.4;"></div>
+          <div style="margin-top: 14px;">
+            <label for="inputCantidadPedido" style="display: block; margin-bottom: 8px; font-weight: 600; color: #333; font-size: 15px;">
+              Armarios/pedido:
+            </label>
+            <input 
+              type="text"
+              id="inputCantidadPedido"
+              readonly
+              placeholder="Se completará automáticamente"
+              style="width: 100%; padding: 12px 16px; font-size: 16px; border: 2px solid #ddd; border-radius: 8px; box-sizing: border-box; background: #f7f9fb; color: #334155;"
+            />
+          </div>
         </div>
         
         <div style="background: #f0f7ff; padding: 15px; border-radius: 8px; border-left: 4px solid #2980c7; margin-bottom: 20px;">
@@ -15728,7 +18565,7 @@
         <button onclick="cerrarNumPedidoModal()" style="padding: 12px 30px; background: #95a5a6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; transition: all 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onmouseover="this.style.background='#7f8c8d'" onmouseout="this.style.background='#95a5a6'">
           ❌ Cancelar
         </button>
-        <button id="confirmarNumPedidoBtn" style="padding: 12px 30px; background: linear-gradient(135deg, #27ae60 0%, #229954 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 15px; font-weight: 600; transition: all 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 5px rgba(0,0,0,0.1)'">
+        <button id="confirmarNumPedidoBtn" disabled style="padding: 12px 30px; background: #b0bec5; color: white; border: none; border-radius: 6px; cursor: not-allowed; font-size: 15px; font-weight: 600; transition: all 0.3s; box-shadow: 0 2px 5px rgba(0,0,0,0.1); opacity: 0.7;">
           ✓ Registrar
         </button>
       </div>
@@ -15880,30 +18717,37 @@
       }
     }
 
-    // Actualizar visibilidad de la tarjeta de Configuración según el nivel del usuario
+    // Actualizar visibilidad de las tarjetas restringidas según el nivel del usuario
     function updateConfigurationCardAccess(userLevel) {
       const configCard = document.getElementById('configCard');
+      const gestionCard = document.getElementById('gestionCard');
       
-      if (!configCard) {
-        console.warn('⚠️ Elemento configCard no encontrado');
+      if (!configCard || !gestionCard) {
+        console.warn('⚠️ Tarjetas restringidas no encontradas');
         return;
       }
       
-      // Configuración requiere nivel > 2
       const hasAccess = userLevel > 2;
-      
-      if (hasAccess) {
-        console.log('✅ Usuario con nivel', userLevel, '- Acceso a Configuración permitido');
-        configCard.style.cursor = 'pointer';
-        configCard.style.opacity = '1';
-        configCard.onclick = () => showScreen('screen-config-menu');
-        configCard.querySelector('[style*="font-size: 11px"]').style.display = 'none';
-      } else {
-        console.log('❌ Usuario con nivel', userLevel, '- Acceso a Configuración denegado');
-        configCard.style.cursor = 'not-allowed';
-        configCard.style.opacity = '0.5';
-        configCard.onclick = accessConfiguration;
-        configCard.querySelector('[style*="font-size: 11px"]').style.display = 'block';
+
+      setRestrictedCardState(configCard, hasAccess, () => showScreen('screen-config-menu'), accessConfiguration);
+      setRestrictedCardState(gestionCard, hasAccess, () => showScreen('screen-gestion'), accessGestion);
+
+      console.log(
+        hasAccess
+          ? `✅ Usuario con nivel ${userLevel} - Acceso a Configuración y Gestión permitido`
+          : `❌ Usuario con nivel ${userLevel} - Acceso a Configuración y Gestión denegado`
+      );
+    }
+
+    function setRestrictedCardState(cardElement, hasAccess, onAllowedClick, onDeniedClick) {
+      const helperText = cardElement.querySelector('[style*="font-size: 11px"]');
+
+      cardElement.style.cursor = hasAccess ? 'pointer' : 'not-allowed';
+      cardElement.style.opacity = hasAccess ? '1' : '0.5';
+      cardElement.onclick = hasAccess ? onAllowedClick : onDeniedClick;
+
+      if (helperText) {
+        helperText.style.display = hasAccess ? 'none' : 'block';
       }
     }
 
@@ -15915,6 +18759,7 @@
       document.getElementById('config-proveedores-form').style.display = 'none';
       document.getElementById('config-proveedor-pauta-list').style.display = 'none';
       document.getElementById('config-proveedor-pauta-form').style.display = 'none';
+      updateProveedoresBreadcrumbs();
     }
 
     function showProveedoresSection() {
@@ -17406,36 +20251,6 @@
         btnEditar.style.display = 'none';
       }
     }
-    
-    // Actualizar títulos y cargar armarios cuando se abre la pantalla de correcciones
-    (function() {
-      const originalShowScreen = window.showScreen;
-      window.showScreen = function(screenId, addToHistory = true) {
-        originalShowScreen.call(this, screenId, addToHistory);
-        
-        if (screenId === 'screen-correcciones') {
-          // Actualizar títulos
-          const titles = {
-            'screen-main': 'CHECKLIST CALIDAD',
-            'screen-config-menu': 'CONFIGURACIÓN',
-            'screen-puestos': 'PUESTOS',
-            'screen-listado-armarios': 'LISTADO ARMARIOS',
-            'screen-config-puestos': 'CONFIGURACIÓN DE PUESTOS',
-            'screen-config-controles': 'CONFIGURACIÓN DE CONTROLES',
-            'screen-config-pautas': 'CONFIGURACIÓN DE PAUTAS',
-            'screen-config-proveedores': 'CONFIGURACIÓN PROVEEDORES',
-            'screen-checklist': 'CHECKLIST',
-            'screen-correcciones': 'CORRECCIONES'
-          };
-          
-          const headerTitle = document.getElementById('headerTitle');
-          headerTitle.textContent = titles[screenId] || 'CHECKLIST';
-          
-          // Cargar armarios
-          cargarArmariosCorrecciones();
-        }
-      };
-    })();
 
   </script>
 

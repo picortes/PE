@@ -386,8 +386,8 @@ def obtener_id_usuario_request():
 # ====================================================================================
 @app.route('/')
 def index():
-    """Página principal - servir index1.html"""
-    return send_from_directory(RUTA_TEMPLATES, "index1.html")
+    """Página principal - servir la SPA principal."""
+    return send_from_directory(os.path.join(RUTA_TEMPLATES, "generales"), "ChecklistSPA.html")
 
 @app.route('/Templates/<path:nombre_archivo>')
 def servir_pantalla(nombre_archivo):
@@ -2606,17 +2606,23 @@ def get_puesto_pauta():
     - Mostrar una tarjeta por cada pauta (comportamiento actual)
     """
     request_started_at = time.perf_counter()
+    print(f"\n🔍 [GET /api/get-puesto-pauta] Iniciando obtención de puestos y pautas...")
+    
     try:
+        print("📡 Estableciendo conexión a base de datos...")
         with ConexionODBC('Digitalizacion') as conn:
             if not conn:
+                print("❌ Error: No se pudo establecer conexión a base de datos")
                 return jsonify({'success': False, 'message': 'Error de conexión a base de datos'}), 500
             
+            print("✅ Conexión establecida correctamente")
             cursor = conn.cursor()
             try:
                 cursor.timeout = 10
             except Exception:
                 pass
             
+            print("🗄️ Ejecutando consulta SQL...")
             # Obtener datos de puestos y pautas SOLO donde Activo = 1
             cursor.execute("""
                 SELECT DISTINCT pp.[Puesto], pp.[Nombre_Pauta], pp.[Num_Pautas]
@@ -2744,11 +2750,14 @@ def get_puesto_pauta():
                 for pauta in p['pautas']:
                     print(f"      - {pauta['nombre_pauta']}")
             
-            return jsonify({
+            response_data = {
                 'success': True,
                 'puestos': lista_puestos,
                 'message': f'Se obtuvieron {len(lista_puestos)} puestos con sus pautas activas exitosamente'
-            })
+            }
+            print(f"✅ [GET /api/get-puesto-pauta] Enviando respuesta exitosa en {time.perf_counter() - request_started_at:.2f}s")
+            
+            return jsonify(response_data)
             
     except Exception as e:
         print(f"💥 Error obteniendo puesto-pauta tras {time.perf_counter() - request_started_at:.2f}s: {e}")
@@ -2886,6 +2895,104 @@ def get_checklist(puesto, pauta):
 # ENDPOINTS PARA GESTIÓN DE PEDIDOS/ARMARIOS
 # ====================================================================================
 
+def _normalizar_cantidad_cache(valor):
+    if valor is None:
+        return None
+
+    try:
+        cantidad_float = float(valor)
+        return int(cantidad_float) if cantidad_float.is_integer() else cantidad_float
+    except Exception:
+        return valor
+
+
+def _obtener_info_cache_num_pedido(cursor, num_pedido):
+    num_pedido_limpio = str(num_pedido or '').strip()
+
+    if not num_pedido_limpio:
+        return {
+            'exists': False,
+            'num_pedido': '',
+            'cantidad': None,
+            'semana_entrega': ''
+        }
+
+    cursor.execute("""
+        SELECT TOP 1 [NumPedido], [Cantidad], [SEMANAENTREGA]
+        FROM [Digitalizacion].[PE].[Pedido_Cantidad_SemanaEntrega_Cache]
+        WHERE LTRIM(RTRIM([NumPedido])) = ?
+    """, (num_pedido_limpio,))
+
+    row = cursor.fetchone()
+    if not row:
+        return {
+            'exists': False,
+            'num_pedido': num_pedido_limpio,
+            'cantidad': None,
+            'semana_entrega': ''
+        }
+
+    return {
+        'exists': True,
+        'num_pedido': str(row[0]).strip() if row[0] is not None else num_pedido_limpio,
+        'cantidad': _normalizar_cantidad_cache(row[1]),
+        'semana_entrega': str(row[2]).strip() if row[2] is not None else ''
+    }
+
+
+def _obtener_posicion_num_pedido(cursor, num_pedido, pedido_id):
+    num_pedido_limpio = str(num_pedido or '').strip()
+
+    if not num_pedido_limpio or not pedido_id:
+        return {
+            'NumPedidoConPosicion': num_pedido_limpio,
+            'TotalNumPedido': 0 if not num_pedido_limpio else 1,
+            'PosicionNumPedido': 0 if not num_pedido_limpio else 1
+        }
+
+    cursor.execute("""
+        WITH pedidos_ranking AS (
+            SELECT 
+                [ID_Pedido],
+                ROW_NUMBER() OVER (ORDER BY [ID_Pedido] ASC) as posicion,
+                COUNT(*) OVER () as total
+            FROM [Digitalizacion].[PE].[Pedido]
+            WHERE [NumPedido] = ?
+        )
+        SELECT posicion, total
+        FROM pedidos_ranking
+        WHERE [ID_Pedido] = ?
+    """, (num_pedido_limpio, pedido_id))
+
+    resultado = cursor.fetchone()
+    if resultado:
+        posicion = resultado[0]
+        total = resultado[1]
+        return {
+            'NumPedidoConPosicion': f"{num_pedido_limpio}/{posicion}",
+            'TotalNumPedido': total,
+            'PosicionNumPedido': posicion
+        }
+
+    return {
+        'NumPedidoConPosicion': num_pedido_limpio,
+        'TotalNumPedido': 1,
+        'PosicionNumPedido': 1
+    }
+
+
+def _enriquecer_pedido_num_pedido(cursor, pedido):
+    num_pedido = str(pedido.get('NumPedido') or '').strip()
+    pedido_id = pedido.get('ID_Pedido') or pedido.get('id_pedido') or pedido.get('id')
+
+    pedido.update(_obtener_posicion_num_pedido(cursor, num_pedido, pedido_id))
+
+    cache_info = _obtener_info_cache_num_pedido(cursor, num_pedido)
+    pedido['CantidadPedido'] = cache_info['cantidad']
+    pedido['SemanaEntregaPedido'] = cache_info['semana_entrega']
+
+    return pedido
+
 @app.route('/api/pedido/<armario>', methods=['GET'])
 def get_pedido_por_armario(armario):
     """Busca un pedido por número de armario (opcionalmente filtra por pauta)"""
@@ -2912,14 +3019,14 @@ def get_pedido_por_armario(armario):
             if nombre_pauta_limpio:
                 print(f"   📋 Ejecutando query CON filtro de pauta...")
                 cursor.execute("""
-                    SELECT [ID_Pedido], [Armario], [Fecha], [Referencia], [Comentarios], [Nombre_Pauta], [Cerrado]
+                    SELECT [ID_Pedido], [Armario], [Fecha], [Referencia], [Comentarios], [Nombre_Pauta], [Cerrado], [NumPedido]
                     FROM [Digitalizacion].[PE].[Pedido]
                     WHERE CAST(TRIM([Armario]) AS VARCHAR(MAX)) = CAST(? AS VARCHAR(MAX)) AND [Nombre_Pauta] = ?
                 """, (armario_limpio, nombre_pauta_limpio))
             else:
                 print(f"   📋 Ejecutando query SIN filtro de pauta...")
                 cursor.execute("""
-                    SELECT [ID_Pedido], [Armario], [Fecha], [Referencia], [Comentarios], [Nombre_Pauta], [Cerrado]
+                    SELECT [ID_Pedido], [Armario], [Fecha], [Referencia], [Comentarios], [Nombre_Pauta], [Cerrado], [NumPedido]
                     FROM [Digitalizacion].[PE].[Pedido]
                     WHERE CAST(TRIM([Armario]) AS VARCHAR(MAX)) = CAST(? AS VARCHAR(MAX))
                 """, (armario_limpio,))
@@ -2934,8 +3041,10 @@ def get_pedido_por_armario(armario):
                     'Referencia': resultado[3],
                     'Comentarios': resultado[4],
                     'Nombre_Pauta': resultado[5],
-                    'Cerrado': resultado[6]
+                    'Cerrado': resultado[6],
+                    'NumPedido': resultado[7] if resultado[7] else ''
                 }
+                _enriquecer_pedido_num_pedido(cursor, pedido)
                 
                 print(f"✅ Pedido encontrado: ID={pedido['ID_Pedido']}, Armario={pedido['Armario']}, Pauta={pedido['Nombre_Pauta']}")
                 return jsonify(pedido)
@@ -3046,8 +3155,10 @@ def crear_pedido():
                 'Referencia': resultado[3],
                 'Comentarios': resultado[4],
                 'Nombre_Pauta': resultado[5],
-                'Cerrado': 0
+                'Cerrado': 0,
+                'NumPedido': ''
             }
+            _enriquecer_pedido_num_pedido(cursor, pedido_creado)
             
             print(f"✅ Pedido creado exitosamente: {pedido_creado}")
             
@@ -3086,7 +3197,7 @@ def actualizar_pedido(pedido_id):
             
             # Verificar que el pedido existe
             cursor.execute("""
-                SELECT [ID_Pedido], [Armario], [Fecha], [Referencia], [Comentarios]
+                SELECT [ID_Pedido], [Armario], [Fecha], [Referencia], [Comentarios], [Nombre_Pauta], [NumPedido]
                 FROM [Digitalizacion].[PE].[pedido]
                 WHERE [ID_Pedido] = ?
             """, (pedido_id,))
@@ -3110,8 +3221,11 @@ def actualizar_pedido(pedido_id):
                 'Armario': pedido_actual[1],
                 'Fecha': pedido_actual[2].isoformat() if pedido_actual[2] else None,
                 'Referencia': nueva_referencia,  # Nueva referencia
-                'Comentarios': pedido_actual[4]
+                'Comentarios': pedido_actual[4],
+                'Nombre_Pauta': pedido_actual[5],
+                'NumPedido': pedido_actual[6] if pedido_actual[6] else ''
             }
+            _enriquecer_pedido_num_pedido(cursor, pedido_actualizado)
             
             print(f"✅ Pedido {pedido_id} actualizado exitosamente")
             
@@ -3199,6 +3313,69 @@ def actualizar_pauta_pedido(pedido_id):
 # ====================================================================================
 # ENDPOINT PARA ACTUALIZAR NUMPEDIDO EN UN PEDIDO
 # ====================================================================================
+@app.route('/api/validar-num-pedido-cliente', methods=['GET'])
+def validar_num_pedido_cliente():
+    """Valida si un número de pedido existe en PE.Pedido_Cantidad_SemanaEntrega_Cache."""
+    request_started_at = time.perf_counter()
+
+    try:
+        num_pedido = (request.args.get('num_pedido') or '').strip()
+
+        if not num_pedido:
+            return jsonify({
+                'success': False,
+                'exists': False,
+                'message': 'NumPedido es obligatorio'
+            }), 400
+
+        print(f"🔍 Validando NumPedido de cliente: {num_pedido}")
+
+        pedido_id_param = (request.args.get('pedido_id') or '').strip()
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'exists': False, 'message': 'Error de conexión a base de datos'}), 500
+
+            cursor = conn.cursor()
+            cache_info = _obtener_info_cache_num_pedido(cursor, num_pedido)
+            exists = cache_info['exists']
+
+            ya_asignados = 0
+            if exists and pedido_id_param and pedido_id_param.isdigit():
+                try:
+                    cursor.execute("""
+                        SELECT COUNT(*) FROM [Digitalizacion].[PE].[Pedido]
+                        WHERE LTRIM(RTRIM([NumPedido])) = ? AND [ID_Pedido] <> ?
+                    """, (num_pedido, int(pedido_id_param)))
+                    ya_asignados = cursor.fetchone()[0]
+                except Exception:
+                    ya_asignados = 0
+
+            print(
+                f"{'✅' if exists else '⚠️'} Validación NumPedido '{num_pedido}': "
+                f"{'existe' if exists else 'no existe'} | ya_asignados={ya_asignados} en {time.perf_counter() - request_started_at:.2f}s"
+            )
+
+            return jsonify({
+                'success': True,
+                'exists': exists,
+                'cantidad': cache_info['cantidad'],
+                'ya_asignados': ya_asignados,
+                'semana_entrega': cache_info['semana_entrega'],
+                'message': 'NumPedido válido' if exists else 'El número de pedido introducido no es un pedido de cliente'
+            })
+
+    except Exception as e:
+        print(f"💥 Error validando NumPedido de cliente: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({
+            'success': False,
+            'exists': False,
+            'message': f'Error del servidor: {str(e)}'
+        }), 500
+
+
 @app.route('/api/pedido/<int:pedido_id>/numpedido', methods=['PATCH'])
 def actualizar_numpedido(pedido_id):
     """Actualiza el campo NumPedido de un pedido existente"""
@@ -3208,9 +3385,11 @@ def actualizar_numpedido(pedido_id):
             return jsonify({'success': False, 'message': 'No se recibieron datos'}), 400
         
         num_pedido = data.get('NumPedido', '').strip()
+        permitir_no_cliente = bool(data.get('PermitirNoCliente', False))
         
         print(f"🔄 Actualizando NumPedido del pedido ID {pedido_id}")
         print(f"   - NumPedido: {num_pedido}")
+        print(f"   - PermitirNoCliente: {permitir_no_cliente}")
         
         if not num_pedido:
             return jsonify({'success': False, 'message': 'NumPedido es obligatorio'}), 400
@@ -3231,6 +3410,30 @@ def actualizar_numpedido(pedido_id):
             pedido_actual = cursor.fetchone()
             if not pedido_actual:
                 return jsonify({'success': False, 'message': 'Pedido no encontrado'}), 404
+
+            cache_info = _obtener_info_cache_num_pedido(cursor, num_pedido)
+            pedido_cliente_existe = cache_info['exists']
+
+            # Siempre bloquear si el NumPedido no existe en la cache ERP
+            if not pedido_cliente_existe:
+                return jsonify({
+                    'success': False,
+                    'message': f'El número de pedido "{num_pedido}" no existe en el sistema ERP. Solo se pueden asignar pedidos de cliente.'
+                }), 400
+
+            # Validar capacidad: no se pueden asignar más armarios que Cantidad
+            cantidad_max = cache_info.get('cantidad') or 0
+            if cantidad_max > 0:
+                cursor.execute("""
+                    SELECT COUNT(*) FROM [Digitalizacion].[PE].[Pedido]
+                    WHERE LTRIM(RTRIM([NumPedido])) = ? AND [ID_Pedido] <> ?
+                """, (num_pedido, pedido_id))
+                ya_asignados = cursor.fetchone()[0]
+                if ya_asignados >= cantidad_max:
+                    return jsonify({
+                        'success': False,
+                        'message': f'El pedido "{num_pedido}" ya tiene {ya_asignados}/{int(cantidad_max)} armarios asignados (máximo permitido). No se pueden añadir más.'
+                    }), 400
             
             numpedido_anterior = pedido_actual[2]
             
@@ -3244,12 +3447,20 @@ def actualizar_numpedido(pedido_id):
             conn.commit()
             
             print(f"✅ Pedido {pedido_id} actualizado con NumPedido '{num_pedido}'")
+
+            posicion_info = _obtener_posicion_num_pedido(cursor, num_pedido, pedido_id)
             
             return jsonify({
                 'success': True,
                 'message': f'NumPedido actualizado correctamente',
                 'ID_Pedido': pedido_id,
                 'NumPedido': num_pedido,
+                'NumPedidoConPosicion': posicion_info['NumPedidoConPosicion'],
+                'TotalNumPedido': posicion_info['TotalNumPedido'],
+                'PosicionNumPedido': posicion_info['PosicionNumPedido'],
+                'CantidadPedido': cache_info['cantidad'],
+                'SemanaEntregaPedido': cache_info['semana_entrega'],
+                'pedido_cliente_validado': True,
                 'NumPedido_Anterior': numpedido_anterior
             })
             
@@ -4203,43 +4414,8 @@ def obtener_pedidos_borradores(puesto, pauta):
                 pedidos_borradores.append(pedido)
                 print(f"  📋 INCOMPLETO encontrado: Armario={row[1]}, Cerrado={row[5]}, Controles={row[7]}/{row[8]}, Tipo={row[9]}")
             
-            # 🆕 Agregar información de posición para cada NumPedido
             for pedido in pedidos_borradores:
-                num_pedido = pedido['NumPedido']
-                id_pedido = pedido['ID_Pedido']
-                
-                if num_pedido:
-                    # Obtener posición y total con una sola consulta optimizada
-                    cursor.execute("""
-                        WITH pedidos_ranking AS (
-                            SELECT 
-                                [ID_Pedido],
-                                ROW_NUMBER() OVER (ORDER BY [ID_Pedido] ASC) as posicion,
-                                COUNT(*) OVER () as total
-                            FROM [Digitalizacion].[PE].[Pedido]
-                            WHERE [NumPedido] = ?
-                        )
-                        SELECT posicion, total
-                        FROM pedidos_ranking
-                        WHERE [ID_Pedido] = ?
-                    """, (num_pedido, id_pedido))
-                    
-                    resultado = cursor.fetchone()
-                    if resultado:
-                        posicion = resultado[0]
-                        total_con_num_pedido = resultado[1]
-                        pedido['NumPedidoConPosicion'] = f"{num_pedido}/{posicion}"
-                        pedido['TotalNumPedido'] = total_con_num_pedido
-                        pedido['PosicionNumPedido'] = posicion
-                        print(f"📍 Pedido {id_pedido}: NumPedido={num_pedido}, Posición={posicion}/{total_con_num_pedido}")
-                    else:
-                        pedido['NumPedidoConPosicion'] = num_pedido
-                        pedido['TotalNumPedido'] = 1
-                        pedido['PosicionNumPedido'] = 1
-                else:
-                    pedido['NumPedidoConPosicion'] = ''
-                    pedido['TotalNumPedido'] = 0
-                    pedido['PosicionNumPedido'] = 0
+                _enriquecer_pedido_num_pedido(cursor, pedido)
             
             print(f"✅ {len(pedidos_borradores)} pedidos INCOMPLETOS encontrados")
             
@@ -4514,43 +4690,8 @@ def obtener_pedidos_disponibles(puesto, pauta):
                     'TipoRetrabajo': tipo_retrabajo
                 })
             
-            # 🆕 Agregar información de posición para cada NumPedido
             for pedido in pedidos_validos:
-                num_pedido = pedido['NumPedido']
-                id_pedido = pedido['ID_Pedido']
-                
-                if num_pedido:
-                    # Obtener posición y total con una sola consulta optimizada
-                    cursor.execute("""
-                        WITH pedidos_ranking AS (
-                            SELECT 
-                                [ID_Pedido],
-                                ROW_NUMBER() OVER (ORDER BY [ID_Pedido] ASC) as posicion,
-                                COUNT(*) OVER () as total
-                            FROM [Digitalizacion].[PE].[Pedido]
-                            WHERE [NumPedido] = ?
-                        )
-                        SELECT posicion, total
-                        FROM pedidos_ranking
-                        WHERE [ID_Pedido] = ?
-                    """, (num_pedido, id_pedido))
-                    
-                    resultado = cursor.fetchone()
-                    if resultado:
-                        posicion = resultado[0]
-                        total_con_num_pedido = resultado[1]
-                        pedido['NumPedidoConPosicion'] = f"{num_pedido}/{posicion}"
-                        pedido['TotalNumPedido'] = total_con_num_pedido
-                        pedido['PosicionNumPedido'] = posicion
-                        print(f"📍 Pedido {id_pedido}: NumPedido={num_pedido}, Posición={posicion}/{total_con_num_pedido}")
-                    else:
-                        pedido['NumPedidoConPosicion'] = num_pedido
-                        pedido['TotalNumPedido'] = 1
-                        pedido['PosicionNumPedido'] = 1
-                else:
-                    pedido['NumPedidoConPosicion'] = ''
-                    pedido['TotalNumPedido'] = 0
-                    pedido['PosicionNumPedido'] = 0
+                _enriquecer_pedido_num_pedido(cursor, pedido)
             
             print(f"✅ Encontrados {len(pedidos_validos)} pedidos permitidos (sin NOK en {puesto_anterior})")
             
@@ -7861,6 +8002,1235 @@ def actualizar_pedido_correcciones(id_pedido):
         traceback.print_exc()
         return jsonify({'success': False, 'message': str(e)}), 500
 
+@app.route('/api/gestion/checklist-documentos', methods=['GET'])
+def get_gestion_checklist_documentos():
+    """Obtiene los registros de Checklist_Documentos para la vista de Pedidos Checklist."""
+    try:
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT [ID], [NumPedido], [NumArmario], [NombreArchivo], [Fecha_Modificacion_Archivo], [Fecha_Registro]
+                FROM [Digitalizacion].[PE].[Checklist_Documentos]
+                ORDER BY [Fecha_Modificacion_Archivo] DESC, [NumPedido] ASC
+            """)
+            rows = cursor.fetchall()
+            docs = []
+            for r in rows:
+                fecha_mod = ''
+                if r[4]:
+                    try:
+                        fecha_mod = r[4].strftime('%d/%m/%Y %H:%M')
+                    except Exception:
+                        fecha_mod = str(r[4])
+                fecha_reg = ''
+                if r[5]:
+                    try:
+                        fecha_reg = r[5].strftime('%d/%m/%Y %H:%M')
+                    except Exception:
+                        fecha_reg = str(r[5])
+                docs.append({
+                    'id': r[0],
+                    'num_pedido': r[1] or '',
+                    'num_armario': r[2] or '',
+                    'nombre_archivo': r[3] or '',
+                    'fecha_modificacion': fecha_mod,
+                    'fecha_registro': fecha_reg
+                })
+            return jsonify({'success': True, 'docs': docs, 'total': len(docs)})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/gestion/checklist-documentos/<int:doc_id>', methods=['DELETE'])
+def delete_gestion_checklist_documento(doc_id):
+    """Elimina un registro de Checklist_Documentos por su ID y también el certificado de pintura asociado por NumArmario."""
+    try:
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT [NombreArchivo], [NumArmario] FROM [Digitalizacion].[PE].[Checklist_Documentos] WHERE [ID] = ?
+            """, (doc_id,))
+            row = cursor.fetchone()
+            if not row:
+                return jsonify({'success': False, 'message': 'Registro no encontrado'}), 404
+            nombre_archivo = row[0]
+            num_armario    = row[1]
+
+            # Eliminar certificados de pintura asociados al mismo NumArmario
+            cert_eliminados = 0
+            if num_armario:
+                cursor.execute("""
+                    SELECT COUNT(*) FROM [Digitalizacion].[PE].[Certificados_Pintura_Documentos]
+                    WHERE [NumArmario] = ?
+                """, (num_armario,))
+                cert_eliminados = cursor.fetchone()[0]
+                if cert_eliminados > 0:
+                    cursor.execute("""
+                        DELETE FROM [Digitalizacion].[PE].[Certificados_Pintura_Documentos]
+                        WHERE [NumArmario] = ?
+                    """, (num_armario,))
+                    print(f'🗑️ [Gestión] Certificados_Pintura eliminados para NumArmario={num_armario}: {cert_eliminados} registro(s)')
+
+            cursor.execute("""
+                DELETE FROM [Digitalizacion].[PE].[Checklist_Documentos] WHERE [ID] = ?
+            """, (doc_id,))
+            conn.commit()
+            print(f'🗑️ [Gestión] Checklist_Documentos ID={doc_id} eliminado: {nombre_archivo}')
+
+            msg = f'Registro "{nombre_archivo}" eliminado'
+            if cert_eliminados > 0:
+                msg += f' (y {cert_eliminados} certificado{"s" if cert_eliminados > 1 else ""} de pintura asociado{"s" if cert_eliminados > 1 else ""})'
+            return jsonify({'success': True, 'message': msg, 'cert_eliminados': cert_eliminados})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/gestion/pedidos-join', methods=['GET'])
+def get_gestion_pedidos_join():
+    """
+    JOIN entre Checklist_Documentos y Pedido_Cantidad_SemanaEntrega_Cache por NumPedido.
+    Devuelve filas con la lista de armarios e incluye trazabilidades calculadas
+    usando el GAP configurado en config.json.
+    """
+    try:
+        # Leer GAP de configuración
+        cfg = _read_config()
+        gap = int(cfg.get('gap_trazabilidad_semanas', 0))
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+
+            # --- Cargar mapa de trazabilidad: {(semana, ano): set(DATOs)} ---
+            cursor.execute("""
+                SELECT [numsemana], [ano], [DATO]
+                FROM [Digitalizacion].[PE].[vw_LotesChapaProduccion]
+                WHERE [numsemana] IS NOT NULL AND [ano] IS NOT NULL
+            """)
+            traz_map = {}   # (semana:int, ano:int) -> set(dato)
+            anos_con_semana53 = set()  # años que tienen semana 53 registrada
+            for tr in cursor.fetchall():
+                sem = int(tr[0]) if tr[0] is not None else None
+                ano = int(tr[1]) if tr[1] is not None else None
+                dato = str(tr[2] or '').strip()
+                if sem is None or ano is None:
+                    continue
+                key = (sem, ano)
+                traz_map.setdefault(key, set())
+                if dato:
+                    traz_map[key].add(dato)
+                if sem == 53:
+                    anos_con_semana53.add(ano)
+
+            cursor.execute("""
+                SELECT [DATO]
+                FROM [Digitalizacion].[PE].[Certificados_Chapa_Documentos]
+                WHERE [DATO] IS NOT NULL AND LTRIM(RTRIM([DATO])) <> ''
+            """)
+            certificados_chapa_existentes = {
+                str(row[0]).strip()
+                for row in cursor.fetchall()
+                if row[0] is not None and str(row[0]).strip()
+            }
+
+            def _semanas_objetivo(semana_entrega_str, gap_semanas):
+                """Devuelve lista de (semana, ano) que corresponden al target."""
+                if not semana_entrega_str or gap_semanas == 0:
+                    return []
+                # Formato esperado: "16/2026" o "16 2026" etc.
+                import re as _re
+                m = _re.search(r'(\d+)[^\d]+(\d{4})', semana_entrega_str)
+                if not m:
+                    return []
+                sem = int(m.group(1))
+                ano = int(m.group(2))
+                target_sem = sem - gap_semanas
+                target_ano = ano
+                while target_sem <= 0:
+                    target_ano -= 1
+                    max_sem = 53 if target_ano in anos_con_semana53 else 52
+                    target_sem = max_sem + target_sem
+                return [(target_sem, target_ano)]
+
+            # --- Obtener pedidos-join ---
+            cursor.execute("""
+                SELECT
+                    c.[NumPedido],
+                    c.[NumArmario],
+                    c.[Fecha_Modificacion_Archivo],
+                    p.[Cantidad],
+                    p.[SEMANAENTREGA],
+                    p.[FechaRefresco],
+                    cp.[NombreArchivo] AS CertPinturaArchivo
+                FROM [Digitalizacion].[PE].[Checklist_Documentos] c
+                LEFT JOIN [Digitalizacion].[PE].[Pedido_Cantidad_SemanaEntrega_Cache] p
+                    ON c.[NumPedido] = p.[NumPedido]
+                LEFT JOIN (
+                    SELECT [NumArmario], MIN([NombreArchivo]) AS [NombreArchivo]
+                    FROM [Digitalizacion].[PE].[Certificados_Pintura_Documentos]
+                    GROUP BY [NumArmario]
+                ) cp ON cp.[NumArmario] = c.[NumArmario]
+                ORDER BY c.[NumPedido] ASC, c.[Fecha_Modificacion_Archivo] DESC
+            """)
+            rows = cursor.fetchall()
+            items = []
+            for r in rows:
+                fecha_mod = ''
+                if r[2]:
+                    try:
+                        fecha_mod = r[2].strftime('%d/%m/%Y %H:%M')
+                    except Exception:
+                        fecha_mod = str(r[2])
+                fecha_ref = ''
+                fecha_ref_sort = ''
+                if r[5]:
+                    try:
+                        fecha_ref = r[5].strftime('%d/%m/%Y %H:%M')
+                        fecha_ref_sort = r[5].strftime('%Y%m%d%H%M')
+                    except Exception:
+                        fecha_ref = str(r[5])
+                cantidad = None
+                if r[3] is not None:
+                    try:
+                        cantidad = int(r[3])
+                    except Exception:
+                        cantidad = r[3]
+
+                semana_entrega = str(r[4]).strip() if r[4] else ''
+
+                # Calcular trazabilidades con GAP
+                trazabilidades = []
+                if gap > 0 and semana_entrega:
+                    for key in _semanas_objetivo(semana_entrega, gap):
+                        datos = traz_map.get(key, set())
+                        trazabilidades.extend(datos)
+                    trazabilidades = sorted(set(trazabilidades))
+
+                certificados_chapa_encontrados = [
+                    trazabilidad
+                    for trazabilidad in trazabilidades
+                    if trazabilidad in certificados_chapa_existentes
+                ]
+                certificados_chapa_faltantes = [
+                    trazabilidad
+                    for trazabilidad in trazabilidades
+                    if trazabilidad not in certificados_chapa_existentes
+                ]
+
+                items.append({
+                    'num_pedido': r[0] or '',
+                    'num_armario': r[1] or '',
+                    'fecha_modificacion': fecha_mod,
+                    'cantidad': cantidad,
+                    'semana_entrega': semana_entrega,
+                    'fecha_refresco': fecha_ref,
+                    'fecha_refresco_sort': fecha_ref_sort,
+                    'trazabilidades': trazabilidades,
+                    'cert_pintura': str(r[6]).strip() if r[6] else '',
+                    'certificados_chapa_encontrados': certificados_chapa_encontrados,
+                    'certificados_chapa_faltantes': certificados_chapa_faltantes
+                })
+            return jsonify({'success': True, 'items': items, 'total': len(items), 'gap': gap})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/gestion/refrescar-checklist', methods=['POST'])
+def refrescar_checklist_documentos():
+    """
+    Escanea la carpeta Checklist (ID_Ruta=3 en Rutas_Gestion) buscando archivos
+    PDF modificados DESPUÉS del último registro en Checklist_Documentos.
+    Inserta los nuevos archivos en la tabla.
+    Formato esperado del nombre: "Pedido 202603753_ Armario 76260499.pdf"
+    """
+    import re
+    import os
+
+    request_started_at = time.perf_counter()
+
+    try:
+        print("🔄 [Gestión] Iniciando refresco de Checklist_Documentos...")
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+
+            cursor = conn.cursor()
+
+            # 1. Obtener la ruta configurada para Checklist (ID_Ruta = 3)
+            cursor.execute("""
+                SELECT [Ruta], [Descripcion_Ruta]
+                FROM [Digitalizacion].[PE].[Rutas_Gestion]
+                WHERE [ID_Ruta] = 3
+            """)
+            ruta_row = cursor.fetchone()
+            if not ruta_row or not ruta_row[0]:
+                return jsonify({'success': False, 'message': 'No hay ruta configurada para Checklist (ID_Ruta=3)'}), 400
+
+            ruta_carpeta = ruta_row[0].strip()
+            print(f"   📁 Ruta Checklist: {ruta_carpeta}")
+
+            if not os.path.exists(ruta_carpeta):
+                return jsonify({'success': False, 'message': f'La carpeta no existe o no es accesible: {ruta_carpeta}'}), 400
+
+            # 2. Obtener el SET de nombres de archivo ya registrados en BD
+            cursor.execute("""
+                SELECT [NombreArchivo]
+                FROM [Digitalizacion].[PE].[Checklist_Documentos]
+            """)
+            nombres_omitir = {row[0] for row in cursor.fetchall()}
+            print(f"   📋 Archivos ya en BD: {len(nombres_omitir)}")
+
+            # 2b. Cargar capacidades de la cache: {NumPedido: Cantidad}
+            cursor.execute("""
+                SELECT [NumPedido], [Cantidad]
+                FROM [Digitalizacion].[PE].[Pedido_Cantidad_SemanaEntrega_Cache]
+            """)
+            cache_capacidad = {str(row[0]): (row[1] if row[1] is not None else 0) for row in cursor.fetchall()}
+            print(f"   📊 Pedidos en cache: {len(cache_capacidad)}")
+
+            # 3. Escanear archivos PDF de la carpeta
+            patron = re.compile(r'Pedido\s+(\d+)_\s*Armario\s+(\d+)', re.IGNORECASE)
+            nuevos = 0
+            omitidos = 0
+            sin_patron = 0
+            pedido_no_existe = 0
+
+            for nombre_archivo in os.listdir(ruta_carpeta):
+                if not nombre_archivo.lower().endswith('.pdf'):
+                    continue
+
+                # Omitir si ya está registrado
+                if nombre_archivo in nombres_omitir:
+                    omitidos += 1
+                    continue
+
+                ruta_completa = os.path.join(ruta_carpeta, nombre_archivo)
+
+                try:
+                    ts = os.path.getmtime(ruta_completa)
+                    from datetime import datetime
+                    fecha_mod = datetime.fromtimestamp(ts)
+                except Exception:
+                    omitidos += 1
+                    continue
+
+                # Extraer NumPedido y NumArmario del nombre
+                m = patron.search(nombre_archivo)
+                if not m:
+                    sin_patron += 1
+                    print(f"   ⚠️ Sin patrón reconocible: {nombre_archivo}")
+                    continue
+
+                num_pedido = m.group(1)
+                num_armario = m.group(2)
+
+                # Validar que el NumPedido existe en la cache
+                if num_pedido not in cache_capacidad:
+                    pedido_no_existe += 1
+                    print(f"   ❌ Pedido no encontrado en cache: {num_pedido} ({nombre_archivo})")
+                    continue
+
+                # Insertar en la tabla
+                cursor.execute("""
+                    INSERT INTO [Digitalizacion].[PE].[Checklist_Documentos]
+                        ([NumPedido], [NumArmario], [NombreArchivo], [Ruta_Completa], [Fecha_Modificacion_Archivo])
+                    VALUES (?, ?, ?, ?, ?)
+                """, (num_pedido, num_armario, nombre_archivo, ruta_completa, fecha_mod))
+                nuevos += 1
+
+            conn.commit()
+
+            elapsed = time.perf_counter() - request_started_at
+            print(f"✅ [Gestión] Refresco completado en {elapsed:.2f}s — Nuevos: {nuevos}, Omitidos: {omitidos}, Sin patrón: {sin_patron}, Pedido no existe: {pedido_no_existe}")
+
+            return jsonify({
+                'success': True,
+                'nuevos': nuevos,
+                'omitidos': omitidos,
+                'sin_patron': sin_patron,
+                'pedido_no_existe': pedido_no_existe,
+                'archivos_en_bd': len(nombres_omitir),
+                'message': f'{nuevos} nuevos archivos registrados'
+            })
+
+    except Exception as e:
+        print(f"❌ Error [Gestión] refrescando checklist tras {time.perf_counter() - request_started_at:.2f}s: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
+
+
+@app.route('/api/gestion/certificados-pintura', methods=['GET'])
+def get_gestion_certificados_pintura():
+    """Obtiene los registros de Certificados_Pintura_Documentos."""
+    try:
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT cp.[ID], cp.[NumArmario], cp.[NombreArchivo],
+                       cp.[Fecha_Modificacion_Archivo], cp.[Fecha_Registro],
+                       ISNULL(MAX(cd.[NumPedido]), '') AS NumPedido
+                FROM [Digitalizacion].[PE].[Certificados_Pintura_Documentos] cp
+                LEFT JOIN [Digitalizacion].[PE].[Checklist_Documentos] cd
+                    ON cd.[NumArmario] = cp.[NumArmario]
+                GROUP BY cp.[ID], cp.[NumArmario], cp.[NombreArchivo],
+                         cp.[Fecha_Modificacion_Archivo], cp.[Fecha_Registro]
+                ORDER BY cp.[Fecha_Modificacion_Archivo] DESC, cp.[NumArmario] ASC
+            """)
+            rows = cursor.fetchall()
+            docs = []
+            for r in rows:
+                docs.append({
+                    'id': r[0],
+                    'num_armario': str(r[1]) if r[1] is not None else '',
+                    'nombre_archivo': str(r[2]) if r[2] is not None else '',
+                    'fecha_modificacion': r[3].strftime('%d/%m/%Y %H:%M') if r[3] else '',
+                    'fecha_modificacion_iso': r[3].isoformat() if r[3] else '',
+                    'fecha_registro': r[4].strftime('%d/%m/%Y %H:%M') if r[4] else '',
+                    'num_pedido': str(r[5]) if r[5] else '',
+                })
+            return jsonify({'success': True, 'docs': docs, 'total': len(docs)})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/gestion/certificados-pintura/faltantes/export', methods=['GET'])
+def export_gestion_certificados_pintura_faltantes():
+    """Exporta a Excel los armarios de Checklist_Documentos sin certificado de pintura."""
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment
+        from openpyxl.utils import get_column_letter
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT
+                    cd.[NumArmario],
+                    ISNULL(MAX(cd.[NumPedido]), '') AS NumPedido,
+                    MAX(cd.[Fecha_Modificacion_Archivo]) AS UltimaFechaChecklist
+                FROM [Digitalizacion].[PE].[Checklist_Documentos] cd
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM [Digitalizacion].[PE].[Certificados_Pintura_Documentos] cp
+                    WHERE cp.[NumArmario] = cd.[NumArmario]
+                )
+                GROUP BY cd.[NumArmario]
+                ORDER BY MAX(cd.[Fecha_Modificacion_Archivo]) DESC
+            """)
+            rows = cursor.fetchall()
+
+        wb = Workbook()
+        ws = wb.active
+        ws.title = 'Sin Certificado Pintura'
+
+        encabezados = ['NumPedido', 'NumArmario', 'Fecha Checklist']
+        ws.append(encabezados)
+
+        header_fill = PatternFill(start_color='C0392B', end_color='C0392B', fill_type='solid')
+        header_font = Font(color='FFFFFF', bold=True)
+        for col_num in range(1, len(encabezados) + 1):
+            cell = ws.cell(row=1, column=col_num)
+            cell.fill   = header_fill
+            cell.font   = header_font
+            cell.alignment = Alignment(horizontal='center')
+
+        for r in rows:
+            fecha_str = r[2].strftime('%d/%m/%Y %H:%M') if r[2] else ''
+            ws.append([str(r[1]) if r[1] else '', str(r[0]) if r[0] else '', fecha_str])
+
+        for col in ws.columns:
+            max_len = max((len(str(cell.value or '')) for cell in col), default=10)
+            ws.column_dimensions[get_column_letter(col[0].column)].width = min(max_len + 4, 50)
+
+        from datetime import datetime
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename  = f'armarios_sin_certificado_pintura_{timestamp}.xlsx'
+        filepath  = os.path.join(RUTA_PDFS, filename)
+        wb.save(filepath)
+
+        print(f'✅ [Gestión] Excel faltantes generado: {filepath}')
+        return send_file(filepath, as_attachment=True, download_name=filename,
+                         mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    except ImportError:
+        return jsonify({'success': False, 'message': 'openpyxl no está instalado'}), 500
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/gestion/certificados-pintura/faltantes', methods=['GET'])
+def get_gestion_certificados_pintura_faltantes():
+    """Devuelve armarios de Checklist_Documentos que NO tienen certificado de pintura."""
+    try:
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT
+                    cd.[NumArmario],
+                    ISNULL(MAX(cd.[NumPedido]), '') AS NumPedido,
+                    MAX(cd.[Fecha_Modificacion_Archivo]) AS UltimaFechaChecklist
+                FROM [Digitalizacion].[PE].[Checklist_Documentos] cd
+                WHERE NOT EXISTS (
+                    SELECT 1
+                    FROM [Digitalizacion].[PE].[Certificados_Pintura_Documentos] cp
+                    WHERE cp.[NumArmario] = cd.[NumArmario]
+                )
+                GROUP BY cd.[NumArmario]
+                ORDER BY MAX(cd.[Fecha_Modificacion_Archivo]) DESC
+            """)
+            rows = cursor.fetchall()
+            faltantes = []
+            for r in rows:
+                faltantes.append({
+                    'num_armario': str(r[0]) if r[0] is not None else '',
+                    'num_pedido':  str(r[1]) if r[1] else '',
+                    'fecha_checklist': r[2].strftime('%d/%m/%Y %H:%M') if r[2] else '',
+                    'fecha_checklist_iso': r[2].isoformat() if r[2] else '',
+                })
+            return jsonify({'success': True, 'faltantes': faltantes, 'total': len(faltantes)})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/gestion/certificados-pintura/<int:doc_id>', methods=['DELETE'])
+def delete_gestion_certificado_pintura(doc_id):
+    """Elimina un registro de Certificados_Pintura_Documentos por su ID."""
+    try:
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            cursor.execute("SELECT [NombreArchivo] FROM [Digitalizacion].[PE].[Certificados_Pintura_Documentos] WHERE [ID] = ?", (doc_id,))
+            row = cursor.fetchone()
+            if not row:
+                return jsonify({'success': False, 'message': 'Registro no encontrado'}), 404
+            nombre_archivo = row[0]
+            cursor.execute("DELETE FROM [Digitalizacion].[PE].[Certificados_Pintura_Documentos] WHERE [ID] = ?", (doc_id,))
+            conn.commit()
+            print(f'🗑️ [Gestión] Certificados_Pintura ID={doc_id} eliminado: {nombre_archivo}')
+            return jsonify({'success': True, 'message': f'Registro "{nombre_archivo}" eliminado correctamente'})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/gestion/refrescar-certificados-pintura', methods=['POST'])
+def refrescar_certificados_pintura():
+    """
+    Escanea la carpeta 'Ruta certificados pintura' de Rutas_Gestion buscando archivos
+    cuyo nombre (sin extensión) coincida con algún NumArmario en Checklist_Documentos.
+    Solo inserta los que aún no están en Certificados_Pintura_Documentos.
+    """
+    import re as _re
+    import traceback
+    request_started_at = time.perf_counter()
+    try:
+        print("🔄 [Gestión] Iniciando refresco de Certificados_Pintura_Documentos...")
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+
+            # 1. Obtener la ruta configurada para Certificados Pintura
+            #    Busca por ID_Ruta=2 primero (descripción exacta "Ruta certificados pintura"),
+            #    y como fallback por LIKE en descripción
+            cursor.execute("""
+                SELECT [ID_Ruta], [Ruta], [Descripcion_Ruta]
+                FROM [Digitalizacion].[PE].[Rutas_Gestion]
+                WHERE [ID_Ruta] = 2
+                   OR LOWER([Descripcion_Ruta]) LIKE '%certificados pintura%'
+                ORDER BY CASE WHEN [ID_Ruta] = 2 THEN 0 ELSE 1 END
+            """)
+            ruta_row = cursor.fetchone()
+            if not ruta_row or not ruta_row[1]:
+                # Mostrar qué rutas hay disponibles para ayudar al diagnóstico
+                cursor.execute("SELECT [ID_Ruta], [Descripcion_Ruta], [Ruta] FROM [Digitalizacion].[PE].[Rutas_Gestion]")
+                rutas_disponibles = [(r[0], r[1], r[2]) for r in cursor.fetchall()]
+                print(f"   ⚠️ Rutas disponibles en Rutas_Gestion:")
+                for rd in rutas_disponibles:
+                    print(f"      ID={rd[0]} | Desc='{rd[1]}' | Ruta='{rd[2]}'")
+                return jsonify({
+                    'success': False,
+                    'message': f'No hay ruta configurada para Certificados Pintura (ID_Ruta=2). Rutas disponibles: {[r[1] for r in rutas_disponibles]}'
+                }), 400
+
+            id_ruta   = ruta_row[0]
+            ruta_carpeta = ruta_row[1].strip()
+            desc_ruta = ruta_row[2]
+            print(f"   📁 Ruta Certificados Pintura (ID_Ruta={id_ruta}): {ruta_carpeta}")
+
+            if not os.path.exists(ruta_carpeta):
+                return jsonify({'success': False, 'message': f'La carpeta no existe o no es accesible: {ruta_carpeta}'}), 400
+
+            # 2. Obtener el SET de NumArmarios que existen en Checklist_Documentos
+            cursor.execute("SELECT DISTINCT [NumArmario] FROM [Digitalizacion].[PE].[Checklist_Documentos]")
+            armarios_validos = {str(row[0]).strip() for row in cursor.fetchall() if row[0]}
+            print(f"   📋 Armarios válidos (Checklist): {len(armarios_validos)}")
+
+            if not armarios_validos:
+                return jsonify({'success': True, 'nuevos': 0, 'omitidos': 0, 'sin_armario': 0,
+                                'message': 'No hay armarios en Checklist_Documentos. Refresca primero esa tabla.'}), 200
+
+            # 3. Obtener el SET de NombreArchivo ya registrados (para evitar duplicados)
+            cursor.execute("SELECT [NombreArchivo] FROM [Digitalizacion].[PE].[Certificados_Pintura_Documentos]")
+            nombres_omitir = {row[0] for row in cursor.fetchall()}
+            print(f"   📋 Archivos ya en BD: {len(nombres_omitir)}")
+
+            # 4. Escanear archivos en la carpeta con os.scandir (una sola llamada al SO,
+            #    DirEntry cachea stat → evita isfile/getmtime adicionales por red)
+            from datetime import datetime as _dt
+            nuevos = 0
+            omitidos = 0
+            sin_armario = 0  # archivos cuyo stem no coincide con ningún armario
+            batch_insertar = []  # acumulamos filas para insertar en bloque
+
+            print(f"   🔍 [Gestión] Listando archivos en carpeta pintura...")
+            with os.scandir(ruta_carpeta) as it:
+                for entry in it:
+                    if not entry.is_file(follow_symlinks=False):
+                        continue
+
+                    nombre_archivo = entry.name
+                    stem = os.path.splitext(nombre_archivo)[0].strip()
+
+                    # Comprobar si el stem coincide con algún armario válido
+                    if stem not in armarios_validos:
+                        sin_armario += 1
+                        continue
+
+                    # Omitir si el nombre de archivo ya está registrado
+                    if nombre_archivo in nombres_omitir:
+                        omitidos += 1
+                        continue
+
+                    try:
+                        ts = entry.stat(follow_symlinks=False).st_mtime
+                        fecha_mod = _dt.fromtimestamp(ts)
+                    except Exception:
+                        omitidos += 1
+                        continue
+
+                    batch_insertar.append((stem, nombre_archivo, entry.path, fecha_mod))
+
+            print(f"   📂 [Gestión] Archivos a insertar: {len(batch_insertar)}, sin_armario: {sin_armario}, omitidos: {omitidos}")
+
+            if batch_insertar:
+                cursor.executemany("""
+                    INSERT INTO [Digitalizacion].[PE].[Certificados_Pintura_Documentos]
+                        ([NumArmario], [NombreArchivo], [Ruta_Completa], [Fecha_Modificacion_Archivo])
+                    VALUES (?, ?, ?, ?)
+                """, batch_insertar)
+                nuevos = len(batch_insertar)
+
+            conn.commit()
+
+            elapsed = time.perf_counter() - request_started_at
+            print(f"✅ [Gestión] Certificados refresco completado en {elapsed:.2f}s — Nuevos: {nuevos}, Omitidos: {omitidos}, Sin armario: {sin_armario}")
+
+            return jsonify({
+                'success': True,
+                'nuevos': nuevos,
+                'omitidos': omitidos,
+                'sin_armario': sin_armario,
+                'message': f'{nuevos} nuevos certificados registrados'
+            })
+
+    except Exception as e:
+        print(f"❌ Error [Gestión] refrescando certificados pintura tras {time.perf_counter() - request_started_at:.2f}s: {e}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
+
+
+@app.route('/api/gestion/certificados-chapa', methods=['GET'])
+def get_gestion_certificados_chapa():
+    """Obtiene los registros de Certificados_Chapa_Documentos."""
+    try:
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT [ID], [DATO], [NombreArchivo], [RutaRelativa],
+                       [Fecha_Modificacion_Archivo], [Fecha_Registro]
+                FROM [Digitalizacion].[PE].[Certificados_Chapa_Documentos]
+                ORDER BY [Fecha_Modificacion_Archivo] DESC, [DATO] ASC
+            """)
+            rows = cursor.fetchall()
+            docs = []
+            for r in rows:
+                docs.append({
+                    'id': r[0],
+                    'dato': str(r[1]) if r[1] is not None else '',
+                    'nombre_archivo': str(r[2]) if r[2] is not None else '',
+                    'ruta_relativa': str(r[3]) if r[3] is not None else '',
+                    'fecha_modificacion': r[4].strftime('%d/%m/%Y %H:%M') if r[4] else '',
+                    'fecha_modificacion_iso': r[4].isoformat() if r[4] else '',
+                    'fecha_registro': r[5].strftime('%d/%m/%Y %H:%M') if r[5] else '',
+                })
+            return jsonify({'success': True, 'docs': docs, 'total': len(docs)})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/gestion/certificados-chapa/<int:doc_id>', methods=['DELETE'])
+def delete_gestion_certificado_chapa(doc_id):
+    """Elimina un registro de Certificados_Chapa_Documentos por su ID."""
+    try:
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            cursor.execute("SELECT [NombreArchivo] FROM [Digitalizacion].[PE].[Certificados_Chapa_Documentos] WHERE [ID] = ?", (doc_id,))
+            row = cursor.fetchone()
+            if not row:
+                return jsonify({'success': False, 'message': 'Registro no encontrado'}), 404
+            nombre_archivo = row[0]
+            cursor.execute("DELETE FROM [Digitalizacion].[PE].[Certificados_Chapa_Documentos] WHERE [ID] = ?", (doc_id,))
+            conn.commit()
+            print(f'🗑️ [Gestión] Certificados_Chapa ID={doc_id} eliminado: {nombre_archivo}')
+            return jsonify({'success': True, 'message': f'Registro "{nombre_archivo}" eliminado correctamente'})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/gestion/refrescar-certificados-chapa', methods=['POST'])
+def refrescar_certificados_chapa():
+    """
+    Escanea recursivamente la carpeta de Recepción (ID_Ruta=1) buscando archivos.
+    Solo inserta los que sean más recientes que MAX(Fecha_Modificacion_Archivo) de la tabla
+    o que no estén ya registrados. DATO = stem del nombre de archivo.
+    """
+    request_started_at = time.perf_counter()
+    try:
+        print("🔄 [Gestión] Iniciando refresco de Certificados_Chapa_Documentos...")
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+
+            # 1. Obtener TODAS las rutas configuradas para Chapa
+            cursor.execute("""
+                SELECT [ID_Ruta], [Ruta], [Descripcion_Ruta]
+                FROM [Digitalizacion].[PE].[Rutas_Gestion]
+                WHERE [Descripcion_Ruta] = 'Ruta certificados de chapa'
+                  AND [Ruta] IS NOT NULL AND LTRIM(RTRIM([Ruta])) <> ''
+                ORDER BY [ID_Ruta]
+            """)
+            rutas_chapa = [(r[0], r[1].strip(), r[2]) for r in cursor.fetchall()]
+            if not rutas_chapa:
+                return jsonify({
+                    'success': False,
+                    'message': 'No hay rutas configuradas para Certificados Chapa (Descripcion_Ruta = "Ruta certificados de chapa")'
+                }), 400
+
+            rutas_accesibles = [r for r in rutas_chapa if os.path.exists(r[1])]
+            if not rutas_accesibles:
+                rutas_str = '; '.join(r[1] for r in rutas_chapa)
+                return jsonify({'success': False, 'message': f'Ninguna carpeta es accesible: {rutas_str}'}), 400
+
+            for r in rutas_chapa:
+                accesible = '✅' if os.path.exists(r[1]) else '❌ (inaccesible)'
+                print(f"   📁 Ruta Chapa (ID={r[0]}) {accesible}: {r[1]}")
+
+            # 2. Obtener el SET de rutas completas ya registradas (RutaRelativa = ruta absoluta completa)
+            #    También cargamos NombreArchivo para dedup por nombre cuando RutaRelativa esté vacía (registros legados)
+            cursor.execute("""
+                SELECT [RutaRelativa], [NombreArchivo]
+                FROM [Digitalizacion].[PE].[Certificados_Chapa_Documentos]
+            """)
+            rutas_existentes   = set()   # rutas absolutas completas (registros nuevos)
+            nombres_existentes = set()   # nombres de archivo (fallback para registros legados sin ruta)
+            for row in cursor.fetchall():
+                ruta_bd   = (row[0] or '').strip()
+                nombre_bd = (row[1] or '').strip()
+                if ruta_bd and os.path.sep in ruta_bd:
+                    # Registro nuevo: RutaRelativa contiene ruta absoluta
+                    rutas_existentes.add(ruta_bd.lower())
+                else:
+                    # Registro legado: solo tenemos el nombre
+                    nombres_existentes.add(nombre_bd)
+            print(f"   📋 Ya en BD — por ruta: {len(rutas_existentes)}, por nombre (legado): {len(nombres_existentes)}")
+
+            # 3. Escanear recursivamente todas las rutas accesibles
+            from pathlib import Path as _Path
+            from datetime import datetime as _dt
+            nuevos = 0
+            omitidos = 0
+
+            for id_ruta_chapa, ruta_carpeta, _ in rutas_accesibles:
+                print(f"   🔍 Escaneando ruta ID={id_ruta_chapa}: {ruta_carpeta}")
+                for root, dirs, files in os.walk(ruta_carpeta):
+                    for nombre_archivo in files:
+                        ruta_completa = os.path.join(root, nombre_archivo)
+
+                        # Saltar si ya está registrado (por ruta completa o por nombre legado)
+                        if ruta_completa.lower() in rutas_existentes:
+                            omitidos += 1
+                            continue
+                        if nombre_archivo in nombres_existentes:
+                            omitidos += 1
+                            continue
+
+                        if not os.path.isfile(ruta_completa):
+                            continue
+
+                        dato = _Path(nombre_archivo).stem
+
+                        try:
+                            ts = os.path.getmtime(ruta_completa)
+                            fecha_mod = _dt.fromtimestamp(ts)
+                        except Exception:
+                            omitidos += 1
+                            continue
+
+                        try:
+                            cursor.execute("""
+                                INSERT INTO [Digitalizacion].[PE].[Certificados_Chapa_Documentos]
+                                    ([DATO], [NombreArchivo], [RutaRelativa], [Fecha_Modificacion_Archivo])
+                                VALUES (?, ?, ?, ?)
+                            """, (dato, nombre_archivo, ruta_completa, fecha_mod))
+                            nuevos += 1
+                            rutas_existentes.add(ruta_completa.lower())
+                        except Exception as e_ins:
+                            omitidos += 1
+                            continue
+
+            conn.commit()
+
+            elapsed = time.perf_counter() - request_started_at
+            print(f"✅ [Gestión] Certificados Chapa refresco completado en {elapsed:.2f}s — Nuevos: {nuevos}, Omitidos: {omitidos}")
+
+            return jsonify({
+                'success': True,
+                'nuevos': nuevos,
+                'omitidos': omitidos,
+                'message': f'{nuevos} nuevos certificados de chapa registrados'
+            })
+
+    except Exception as e:
+        print(f"❌ Error [Gestión] refrescando certificados chapa: {e}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
+
+
+# ====================================================================================
+# 🆕 ENDPOINT PARA EXPORTAR DOCUMENTACIÓN DE UN PEDIDO COMPLETO (VERDE)
+# ====================================================================================
+
+@app.route('/api/gestion/exportar-documentacion', methods=['POST'])
+def exportar_documentacion_pedido():
+    """
+    Copia toda la documentación de un pedido 100 % verde a la
+    carpeta destino configurada (Descripcion_Ruta = 'Ruta destino documentación').
+    Crea subcarpeta {ruta_destino}\\{NumPedido} y copia:
+      - Todos los archivos Checklist (Ruta_Completa de Checklist_Documentos)
+      - Todos los cert. pintura (Ruta_Completa de Certificados_Pintura_Documentos)
+      - Todos los cert. chapa    (RutaRelativa de Certificados_Chapa_Documentos)
+    Solo permite ejecutar si checklist, pintura y chapa están 100 % OK.
+    Al completarse con éxito registra la exportación en PE.Exportaciones_Documentacion.
+    """
+    import shutil
+    import re as _re
+
+    try:
+        data = request.get_json() or {}
+        num_pedido = (data.get('num_pedido') or '').strip()
+        if not num_pedido:
+            return jsonify({'success': False, 'message': 'num_pedido es obligatorio'}), 400
+
+        print(f"📤 [Exportar] Iniciando exportación para NumPedido={num_pedido}")
+
+        cfg = _read_config()
+        gap = int(cfg.get('gap_trazabilidad_semanas', 0))
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+
+            # ── 1. Ruta destino ───────────────────────────────────────────────
+            cursor.execute("""
+                SELECT [Ruta]
+                FROM [Digitalizacion].[PE].[Rutas_Gestion]
+                WHERE [Descripcion_Ruta] = 'Ruta destino documentación'
+                  AND [Ruta] IS NOT NULL AND LTRIM(RTRIM([Ruta])) <> ''
+            """)
+            ruta_row = cursor.fetchone()
+            if not ruta_row:
+                return jsonify({'success': False, 'message': 'No hay ruta destino configurada (Descripcion_Ruta = "Ruta destino documentación")'}), 400
+            ruta_destino = ruta_row[0].strip()
+            if not os.path.exists(ruta_destino):
+                return jsonify({'success': False, 'message': f'La ruta destino no existe o no es accesible: {ruta_destino}'}), 400
+
+            # ── 2. Datos del pedido: armarios + archivos checklist ────────────
+            cursor.execute("""
+                SELECT [NumArmario], [Ruta_Completa], [NombreArchivo]
+                FROM [Digitalizacion].[PE].[Checklist_Documentos]
+                WHERE [NumPedido] = ?
+            """, (num_pedido,))
+            checklist_rows = cursor.fetchall()
+            if not checklist_rows:
+                return jsonify({'success': False, 'message': f'No hay registros de checklist para NumPedido={num_pedido}'}), 404
+
+            num_armarios = [r[0] for r in checklist_rows]
+
+            # ── 3. Datos de ERP: cantidad y semana de entrega ─────────────────
+            cursor.execute("""
+                SELECT [Cantidad], [SEMANAENTREGA]
+                FROM [Digitalizacion].[PE].[Pedido_Cantidad_SemanaEntrega_Cache]
+                WHERE [NumPedido] = ?
+            """, (num_pedido,))
+            erp_row = cursor.fetchone()
+            cantidad_erp = int(erp_row[0]) if erp_row and erp_row[0] is not None else None
+            semana_entrega = str(erp_row[1]).strip() if erp_row and erp_row[1] else ''
+
+            # Validar checklist: nº armarios == cantidad ERP
+            if cantidad_erp is None or len(checklist_rows) != cantidad_erp:
+                return jsonify({
+                    'success': False,
+                    'message': f'Checklist no está completo: {len(checklist_rows)} armarios vs {cantidad_erp} esperados'
+                }), 400
+
+            # ── 4. Certificados pintura ────────────────────────────────────────
+            placeholders = ','.join('?' * len(num_armarios))
+            cursor.execute(f"""
+                SELECT [NumArmario], [Ruta_Completa]
+                FROM [Digitalizacion].[PE].[Certificados_Pintura_Documentos]
+                WHERE [NumArmario] IN ({placeholders})
+            """, tuple(num_armarios))
+            pintura_rows = cursor.fetchall()
+            pintura_por_armario = {r[0]: r[1] for r in pintura_rows}
+
+            armarios_sin_pintura = [a for a in num_armarios if a not in pintura_por_armario]
+            if armarios_sin_pintura:
+                return jsonify({
+                    'success': False,
+                    'message': f'Faltan certificados de pintura para armarios: {armarios_sin_pintura}'
+                }), 400
+
+            # ── 5. Trazabilidades y certificados chapa ────────────────────────
+            # Cargar mapa de trazabilidad
+            cursor.execute("""
+                SELECT [numsemana], [ano], [DATO]
+                FROM [Digitalizacion].[PE].[vw_LotesChapaProduccion]
+                WHERE [numsemana] IS NOT NULL AND [ano] IS NOT NULL
+            """)
+            traz_map = {}
+            anos_con_semana53 = set()
+            for tr in cursor.fetchall():
+                sem = int(tr[0]) if tr[0] is not None else None
+                ano = int(tr[1]) if tr[1] is not None else None
+                dato = str(tr[2] or '').strip()
+                if sem is None or ano is None:
+                    continue
+                traz_map.setdefault((sem, ano), set())
+                if dato:
+                    traz_map[(sem, ano)].add(dato)
+                if sem == 53:
+                    anos_con_semana53.add(ano)
+
+            def _semanas_obj(semana_entrega_str, gap_semanas):
+                if not semana_entrega_str or gap_semanas == 0:
+                    return []
+                m = _re.search(r'(\d+)[^\d]+(\d{4})', semana_entrega_str)
+                if not m:
+                    return []
+                sem = int(m.group(1))
+                ano = int(m.group(2))
+                ts = sem - gap_semanas
+                ta = ano
+                while ts <= 0:
+                    ta -= 1
+                    ts = (53 if ta in anos_con_semana53 else 52) + ts
+                return [(ts, ta)]
+
+            trazabilidades = []
+            if gap > 0 and semana_entrega:
+                for key in _semanas_obj(semana_entrega, gap):
+                    trazabilidades.extend(traz_map.get(key, set()))
+                trazabilidades = sorted(set(trazabilidades))
+
+            if not trazabilidades:
+                return jsonify({
+                    'success': False,
+                    'message': f'No hay trazabilidad de fabricación para NumPedido={num_pedido}. '
+                               f'Comprueba que la semana de entrega está configurada y el GAP es mayor que 0.'
+                }), 400
+
+            # Buscar archivos de chapa (todos los que tienen ruta en BD, sin filtrar por existencia aquí)
+            chapa_rutas = []  # lista de (dato, ruta_absoluta)
+            if trazabilidades:
+                pl2 = ','.join('?' * len(trazabilidades))
+                cursor.execute(f"""
+                    SELECT [DATO], [RutaRelativa]
+                    FROM [Digitalizacion].[PE].[Certificados_Chapa_Documentos]
+                    WHERE [DATO] IN ({pl2})
+                      AND [RutaRelativa] IS NOT NULL
+                      AND LTRIM(RTRIM([RutaRelativa])) <> ''
+                """, tuple(trazabilidades))
+                chapa_rows_db = cursor.fetchall()
+                dato_a_ruta = {}
+                for row in chapa_rows_db:
+                    dato = str(row[0] or '').strip()
+                    ruta = (row[1] or '').strip()
+                    if dato and ruta:
+                        dato_a_ruta[dato] = ruta
+
+                # Validar que todos los DATOs tienen ruta registrada en BD
+                faltantes_chapa = [t for t in trazabilidades if t not in dato_a_ruta]
+                if faltantes_chapa:
+                    return jsonify({
+                        'success': False,
+                        'message': f'Faltan certificados de chapa en BD: {faltantes_chapa}'
+                    }), 400
+
+                chapa_rutas = [(dato, ruta) for dato, ruta in dato_a_ruta.items()]
+                print(f"   🔩 [Exportar] Chapa: {len(chapa_rutas)} archivos encontrados en BD")
+
+        # ── 6. Crear subcarpetas destino y copiar archivos ────────────────────
+        carpeta_pedido   = os.path.join(ruta_destino, num_pedido)
+        carpeta_checklist = os.path.join(carpeta_pedido, 'Checklist')
+        carpeta_pintura   = os.path.join(carpeta_pedido, 'Certificados_Pintura')
+        carpeta_chapa     = os.path.join(carpeta_pedido, 'Certificados_Chapa')
+        for carpeta in (carpeta_checklist, carpeta_pintura, carpeta_chapa):
+            os.makedirs(carpeta, exist_ok=True)
+        print(f"   📁 Carpeta destino: {carpeta_pedido}")
+
+        copiados = []
+        errores  = []
+
+        def _copiar(src, subcarpeta, etiqueta):
+            if not src:
+                errores.append(f'{etiqueta}: ruta vacía')
+                return
+            if not os.path.exists(src):
+                errores.append(f'{etiqueta}: archivo no encontrado ({src})')
+                return
+            try:
+                dst = os.path.join(subcarpeta, os.path.basename(src))
+                if os.path.exists(dst) and not os.path.samefile(src, dst):
+                    base, ext = os.path.splitext(os.path.basename(src))
+                    import time as _t
+                    dst = os.path.join(subcarpeta, f'{base}_{int(_t.time())}{ext}')
+                shutil.copy2(src, dst)
+                copiados.append(os.path.relpath(dst, carpeta_pedido))
+                print(f"   ✅ Copiado [{etiqueta}]: {os.path.relpath(dst, carpeta_pedido)}")
+            except Exception as ex:
+                errores.append(f'{etiqueta}: {ex}')
+
+        # Checklist
+        for row in checklist_rows:
+            ruta_cl = (row[1] or '').strip()
+            _copiar(ruta_cl, carpeta_checklist, f'Checklist armario {row[0]}')
+
+        # Pintura
+        for armario, ruta_p in pintura_por_armario.items():
+            _copiar((ruta_p or '').strip(), carpeta_pintura, f'Pintura armario {armario}')
+
+        # Chapa
+        for dato, ruta_ch in chapa_rutas:
+            _copiar(ruta_ch, carpeta_chapa, f'Chapa {dato}')
+
+        print(f"✅ [Exportar] NumPedido={num_pedido}: {len(copiados)} archivos copiados, {len(errores)} errores")
+
+        # ── 7. Registrar exportación en BD (upsert) ─────────────────────────
+        if len(errores) == 0:
+            try:
+                with ConexionODBC('Digitalizacion') as conn2:
+                    if conn2:
+                        cur2 = conn2.cursor()
+                        # Crear tabla si no existe
+                        cur2.execute("""
+                            IF NOT EXISTS (
+                                SELECT 1 FROM INFORMATION_SCHEMA.TABLES
+                                WHERE TABLE_SCHEMA = 'PE'
+                                  AND TABLE_NAME   = 'Exportaciones_Documentacion'
+                            )
+                            CREATE TABLE [Digitalizacion].[PE].[Exportaciones_Documentacion] (
+                                [ID]               INT IDENTITY(1,1) PRIMARY KEY,
+                                [NumPedido]        NVARCHAR(50)  NOT NULL,
+                                [FechaExportacion] DATETIME      NOT NULL DEFAULT GETDATE(),
+                                [CarpetaDestino]   NVARCHAR(500) NULL,
+                                CONSTRAINT UQ_ExportDoc_NumPedido UNIQUE ([NumPedido])
+                            )
+                        """)
+                        # Upsert: si ya existe actualizar fecha, si no insertar
+                        cur2.execute("""
+                            IF EXISTS (SELECT 1 FROM [Digitalizacion].[PE].[Exportaciones_Documentacion] WHERE [NumPedido] = ?)
+                                UPDATE [Digitalizacion].[PE].[Exportaciones_Documentacion]
+                                SET [FechaExportacion] = GETDATE(), [CarpetaDestino] = ?
+                                WHERE [NumPedido] = ?
+                            ELSE
+                                INSERT INTO [Digitalizacion].[PE].[Exportaciones_Documentacion]
+                                    ([NumPedido], [FechaExportacion], [CarpetaDestino])
+                                VALUES (?, GETDATE(), ?)
+                        """, (num_pedido, carpeta_pedido, num_pedido, num_pedido, carpeta_pedido))
+                        conn2.commit()
+                        print(f"   📝 [Exportar] Marca de exportación guardada para NumPedido={num_pedido}")
+            except Exception as ex_bd:
+                print(f"   ⚠️ [Exportar] No se pudo guardar marca en BD: {ex_bd}")
+
+        return jsonify({
+            'success': len(errores) == 0,
+            'message': f'{len(copiados)} archivos exportados a {carpeta_pedido}' + (f' — {len(errores)} errores' if errores else ''),
+            'carpeta': carpeta_pedido,
+            'copiados': copiados,
+            'errores': errores
+        }), 200 if len(errores) == 0 else 207
+
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
+
+
+@app.route('/api/gestion/pedidos-cache', methods=['GET'])
+def get_gestion_pedidos_cache():
+    pass
+
+
+@app.route('/api/gestion/exportaciones-documentacion', methods=['GET'])
+def get_exportaciones_documentacion():
+    """Devuelve todos los pedidos marcados como exportados."""
+    try:
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            # Crear tabla si no existe
+            cursor.execute("""
+                IF NOT EXISTS (
+                    SELECT 1 FROM INFORMATION_SCHEMA.TABLES
+                    WHERE TABLE_SCHEMA = 'PE' AND TABLE_NAME = 'Exportaciones_Documentacion'
+                )
+                CREATE TABLE [Digitalizacion].[PE].[Exportaciones_Documentacion] (
+                    [ID]               INT IDENTITY(1,1) PRIMARY KEY,
+                    [NumPedido]        NVARCHAR(50)  NOT NULL,
+                    [FechaExportacion] DATETIME      NOT NULL DEFAULT GETDATE(),
+                    [CarpetaDestino]   NVARCHAR(500) NULL,
+                    CONSTRAINT UQ_ExportDoc_NumPedido UNIQUE ([NumPedido])
+                )
+            """)
+            conn.commit()
+            cursor.execute("""
+                SELECT [NumPedido], [FechaExportacion], [CarpetaDestino]
+                FROM [Digitalizacion].[PE].[Exportaciones_Documentacion]
+                ORDER BY [FechaExportacion] DESC
+            """)
+            exportaciones = []
+            for r in cursor.fetchall():
+                exportaciones.append({
+                    'num_pedido': r[0],
+                    'fecha': r[1].strftime('%d/%m/%Y %H:%M') if r[1] else '',
+                    'carpeta': r[2] or ''
+                })
+            return jsonify({'success': True, 'exportaciones': exportaciones})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/gestion/exportaciones-documentacion/<num_pedido>', methods=['DELETE'])
+def delete_exportacion_documentacion(num_pedido):
+    """Elimina la marca de exportado de un pedido."""
+    try:
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            cursor.execute("""
+                DELETE FROM [Digitalizacion].[PE].[Exportaciones_Documentacion]
+                WHERE [NumPedido] = ?
+            """, (num_pedido,))
+            conn.commit()
+            print(f"🗑️ [Exportaciones] Marca eliminada para NumPedido={num_pedido}")
+            return jsonify({'success': True, 'message': f'Marca eliminada para pedido {num_pedido}'})
+    except Exception as e:
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+    """Obtiene pedidos cacheados con cantidad, semana de entrega y fecha de refresco."""
+    request_started_at = time.perf_counter()
+
+    try:
+        print("🔍 [Gestión] Obteniendo pedidos cacheados...")
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión a base de datos'}), 500
+
+            cursor = conn.cursor()
+            try:
+                cursor.timeout = 10
+            except Exception:
+                pass
+
+            cursor.execute("""
+                SELECT TOP (1000)
+                    [NumPedido],
+                    [Cantidad],
+                    [SEMANAENTREGA],
+                    [FechaRefresco]
+                FROM [Digitalizacion].[PE].[Pedido_Cantidad_SemanaEntrega_Cache]
+                ORDER BY [FechaRefresco] DESC, [NumPedido] ASC
+            """)
+
+            pedidos = []
+            for row in cursor.fetchall():
+                fecha_refresco = row[3]
+                cantidad = None
+
+                if row[1] is not None:
+                    try:
+                        cantidad_float = float(row[1])
+                        cantidad = int(cantidad_float) if cantidad_float.is_integer() else cantidad_float
+                    except Exception:
+                        cantidad = row[1]
+
+                pedidos.append({
+                    'num_pedido': str(row[0]).strip() if row[0] is not None else '',
+                    'cantidad': cantidad,
+                    'semana_entrega': str(row[2]).strip() if row[2] is not None else '',
+                    'fecha_refresco': fecha_refresco.strftime('%d/%m/%Y %H:%M:%S') if isinstance(fecha_refresco, datetime) else (str(fecha_refresco) if fecha_refresco else ''),
+                    'fecha_refresco_sort': fecha_refresco.isoformat() if isinstance(fecha_refresco, datetime) else (str(fecha_refresco) if fecha_refresco else '')
+                })
+
+            print(f"✅ [Gestión] {len(pedidos)} pedidos cacheados obtenidos en {time.perf_counter() - request_started_at:.2f}s")
+
+            return jsonify({
+                'success': True,
+                'pedidos': pedidos,
+                'total': len(pedidos)
+            })
+
+    except Exception as e:
+        print(f"❌ Error [Gestión] obteniendo pedidos cacheados tras {time.perf_counter() - request_started_at:.2f}s: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': f'Error del servidor: {str(e)}'}), 500
+
 @app.route('/api/pedido/<int:id_pedido>', methods=['GET'])
 def get_pedido_datos(id_pedido):
     """Obtiene los datos del Pedido para edición"""
@@ -8005,6 +9375,266 @@ def eliminar_pedido(id_pedido):
         return jsonify({'success': False, 'message': str(e)}), 500
 
 
+# ====================================================================================
+# ====================================================================================
+# ENDPOINT PARA TRAZABILIDAD DE PEDIDOS (vw_LotesChapaProduccion)
+# ====================================================================================
+
+@app.route('/api/gestion/trazabilidad-cache', methods=['GET'])
+def get_gestion_trazabilidad_cache():
+    """
+    Devuelve numsemana, ano y DATO desde [PE].[vw_LotesChapaProduccion].
+    """
+    request_started_at = time.perf_counter()
+    try:
+        print("🔍 [Gestión] Obteniendo trazabilidad desde vw_LotesChapaProduccion...")
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT [numsemana], [ano], [DATO]
+                FROM [Digitalizacion].[PE].[vw_LotesChapaProduccion]
+                ORDER BY [ano] DESC, [numsemana] DESC
+            """)
+            rows = cursor.fetchall()
+            items = []
+            for r in rows:
+                items.append({
+                    'numsemana': r[0],
+                    'ano':       r[1],
+                    'dato':      str(r[2] or ''),
+                })
+            print(f"✅ [Gestión] {len(items)} filas de trazabilidad en {time.perf_counter() - request_started_at:.2f}s")
+            return jsonify({'success': True, 'items': items, 'total': len(items)})
+    except Exception as e:
+        import traceback
+        print(f"❌ Error obteniendo trazabilidad: {e}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# ====================================================================================
+# ENDPOINTS PARA CONFIGURACIÓN GENERAL (config.json)
+# ====================================================================================
+
+_CONFIG_FILE = os.path.join(BASE_DIR, 'api', 'config.json')
+
+
+def _read_config():
+    """Lee el fichero config.json. Devuelve {} si no existe o está corrupto."""
+    try:
+        if os.path.exists(_CONFIG_FILE):
+            with open(_CONFIG_FILE, 'r', encoding='utf-8') as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return {}
+
+
+def _write_config(data):
+    """Escribe data en config.json."""
+    with open(_CONFIG_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=2)
+
+
+@app.route('/api/config', methods=['GET'])
+def get_config():
+    """Devuelve la configuración general (config.json)."""
+    try:
+        return jsonify({'success': True, 'config': _read_config()})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/config', methods=['PUT'])
+def update_config():
+    """Actualiza uno o varios campos de la configuración general."""
+    try:
+        data = request.get_json() or {}
+        cfg = _read_config()
+        cfg.update(data)
+        _write_config(cfg)
+        print(f'✅ config.json actualizado: {data}')
+        return jsonify({'success': True, 'config': cfg})
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+# ====================================================================================
+# ENDPOINTS PARA RUTAS GESTIÓN
+# ====================================================================================
+
+@app.route('/api/rutas-gestion', methods=['GET'])
+
+def get_rutas_gestion():
+    """Obtiene todas las rutas de gestión configuradas"""
+    try:
+        print("🔍 Obteniendo rutas de gestión...")
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT
+                    [ID_Ruta],
+                    [Descripcion_Ruta],
+                    [Ruta],
+                    [Fecha_Modificacion],
+                    [Usuario_Modificacion]
+                FROM [Digitalizacion].[PE].[Rutas_Gestion]
+                ORDER BY [ID_Ruta]
+            """)
+
+            rutas = []
+            for row in cursor.fetchall():
+                fecha_str = ''
+                if row[3]:
+                    try:
+                        fecha_str = row[3].strftime('%d/%m/%Y %H:%M')
+                    except Exception:
+                        fecha_str = str(row[3])
+                rutas.append({
+                    'id_ruta': row[0],
+                    'descripcion_ruta': row[1] or '',
+                    'ruta': row[2] or '',
+                    'fecha_modificacion': fecha_str,
+                    'usuario_modificacion': row[4] or ''
+                })
+
+            print(f"✅ {len(rutas)} rutas obtenidas")
+            return jsonify({'success': True, 'rutas': rutas})
+
+    except Exception as e:
+        print(f"❌ Error obteniendo rutas de gestión: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/rutas-gestion/<int:id_ruta>', methods=['PUT'])
+def actualizar_ruta_gestion(id_ruta):
+    """Actualiza la ruta de un registro de Rutas_Gestion"""
+    try:
+        data = request.get_json() or {}
+        ruta = (data.get('ruta') or '').strip()
+        usuario = (data.get('usuario') or '').strip()
+
+        print(f"📝 Actualizando ruta ID {id_ruta}: '{ruta}' por '{usuario}'")
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                SELECT COUNT(*)
+                FROM [Digitalizacion].[PE].[Rutas_Gestion]
+                WHERE ID_Ruta = ?
+            """, (id_ruta,))
+
+            if cursor.fetchone()[0] == 0:
+                return jsonify({'success': False, 'message': 'Ruta no encontrada'}), 404
+
+            cursor.execute("""
+                UPDATE [Digitalizacion].[PE].[Rutas_Gestion]
+                SET [Ruta] = ?,
+                    [Fecha_Modificacion] = GETDATE(),
+                    [Usuario_Modificacion] = ?
+                WHERE ID_Ruta = ?
+            """, (ruta if ruta else None, usuario if usuario else None, id_ruta))
+
+            conn.commit()
+
+            print(f"✅ Ruta {id_ruta} actualizada correctamente")
+            return jsonify({'success': True, 'message': 'Ruta actualizada correctamente'})
+
+    except Exception as e:
+        print(f"❌ Error actualizando ruta {id_ruta}: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/rutas-gestion', methods=['POST'])
+def crear_ruta_gestion():
+    """Crea una nueva fila en Rutas_Gestion (usado para añadir rutas adicionales de chapa)"""
+    try:
+        data = request.get_json() or {}
+        descripcion = (data.get('descripcion_ruta') or '').strip()
+        ruta = (data.get('ruta') or '').strip()
+        usuario = (data.get('usuario') or '').strip()
+
+        if not descripcion:
+            return jsonify({'success': False, 'message': 'descripcion_ruta es obligatorio'}), 400
+
+        print(f"📝 Creando nueva ruta: descripcion='{descripcion}', ruta='{ruta}'")
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+
+            cursor = conn.cursor()
+            cursor.execute("""
+                INSERT INTO [Digitalizacion].[PE].[Rutas_Gestion]
+                    ([Descripcion_Ruta], [Ruta], [Fecha_Modificacion], [Usuario_Modificacion])
+                OUTPUT INSERTED.ID_Ruta
+                VALUES (?, ?, GETDATE(), ?)
+            """, (descripcion, ruta if ruta else None, usuario if usuario else None))
+            new_id = cursor.fetchone()[0]
+            conn.commit()
+            print(f"✅ Nueva ruta creada ID={new_id}")
+            return jsonify({'success': True, 'id_ruta': new_id, 'message': 'Ruta creada correctamente'})
+
+    except Exception as e:
+        print(f"❌ Error creando ruta: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
+@app.route('/api/rutas-gestion/<int:id_ruta>', methods=['DELETE'])
+def eliminar_ruta_gestion(id_ruta):
+    """Elimina una fila de Rutas_Gestion. Solo permite eliminar filas de 'Ruta certificados de chapa'."""
+    try:
+        print(f"🗑️ Eliminando ruta ID={id_ruta}")
+
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT [Descripcion_Ruta] FROM [Digitalizacion].[PE].[Rutas_Gestion] WHERE ID_Ruta = ?
+            """, (id_ruta,))
+            row = cursor.fetchone()
+            if not row:
+                return jsonify({'success': False, 'message': 'Ruta no encontrada'}), 404
+
+            if row[0] != 'Ruta certificados de chapa':
+                return jsonify({'success': False, 'message': 'Solo se pueden eliminar rutas de tipo "Ruta certificados de chapa"'}), 403
+
+            cursor.execute("""
+                DELETE FROM [Digitalizacion].[PE].[Rutas_Gestion] WHERE ID_Ruta = ?
+            """, (id_ruta,))
+            conn.commit()
+            print(f"✅ Ruta ID={id_ruta} eliminada")
+            return jsonify({'success': True, 'message': 'Ruta eliminada correctamente'})
+
+    except Exception as e:
+        print(f"❌ Error eliminando ruta {id_ruta}: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
 if __name__ == '__main__':
     print("🚀 Iniciando aplicación Checklist Power...")
     print("📦 Versión: 2.0 | Header EMESA + Widget integrado")
@@ -8033,7 +9663,9 @@ if __name__ == '__main__':
     
     if cert_file and key_file:
         # Ejecutar con HTTPS usando ssl_context
-        print(f"\n🔒 Iniciando servidor HTTPS en https://192.168.253.9:3007")
+        print(f"\n🔒 Iniciando servidor HTTPS en https://127.0.0.1:3007")
+        print(f"🔒 Acceso local también disponible en https://localhost:3007")
+        print(f"🌐 Acceso en red disponible en https://192.168.253.9:3007")
         print(f"⚠️  Nota: El navegador mostrará advertencia de seguridad (certificado auto-firmado)")
         print(f"⚠️  Esto es NORMAL. Continúa de todas formas para usar el lector de QR.\n")
         try:
@@ -8048,6 +9680,8 @@ if __name__ == '__main__':
             app.run(host='0.0.0.0', port=3007, ssl_context=(cert_file, key_file), debug=False, use_reloader=False, threaded=True)
     else:
         # Fallback a HTTP si hay problema con certificado
-        print(f"\n⚠️  Iniciando servidor HTTP en http://192.168.253.9:3007")
+        print(f"\n⚠️  Iniciando servidor HTTP en http://127.0.0.1:3007")
+        print(f"⚠️  Acceso local también disponible en http://localhost:3007")
+        print(f"🌐 Acceso en red disponible en http://192.168.253.9:3007")
         print(f"⚠️  El lector de QR NO funcionará desde direcciones IP sin HTTPS\n")
         app.run(host='0.0.0.0', port=3007, debug=False, use_reloader=False, threaded=True)
