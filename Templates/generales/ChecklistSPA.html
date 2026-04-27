@@ -5914,6 +5914,14 @@
 
         <!-- ===== TAB 3: JOIN ===== -->
         <div id="gestionJoinContainer" class="controls-table gestion-table-wrapper" style="display: block;">
+          <!-- Toggle filtro semáforo -->
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;padding:8px 0;border-bottom:1px solid #dce3ee;">
+            <span style="font-size:0.92em;color:#555;font-weight:600;">Mostrar:</span>
+            <button id="btnJoinTodos"  class="btn btn-primary"    style="font-size:0.85em;padding:4px 14px;" onclick="setJoinSemaforoFiltro('todos')">📋 Todos</button>
+            <button id="btnJoinVerde"  class="btn btn-secondary"  style="font-size:0.85em;padding:4px 14px;" onclick="setJoinSemaforoFiltro('verde')">🟢 Verde (OK)</button>
+            <button id="btnJoinRojo"   class="btn btn-secondary"  style="font-size:0.85em;padding:4px 14px;" onclick="setJoinSemaforoFiltro('rojo')">🔴 Rojo (NOK)</button>
+            <span id="gestionJoinSemaforoCount" style="font-size:0.82em;color:#555;margin-left:6px;"></span>
+          </div>
           <table class="gestion-pedidos-table gestion-join-table">
             <thead>
               <tr>
@@ -7392,6 +7400,7 @@
     // Tab 3: Join
     let gestionJoinData = [];      // raw rows
     let gestionJoinLoaded = false;
+    let gestionJoinSemaforoFiltro = 'todos'; // 'todos' | 'verde' | 'rojo'
     let gestionExportacionesData = {};  // NumPedido -> {fecha, carpeta}
     let gestionExportandoPedidos = new Set(); // NumPedidos actualmente exportando
     let gestionJoinFilters = { num_pedido: '', num_armario: '', cantidad: '', semana_entrega: '', trazabilidad: '' };
@@ -8304,13 +8313,50 @@
         <strong>${icon} ${escapeGestionHtml(label)}</strong>: ${escapeGestionHtml(detail)}
       </div>`;
     }
+    function setJoinSemaforoFiltro(valor) {
+      gestionJoinSemaforoFiltro = valor;
+      // Actualizar estilos de botones
+      const btns = { todos: 'btnJoinTodos', verde: 'btnJoinVerde', rojo: 'btnJoinRojo' };
+      Object.entries(btns).forEach(([k, id]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.className = k === valor ? 'btn btn-primary' : 'btn btn-secondary';
+      });
+      renderGestionJoinTable();
+    }
+
     function renderGestionJoinTable() {
       const tbody = document.getElementById('gestionJoinTableBody');
       const container = document.getElementById('gestionJoinContainer');
       const emptyMsg  = document.getElementById('gestionEmptyMessage');
       const loading   = document.getElementById('gestionLoadingMessage');
       if (!tbody) return;
-      const groups = getFilteredGroupedJoin();
+      const allGroups = getFilteredGroupedJoin();
+      // Aplicar filtro semáforo
+      const groups = allGroups.filter(g => {
+        if (gestionJoinSemaforoFiltro === 'todos') return true;
+        const cantidad = g.cantidad !== null && g.cantidad !== undefined ? g.cantidad : '—';
+        const cantidadEsperada = Number(cantidad);
+        const checklistOk = cantidad !== '—' && !Number.isNaN(cantidadEsperada) && g.armarios.length === cantidadEsperada;
+        const pinturaOk = g.armarios.length > 0 && g.armarios.filter(a => !!a.cert_pintura).length === g.armarios.length;
+        const chapaOk = g.trazabilidades.length > 0 && g.certificados_chapa_faltantes.length === 0;
+        const ok = checklistOk && pinturaOk && chapaOk;
+        return gestionJoinSemaforoFiltro === 'verde' ? ok : !ok;
+      });
+      // Actualizar contador del toggle
+      const countEl = document.getElementById('gestionJoinSemaforoCount');
+      if (countEl) {
+        const verdes = allGroups.filter(g => {
+          const cantidad = g.cantidad !== null && g.cantidad !== undefined ? g.cantidad : '—';
+          const cantidadEsperada = Number(cantidad);
+          const checklistOk = cantidad !== '—' && !Number.isNaN(cantidadEsperada) && g.armarios.length === cantidadEsperada;
+          const pinturaOk = g.armarios.length > 0 && g.armarios.filter(a => !!a.cert_pintura).length === g.armarios.length;
+          const chapaOk = g.trazabilidades.length > 0 && g.certificados_chapa_faltantes.length === 0;
+          return checklistOk && pinturaOk && chapaOk;
+        }).length;
+        const rojos = allGroups.length - verdes;
+        countEl.textContent = `🟢 ${verdes}  🔴 ${rojos}  (${allGroups.length} total)`;
+      }
       const summary = document.getElementById('gestionPedidosSummary');
       if (summary) summary.textContent = `Mostrando ${groups.length} pedidos combinados (${gestionJoinData.length} armarios totales)`;
       if (gestionJoinData.length === 0) {

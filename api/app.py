@@ -9056,7 +9056,34 @@ def exportar_documentacion_pedido():
 
 @app.route('/api/gestion/pedidos-cache', methods=['GET'])
 def get_gestion_pedidos_cache():
-    pass
+    """Devuelve todos los registros de Pedido_Cantidad_SemanaEntrega_Cache para la vista ERP."""
+    try:
+        with ConexionODBC('Digitalizacion') as conn:
+            if not conn:
+                return jsonify({'success': False, 'message': 'Error de conexión'}), 500
+            cursor = conn.cursor()
+            cursor.execute("""
+                SELECT [NumPedido], [Cantidad], [SEMANAENTREGA], [FechaRefresco]
+                FROM [Digitalizacion].[PE].[Pedido_Cantidad_SemanaEntrega_Cache]
+                ORDER BY [FechaRefresco] DESC
+            """)
+            pedidos = []
+            for r in cursor.fetchall():
+                fecha_raw = r[3]
+                fecha_str = fecha_raw.strftime('%d/%m/%Y %H:%M') if fecha_raw else ''
+                fecha_sort = fecha_raw.strftime('%Y-%m-%dT%H:%M:%S') if fecha_raw else ''
+                pedidos.append({
+                    'num_pedido':        r[0] or '',
+                    'cantidad':          r[1],
+                    'semana_entrega':    r[2] or '',
+                    'fecha_refresco':    fecha_str,
+                    'fecha_refresco_sort': fecha_sort,
+                })
+            return jsonify({'success': True, 'pedidos': pedidos, 'total': len(pedidos)})
+    except Exception as e:
+        print(f"❌ Error en get_gestion_pedidos_cache: {e}")
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 
 @app.route('/api/gestion/exportaciones-documentacion', methods=['GET'])
