@@ -138,97 +138,44 @@ app = Flask(__name__)
 app.secret_key = 'emesa_checklist_secret_key_2025'  # Para sesiones
 CORS(app, supports_credentials=True, resources={r"/*": {"origins": "*"}}, methods=["GET", "POST", "PUT", "OPTIONS"], allow_headers=["Content-Type"])
 
-# 🆕 Configuración HTTPS para QR Scanner (navegadores requieren HTTPS para acceso a cámara desde IP)
+# 🔒 Configuración HTTPS con certificado firmado por CA interna EMESA
 def generate_self_signed_cert():
-    """Genera un certificado auto-firmado si no existe"""
-    # Cuando se ejecuta como PyInstaller, usar una carpeta consistente en el sistema (Temp o AppData)
-    # Cuando se ejecuta como script, usar la carpeta api
+    """
+    Localiza los certificados firmados por la CA interna de EMESA.
+    Orden de búsqueda:
+      1. Mismo directorio que app.py  (cert.pem / key.pem copiados al desplegar)
+      2. Carpeta Secretos de skills   (solo en desarrollo)
+    No genera certificados auto-firmados: los certificados son emitidos por la CA
+    raiz EMESA y distribuidos por GPO, por lo que no provocan advertencias en el navegador.
+    """
+    # Directorio base: junto a app.py (también funciona empaquetado con PyInstaller)
     if getattr(sys, 'frozen', False):
-        # Estamos en un ejecutable PyInstaller - usar carpeta temporal consistente
-        certs_dir = os.path.join(os.path.expanduser("~"), "AppData", "Local", "Temp", "ChecklistPower")
-        os.makedirs(certs_dir, exist_ok=True)
+        certs_dir = os.path.dirname(sys.executable)
     else:
-        # Estamos en desarrollo - usar carpeta api
-        certs_dir = os.path.dirname(__file__)
-    
+        certs_dir = os.path.dirname(os.path.abspath(__file__))
+
     cert_file = os.path.join(certs_dir, 'cert.pem')
-    key_file = os.path.join(certs_dir, 'key.pem')
-    
-    if not os.path.exists(cert_file) or not os.path.exists(key_file):
-        try:
-            print(f"📂 Ubicación de certificados: {certs_dir}")
-            print(f"📝 Cert file: {cert_file}")
-            print(f"📝 Key file: {key_file}")
-            from cryptography import x509
-            from cryptography.x509.oid import NameOID
-            from cryptography.hazmat.primitives import hashes
-            from cryptography.hazmat.primitives.asymmetric import rsa
-            from cryptography.hazmat.primitives import serialization
-            from cryptography.hazmat.backends import default_backend
-            from datetime import datetime as dt, timedelta
-            
-            print("🔐 Generando certificado auto-firmado para HTTPS...")
-            
-            # Generar clave privada
-            private_key = rsa.generate_private_key(
-                public_exponent=65537,
-                key_size=2048,
-                backend=default_backend()
-            )
-            
-            # Generar certificado
-            subject = issuer = x509.Name([
-                x509.NameAttribute(NameOID.COUNTRY_NAME, u"ES"),
-                x509.NameAttribute(NameOID.STATE_OR_PROVINCE_NAME, u"Spain"),
-                x509.NameAttribute(NameOID.LOCALITY_NAME, u"Digitalization"),
-                x509.NameAttribute(NameOID.ORGANIZATION_NAME, u"EMESA"),
-                x509.NameAttribute(NameOID.COMMON_NAME, u"192.168.253.9"),
-            ])
-            
-            cert = x509.CertificateBuilder().subject_name(
-                subject
-            ).issuer_name(
-                issuer
-            ).public_key(
-                private_key.public_key()
-            ).serial_number(
-                x509.random_serial_number()
-            ).not_valid_before(
-                dt.utcnow()
-            ).not_valid_after(
-                dt.utcnow() + timedelta(days=365)
-            ).add_extension(
-                x509.SubjectAlternativeName([
-                    x509.DNSName(u"192.168.253.9"),
-                    x509.DNSName(u"localhost"),
-                    x509.DNSName(u"127.0.0.1"),
-                ]),
-                critical=False,
-            ).sign(private_key, hashes.SHA256(), default_backend())
-            
-            # Guardar certificado
-            with open(cert_file, "wb") as f:
-                f.write(cert.public_bytes(serialization.Encoding.PEM))
-            
-            # Guardar clave privada
-            with open(key_file, "wb") as f:
-                f.write(private_key.private_bytes(
-                    encoding=serialization.Encoding.PEM,
-                    format=serialization.PrivateFormat.TraditionalOpenSSL,
-                    encryption_algorithm=serialization.NoEncryption()
-                ))
-            
-            print("✅ Certificado auto-firmado generado correctamente")
-            print(f"📂 Guardado en: {cert_file}")
-            return cert_file, key_file
-        except Exception as e:
-            print(f"⚠️ Error generando certificado: {e}")
-            import traceback
-            traceback.print_exc()
-            return None, None
-    
-    print(f"✅ Certificados encontrados en: {certs_dir}")
-    return cert_file, key_file
+    key_file  = os.path.join(certs_dir, 'key.pem')
+
+    if os.path.exists(cert_file) and os.path.exists(key_file):
+        print(f"✅ Certificado CA-EMESA encontrado en: {certs_dir}")
+        return cert_file, key_file
+
+    # Fallback: carpeta Secretos de skills (solo entorno de desarrollo)
+    secretos_dir = os.path.join(
+        os.path.expanduser("~"), ".codex", "skills", "Secretos",
+        "emesa-internal-https-ca", "servers", "192.168.253.9"
+    )
+    cert_file_s = os.path.join(secretos_dir, 'cert.pem')
+    key_file_s  = os.path.join(secretos_dir, 'key.pem')
+
+    if os.path.exists(cert_file_s) and os.path.exists(key_file_s):
+        print(f"✅ Certificado CA-EMESA encontrado en Secretos: {secretos_dir}")
+        return cert_file_s, key_file_s
+
+    print("❌ No se encontraron certificados CA-EMESA.")
+    print(f"   Copia cert.pem y key.pem en: {certs_dir}")
+    return None, None
 
 # Middleware para agregar headers de seguridad y permisos de cámara
 @app.after_request
@@ -9658,7 +9605,7 @@ if __name__ == '__main__':
     if not os.path.exists(RUTA_PDFS_COMPARTIDA):
         print(f"⚠️ ADVERTENCIA: No se encuentra el directorio compartido: {RUTA_PDFS_COMPARTIDA}")
     
-    # 🆕 Generar certificado auto-firmado para HTTPS
+    # 🔒 Cargar certificado CA-EMESA para HTTPS
     cert_file, key_file = generate_self_signed_cert()
     
     if cert_file and key_file:
@@ -9666,8 +9613,7 @@ if __name__ == '__main__':
         print(f"\n🔒 Iniciando servidor HTTPS en https://127.0.0.1:3007")
         print(f"🔒 Acceso local también disponible en https://localhost:3007")
         print(f"🌐 Acceso en red disponible en https://192.168.253.9:3007")
-        print(f"⚠️  Nota: El navegador mostrará advertencia de seguridad (certificado auto-firmado)")
-        print(f"⚠️  Esto es NORMAL. Continúa de todas formas para usar el lector de QR.\n")
+        print(f"✅  Certificado firmado por CA interna EMESA (sin advertencias si TIC distribuyó root_ca.cer).\n")
         try:
             # Importar ssl para mejor control
             import ssl

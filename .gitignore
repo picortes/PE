@@ -1,0 +1,18 @@
+# Certificados y claves privadas - NO versionar
+*.pem
+*.key
+*.cer
+*.p12
+*.pfx
+
+# Archivos generados
+PDFs_Generados/
+__pycache__/
+*.pyc
+build/
+dist/
+*.spec.bak
+
+# Entornos
+.env
+*.env
