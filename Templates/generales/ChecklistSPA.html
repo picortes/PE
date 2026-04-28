@@ -5485,7 +5485,8 @@
     .qr-scanner-video-container {
       position: relative;
       width: 100%;
-      padding-bottom: 100%;
+      height: 0;
+      padding-bottom: 75%; /* 4:3 — más compatible con cámaras Samsung que 1:1 */
       background: #000;
       overflow: hidden;
     }
@@ -5497,6 +5498,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block; /* evita espacio de inline + rendering bugs en Samsung */
     }
 
     .qr-scanner-overlay {
@@ -5606,8 +5608,8 @@
 
   </style>
 
-  <!-- Librería jsQR para detección de códigos QR -->
-  <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js"></script>
+  <!-- Librería jsQR para detección de códigos QR (local, sin depender de CDN) -->
+  <script src="/assets/js/jsqr.min.js"></script>
 </head>
 <body>
   <!-- Cabecera EMESA -->
@@ -19433,24 +19435,63 @@
         return;
       }
 
+      // Diagnóstico: verificar carga de jsQR
+      if (window._jsQRLoadError || typeof jsQR === 'undefined') {
+        console.error('❌ jsQR no está disponible — la librería CDN no cargó');
+        if (status) {
+          status.textContent = '❌ Error: librería QR no disponible. Comprueba la conexión.';
+          status.style.color = '#d32f2f';
+        }
+        return;
+      }
+
       try {
-        // Solicitar acceso a la cámara
-        qrScannerStream = await navigator.mediaDevices.getUserMedia({
+        // Intentar primero con facingMode: environment (cámara trasera)
+        // Si falla en Samsung con constraint exacto, fallback a constraint mínimo
+        let constraints = {
           video: {
-            facingMode: 'environment', // Usar cámara trasera en móviles
+            facingMode: { ideal: 'environment' }, // ideal en vez de exact — más compatible Samsung
             width: { ideal: 1280 },
             height: { ideal: 720 }
           },
           audio: false
-        });
+        };
+
+        console.log('📷 QR: solicitando getUserMedia con constraints:', JSON.stringify(constraints));
+        qrScannerStream = await navigator.mediaDevices.getUserMedia(constraints);
+
+        const track = qrScannerStream.getVideoTracks()[0];
+        console.log('📷 QR track label:', track.label);
+        console.log('📷 QR track settings:', JSON.stringify(track.getSettings()));
 
         video.srcObject = qrScannerStream;
-        video.onloadedmetadata = () => {
-          video.play();
+
+        // FIX pantalla negra: video.load() reinicia el pipeline de decodificación.
+        // Necesario en Chromium Android cuando srcObject se asigna a un elemento
+        // que ya existía sin source — sin esto el primer play() no decodifica frames.
+        video.load();
+
+        // FIX H2: esperar al evento 'playing' (no 'loadedmetadata') antes de arrancar el loop.
+        // En Samsung Android, videoWidth/videoHeight son 0 en loadedmetadata — solo están
+        // disponibles cuando el primer frame real se ha renderizado.
+        video.onplaying = () => {
+          console.log('📷 QR video playing — videoWidth:', video.videoWidth, 'videoHeight:', video.videoHeight);
           if (status) status.textContent = '📸 Escanea el código QR...';
-          // Iniciar detección de QR
           detectarQR();
         };
+
+        // muted está en el atributo HTML — play() sobre stream muted nunca es
+        // bloqueado por la política de autoplay, aunque el await rompa el user gesture.
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.error('❌ Error en video.play():', error);
+            if (status) {
+              status.textContent = `❌ No se pudo iniciar el video: ${error.message}`;
+              status.style.color = '#d32f2f';
+            }
+          });
+        }
 
       } catch (error) {
         console.error('❌ Error al acceder a la cámara:', error);
@@ -19476,6 +19517,7 @@
 
       const video = document.getElementById('qrScannerVideo');
       if (video) {
+        video.onplaying = null;
         video.srcObject = null;
       }
     }
@@ -19488,27 +19530,47 @@
       if (!video || !canvas || !qrScannerStream) return;
 
       const ctx = canvas.getContext('2d');
-      canvas.width = video.videoWidth;
-      canvas.height = video.videoHeight;
+
+      // FIX H1: NO fijar canvas.width aquí — en Samsung Android, videoWidth puede
+      // ser 0 incluso después de onloadedmetadata. Se actualiza dentro del loop.
+      let lastLoggedSize = '';
 
       const detectFrame = () => {
-        if (!qrScannerStream) return; // Salir si la cámara fue cerrada
+        if (!qrScannerStream) return; // cámara cerrada
 
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        // Actualizar dimensiones si el video ya tiene frames reales
+        const vw = video.videoWidth;
+        const vh = video.videoHeight;
 
-        // Usar jsQR para detectar QR (necesita la librería)
-        if (typeof jsQR !== 'undefined') {
-          const code = jsQR(imageData.data, imageData.width, imageData.height);
+        if (vw === 0 || vh === 0) {
+          // Video aún no tiene frames — reintentar en el siguiente frame
+          qrScannerAnimationId = requestAnimationFrame(detectFrame);
+          return;
+        }
 
-          if (code) {
-            // QR detectado
-            procesarQR(code.data);
-            return;
+        // Sincronizar canvas con resolución real del stream
+        if (canvas.width !== vw || canvas.height !== vh) {
+          canvas.width = vw;
+          canvas.height = vh;
+          const sizeKey = `${vw}x${vh}`;
+          if (sizeKey !== lastLoggedSize) {
+            console.log(`📷 QR canvas actualizado: ${vw}×${vh}`);
+            lastLoggedSize = sizeKey;
           }
         }
 
-        // Continuar detectando
+        ctx.drawImage(video, 0, 0, vw, vh);
+        const imageData = ctx.getImageData(0, 0, vw, vh);
+
+        const code = jsQR(imageData.data, imageData.width, imageData.height, {
+          inversionAttempts: 'dontInvert' // más rápido; cambiar a 'attemptBoth' si hay QR con fondo negro
+        });
+
+        if (code) {
+          procesarQR(code.data);
+          return;
+        }
+
         qrScannerAnimationId = requestAnimationFrame(detectFrame);
       };
 
@@ -19528,6 +19590,8 @@
 
       // Llenar el campo Número de Armario
       document.getElementById('numeroArmario').value = numeroArmario;
+      // Disparar 'input' para que actualizarVisibilidadSecciones() muestre el campo Referencia del Pedido
+      document.getElementById('numeroArmario').dispatchEvent(new Event('input'));
 
       // Mostrar mensaje de éxito
       const status = document.getElementById('qrScannerStatusMessage');
@@ -20309,7 +20373,7 @@
       </div>
 
       <div class="qr-scanner-video-container">
-        <video id="qrScannerVideo" class="qr-scanner-video" playsinline></video>
+        <video id="qrScannerVideo" class="qr-scanner-video" playsinline muted autoplay></video>
         <canvas id="qrScannerCanvas" style="display: none;"></canvas>
         <div class="qr-scanner-overlay">
           <div class="qr-scanner-frame"></div>
