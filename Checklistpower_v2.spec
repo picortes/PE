@@ -49,7 +49,7 @@ exe = EXE(
     a.binaries,
     a.datas,
     [],
-    name='PE_V1',
+    name='PE_V2',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,

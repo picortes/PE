@@ -9392,24 +9392,93 @@ def get_gestion_trazabilidad_cache():
 # ENDPOINTS PARA CONFIGURACIÓN GENERAL (config.json)
 # ====================================================================================
 
-_CONFIG_FILE = os.path.join(BASE_DIR, 'api', 'config.json')
+_CONFIG_FILE = os.path.join(
+    os.path.dirname(sys.executable) if getattr(sys, 'frozen', False) else BASE_DIR,
+    'config.json' if getattr(sys, 'frozen', False) else os.path.join('api', 'config.json')
+)
+
+# Clave que se almacena en Rutas_Gestion como Descripcion_Ruta
+_CFG_KEY_GAP = 'GAP trazabilidad semanas'
 
 
 def _read_config():
-    """Lee el fichero config.json. Devuelve {} si no existe o está corrupto."""
+    """
+    Lee la configuración desde BD (Rutas_Gestion) para claves conocidas,
+    y complementa con config.json para el resto.
+    Siempre devuelve al menos {}.
+    """
+    cfg = {}
+    # 1. Leer JSON como base (puede no existir en el servidor → {})
     try:
         if os.path.exists(_CONFIG_FILE):
             with open(_CONFIG_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
+                cfg = json.load(f)
     except Exception:
         pass
-    return {}
+
+    # 2. Sobreescribir con los valores de BD (tienen prioridad)
+    try:
+        with ConexionODBC('Digitalizacion') as conn:
+            if conn:
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT [Descripcion_Ruta], [Ruta]
+                    FROM [Digitalizacion].[PE].[Rutas_Gestion]
+                    WHERE [Descripcion_Ruta] = ?
+                """, (_CFG_KEY_GAP,))
+                row = cursor.fetchone()
+                if row and row[1] is not None:
+                    try:
+                        cfg['gap_trazabilidad_semanas'] = int(str(row[1]).strip())
+                    except ValueError:
+                        pass
+    except Exception:
+        pass
+
+    return cfg
 
 
 def _write_config(data):
-    """Escribe data en config.json."""
-    with open(_CONFIG_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    """
+    Escribe la configuración:
+    - gap_trazabilidad_semanas → BD (Rutas_Gestion, upsert)
+    - resto de claves          → config.json
+    """
+    # 1. Persistir GAP en BD
+    if 'gap_trazabilidad_semanas' in data:
+        try:
+            valor = str(int(data['gap_trazabilidad_semanas']))
+            with ConexionODBC('Digitalizacion') as conn:
+                if conn:
+                    cursor = conn.cursor()
+                    cursor.execute("""
+                        SELECT COUNT(*) FROM [Digitalizacion].[PE].[Rutas_Gestion]
+                        WHERE [Descripcion_Ruta] = ?
+                    """, (_CFG_KEY_GAP,))
+                    existe = cursor.fetchone()[0] > 0
+                    if existe:
+                        cursor.execute("""
+                            UPDATE [Digitalizacion].[PE].[Rutas_Gestion]
+                            SET [Ruta] = ?
+                            WHERE [Descripcion_Ruta] = ?
+                        """, (valor, _CFG_KEY_GAP))
+                    else:
+                        cursor.execute("""
+                            INSERT INTO [Digitalizacion].[PE].[Rutas_Gestion]
+                                ([Descripcion_Ruta], [Ruta])
+                            VALUES (?, ?)
+                        """, (_CFG_KEY_GAP, valor))
+                    conn.commit()
+                    print(f'✅ GAP trazabilidad guardado en BD: {valor} semanas')
+        except Exception as e:
+            print(f'⚠️ No se pudo guardar GAP en BD: {e}')
+
+    # 2. Guardar el resto en JSON (si es posible escribir)
+    try:
+        with open(_CONFIG_FILE, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+    except Exception:
+        pass  # En el servidor puede que no haya permisos de escritura junto al EXE
 
 
 @app.route('/api/config', methods=['GET'])
