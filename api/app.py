@@ -2940,7 +2940,7 @@ def _enriquecer_pedido_num_pedido(cursor, pedido):
 
     return pedido
 
-@app.route('/api/pedido/<armario>', methods=['GET'])
+@app.route('/api/pedido/armario/<armario>', methods=['GET'])
 def get_pedido_por_armario(armario):
     """Busca un pedido por número de armario (opcionalmente filtra por pauta)"""
     try:

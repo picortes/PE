@@ -6112,8 +6112,6 @@
       </div>
       
       <div class="puestos-header" style="position: relative;">
-        <h1>🏭 Puestos de Trabajo</h1>
-        <p class="subtitle">Vista de puestos y pautas configuradas</p>
         <button onclick="toggleFullScreen()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 24px; cursor: pointer; padding: 5px; border-radius: 5px; transition: background 0.3s;" title="Pantalla completa" onmouseover="this.style.background='rgba(0,0,0,0.05)'" onmouseout="this.style.background='none'">⛶</button>
       </div>
 
@@ -11498,6 +11496,13 @@
               autoGuardarChecklist();
             }, 50);
             showNotification('Foto subida correctamente', 'success');
+            // Permitir retomar foto: cambiar texto del botón y rehabilitarlo
+            if (btnCamera) {
+              btnCamera.textContent = '🔄 Retomar Foto';
+              btnCamera.disabled = false;
+            }
+            // Resetear el input para que onchange dispare aunque se elija el mismo archivo
+            inputElement.value = '';
           } else {
             if (statusSpan) {
                 statusSpan.textContent = '❌ Error';
@@ -12378,6 +12383,10 @@
             statusFoto.textContent = '✅ Foto guardada';
             statusFoto.style.color = 'green';
           }
+
+          // Mostrar opción de retomar foto al cargar un checklist ya guardado
+          botonFoto.textContent = '🔄 Retomar Foto';
+          botonFoto.disabled = false;
 
           console.log(`✅ Foto reaplicada: Control ${controlId} = "${valorParaInput}"`);
         }
@@ -13362,7 +13371,7 @@
         console.log(`🔍 Buscando armario para obtener referencia: ${numeroArmario}`);
         
         // Buscar SIN filtro de pauta para obtener cualquier pedido de ese armario
-        const response = await fetch(`/api/pedido/${encodeURIComponent(numeroArmario)}`);
+        const response = await fetch(`/api/pedido/armario/${encodeURIComponent(numeroArmario)}`);
         
         if (response.ok) {
           const pedido = await response.json();
@@ -13395,7 +13404,7 @@
         console.log(`🔍 Buscando pedido: Armario=${numeroArmario}, Pauta=${pautaActual}`);
         
         // Incluir parámetro nombre_pauta en la consulta
-        const response = await fetch(`/api/pedido/${encodeURIComponent(numeroArmario)}?nombre_pauta=${encodeURIComponent(pautaActual)}`);
+        const response = await fetch(`/api/pedido/armario/${encodeURIComponent(numeroArmario)}?nombre_pauta=${encodeURIComponent(pautaActual)}`);
         
         if (response.ok) {
           const pedido = await response.json();
